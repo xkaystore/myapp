@@ -261,10 +261,58 @@ body.dark .sidebar ul li a .tooltip {
   border-color: #2563eb;
 }
 
-/* Table */
+/* Scrollable table (table) */
 .history table {
   width: 100%;
   border-collapse: collapse;
+  display: block;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+/* Pagination */
+.pagination {
+  text-align: center;
+  margin-top: 15px;
+}
+
+.page-btn {
+  margin: 0 4px;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s, border 0.3s;
+}
+
+.page-btn:hover:not(:disabled) {
+  background: #2563eb;
+  color: white;
+  border-color: #2563eb;
+}
+
+.page-btn.active {
+  background: #2563eb;
+  color: white;
+  border-color: #2563eb;
+}
+
+.page-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Info jumlah data */
+.pagination-info {
+  text-align: center;
+  margin-top: 8px;
+  font-size: 14px;
+  color: #555;
+}
+
+body.dark .pagination-info {
+  color: #ddd;
 }
 
 .history th, .history td {
@@ -424,8 +472,7 @@ body.dark #searchInput {
   .sidebar.collapsed ul li a .tooltip {
     display: block;
   }
-}
-</style></head> 
+}</style></head> 
  <body> <!-- Navbar --> 
   <nav class="navbar"> 
    <div class="navbar-left"> <button id="sidebarToggle" class="icon-btn">☰</button> 
@@ -655,4 +702,96 @@ headers.forEach(th => {
 
 // Pastikan semua baris muncul saat load pertama
 document.querySelectorAll(".history tbody tr").forEach(tr => tr.classList.add("show"));
+
+// ==========================
+// PAGINATION
+// ==========================
+const ROWS_PER_PAGE = 50;
+let currentPage = 1;
+
+function renderTablePage(page = 1) {
+  const rows = table.querySelectorAll("tbody tr");
+  const totalRows = rows.length;
+  const totalPages = Math.ceil(totalRows / ROWS_PER_PAGE);
+
+  // Tampilkan hanya baris sesuai halaman
+  rows.forEach((row, index) => {
+    row.style.display =
+      index >= (page - 1) * ROWS_PER_PAGE && index < page * ROWS_PER_PAGE
+        ? ""
+        : "none";
+  });
+
+  renderPagination(totalPages, page, totalRows);
+}
+
+function renderPagination(totalPages, activePage, totalRows) {
+  let pagination = document.getElementById("pagination");
+  if (!pagination) {
+    pagination = document.createElement("div");
+    pagination.id = "pagination";
+    pagination.classList.add("pagination");
+    table.parentNode.appendChild(pagination);
+  }
+
+  pagination.innerHTML = "";
+
+  // Tombol Prev
+  const prevBtn = document.createElement("button");
+  prevBtn.textContent = "⬅️ Prev";
+  prevBtn.classList.add("page-btn");
+  prevBtn.disabled = activePage === 1;
+  prevBtn.addEventListener("click", () => {
+    if (currentPage > 1) {
+      currentPage--;
+      renderTablePage(currentPage);
+    }
+  });
+  pagination.appendChild(prevBtn);
+
+  // Tombol nomor halaman
+  for (let i = 1; i <= totalPages; i++) {
+    const btn = document.createElement("button");
+    btn.textContent = i;
+    btn.classList.add("page-btn");
+    if (i === activePage) btn.classList.add("active");
+
+    btn.addEventListener("click", () => {
+      currentPage = i;
+      renderTablePage(i);
+    });
+
+    pagination.appendChild(btn);
+  }
+
+  // Tombol Next
+  const nextBtn = document.createElement("button");
+  nextBtn.textContent = "Next ➡️";
+  nextBtn.classList.add("page-btn");
+  nextBtn.disabled = activePage === totalPages;
+  nextBtn.addEventListener("click", () => {
+    if (currentPage < totalPages) {
+      currentPage++;
+      renderTablePage(currentPage);
+    }
+  });
+  pagination.appendChild(nextBtn);
+
+  // Info jumlah data
+  let info = document.getElementById("pagination-info");
+  if (!info) {
+    info = document.createElement("div");
+    info.id = "pagination-info";
+    info.classList.add("pagination-info");
+    table.parentNode.appendChild(info);
+  }
+
+  const start = (activePage - 1) * ROWS_PER_PAGE + 1;
+  const end = Math.min(activePage * ROWS_PER_PAGE, totalRows);
+
+  info.textContent = `Menampilkan ${start}–${end} dari ${totalRows} entri`;
+}
+
+// Jalankan saat halaman pertama kali dibuka
+renderTablePage();
 </script></body></html>
