@@ -315,6 +315,27 @@ body.dark .pagination-info {
   color: #ddd;
 }
 
+/* Dropdown entri */
+.rows-dropdown {
+  margin-right: 10px;
+  padding: 6px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #fff;
+  cursor: pointer;
+  transition: border 0.3s, background 0.3s, color 0.3s;
+}
+
+.rows-dropdown:hover {
+  border-color: #2563eb;
+}
+
+body.dark .rows-dropdown {
+  background: #1f2937;
+  color: #fff;
+  border-color: #374151;
+}
+
 .history th, .history td {
   border: 1px solid #ccc;
   padding: 10px;
@@ -706,7 +727,7 @@ document.querySelectorAll(".history tbody tr").forEach(tr => tr.classList.add("s
 // ==========================
 // PAGINATION
 // ==========================
-const ROWS_PER_PAGE = 50;
+let ROWS_PER_PAGE = 50; // default
 let currentPage = 1;
 
 function renderTablePage(page = 1) {
@@ -735,6 +756,30 @@ function renderPagination(totalPages, activePage, totalRows) {
   }
 
   pagination.innerHTML = "";
+
+  // Dropdown jumlah entri
+  let dropdown = document.getElementById("rows-per-page");
+  if (!dropdown) {
+    dropdown = document.createElement("select");
+    dropdown.id = "rows-per-page";
+    dropdown.classList.add("rows-dropdown");
+
+    [10, 25, 50, 100].forEach(num => {
+      const opt = document.createElement("option");
+      opt.value = num;
+      opt.textContent = `${num} entri`;
+      if (num === ROWS_PER_PAGE) opt.selected = true;
+      dropdown.appendChild(opt);
+    });
+
+    dropdown.addEventListener("change", () => {
+      ROWS_PER_PAGE = parseInt(dropdown.value);
+      currentPage = 1;
+      renderTablePage(currentPage);
+    });
+
+    pagination.appendChild(dropdown);
+  }
 
   // Tombol Prev
   const prevBtn = document.createElement("button");
