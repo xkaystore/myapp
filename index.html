@@ -2,397 +2,452 @@
 <html lang="id">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Xkay Store • Convert & Topup PayPal</title>
 
+  <!-- Font & Tailwind -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       darkMode: 'class',
       theme: {
         extend: {
-          fontFamily: { sans: ['Inter', 'sans-serif'] },
-          colors: { accent: { DEFAULT: '#2563EB', hover: '#1D4ED8' } },
-        },
-      },
-    };
+          fontFamily: { sans: ['Inter','ui-sans-serif','system-ui'] },
+          colors: { brand: { DEFAULT:'#2563EB', dark:'#1E40AF' } }
+        }
+      }
+    }
   </script>
 
+  <!-- Supabase -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
   <meta name="theme-color" content="#2563EB" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0' x2='1' y1='0' y2='1'><stop offset='0%' stop-color='%232563EB'/><stop offset='100%' stop-color='%231D4ED8'/></linearGradient></defs><rect width='100' height='100' rx='22' fill='url(%23g)'/><text x='50%' y='57%' font-size='56' text-anchor='middle' fill='white' font-family='Inter, Arial, sans-serif' font-weight='600'>X</text></svg>'"/>
+
   <style>
-    body { font-family: 'Inter', sans-serif; }
-    .card-glass { backdrop-filter: blur(16px) saturate(180%); -webkit-backdrop-filter: blur(16px) saturate(180%); }
-    .table-container thead th { position: sticky; top: 0; z-index: 1; }
-    .form-input { @apply w-full rounded-lg px-2.5 py-2 sm:px-3 sm:py-2.5 text-sm sm:text-base bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-200 ring-1 ring-slate-300 dark:ring-slate-600 placeholder:text-slate-400 dark:placeholder:text-slate-500; }
-    .opt-btn { @apply h-11 sm:h-12 rounded-lg bg-slate-100 hover:bg-slate-200 ring-1 ring-slate-200 text-xs sm:text-sm font-semibold; }
+    body{font-family:Inter,system-ui,Arial,Helvetica,sans-serif}
+    .glass{backdrop-filter:saturate(180%) blur(16px); -webkit-backdrop-filter:saturate(180%) blur(16px)}
+    .sticky-head th{position:sticky; top:0; z-index:1}
+    /* scrollbars */
+    ::-webkit-scrollbar{width:8px;height:8px}
+    ::-webkit-scrollbar-thumb{background:#CBD5E1;border-radius:999px}
+    html.dark ::-webkit-scrollbar-thumb{background:#475569}
+    /* small press feedback */
+    .btn{transition:transform .06s ease,opacity .2s ease}
+    .btn:active{transform:translateY(1px) scale(.99)}
   </style>
 </head>
-<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 min-h-screen antialiased selection:bg-accent/20">
-  
-  <!-- HEADER -->
-  <header class="card-glass sticky top-0 z-40 bg-white/70 dark:bg-slate-900/70 ring-1 ring-slate-200 dark:ring-slate-800">
-    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between py-3 sm:py-4">
-        <div class="flex items-center gap-2 sm:gap-3">
-          <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-accent grid place-items-center">
-            <span class="text-lg sm:text-xl font-semibold text-white">X</span>
-          </div>
+
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 min-h-screen selection:bg-brand/20">
+  <!-- Header -->
+  <header class="glass sticky top-0 z-40 bg-white/70 dark:bg-slate-900/70 ring-1 ring-slate-200 dark:ring-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between py-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-brand grid place-items-center"><span class="text-white font-semibold text-xl">X</span></div>
           <div>
-            <h1 class="text-base sm:text-lg font-bold">Xkay Store</h1>
-            <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400">Convert & Topup PayPal</p>
+            <h1 class="text-lg sm:text-xl font-bold leading-tight">Xkay Store</h1>
+            <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">Convert & Topup PayPal • cepat & aman</p>
           </div>
         </div>
         <div class="flex items-center gap-2 sm:gap-4">
           <div class="hidden sm:flex items-center gap-4 text-sm">
             <div class="text-center">
-              <div class="text-slate-500 dark:text-slate-400">Convert</div>
-              <div id="rateFixedConvert" class="text-slate-700 dark:text-slate-200"></div>
+              <div class="text-slate-500 dark:text-slate-400">Convert (tetap)</div>
+              <div id="rateFixedConvert" class="font-semibold"></div>
             </div>
             <div class="text-center">
-              <div class="text-slate-500 dark:text-slate-400">Topup</div>
-              <div id="rateFixedTopup" class="text-slate-700 dark:text-slate-200"></div>
+              <div class="text-slate-500 dark:text-slate-400">Topup (tetap)</div>
+              <div id="rateFixedTopup" class="font-semibold"></div>
             </div>
             <div class="text-center">
-              <div class="text-slate-500 dark:text-slate-400">Live</div>
-              <div id="rateLive" class="min-w-[60px] text-slate-700 dark:text-slate-200"></div>
+              <div class="text-slate-500 dark:text-slate-400">Kurs real-time</div>
+              <div id="rateLive" class="min-w-[84px] font-semibold">Memuat…</div>
             </div>
           </div>
-          <button id="themeToggle" class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800">
-            <svg id="theme-icon-dark" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" /></svg>
-            <svg id="theme-icon-light" class="h-5 w-5 hidden" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 018 0z" clip-rule="evenodd" /></svg>
+          <button id="themeToggle" class="btn p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800" aria-label="Toggle theme">
+            <svg id="icon-dark" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/></svg>
+            <svg id="icon-light" class="h-5 w-5 hidden" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 10-1.414 1.414zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM4 11a1 1 0 100-2H3a1 1 0 100 2h1z"/></svg>
           </button>
         </div>
       </div>
     </div>
   </header>
 
-  <!-- MAIN -->
-  <main class="relative py-6 sm:py-10">
-    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 grid gap-5 md:grid-cols-5">
-      
-      <!-- FORM -->
-      <div class="md:col-span-3 card-glass bg-white/70 dark:bg-slate-800/70 rounded-2xl p-4 sm:p-6 ring-1 ring-slate-200 dark:ring-slate-800">
-        <h2 class="text-xl sm:text-2xl font-bold mb-1">Buat Pesanan Baru</h2>
-        <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mb-4">Detail akan dikirim ke WhatsApp Admin.</p>
-        <form id="orderForm" class="space-y-3 sm:space-y-4">
-          <div class="grid sm:grid-cols-2 gap-3">
+  <!-- Main -->
+  <main class="relative py-8 sm:py-12">
+    <div aria-hidden="true" class="absolute inset-0 pointer-events-none">
+      <div class="absolute -top-32 left-1/2 -translate-x-1/2 w-[80vw] max-w-4xl h-[500px] rounded-full bg-brand/10 blur-3xl"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid gap-6 md:gap-8 md:grid-cols-5 relative">
+      <!-- Order Form -->
+      <div class="md:col-span-3 glass bg-white/70 dark:bg-slate-800/70 ring-1 ring-slate-200 dark:ring-slate-800 rounded-2xl p-6 sm:p-8">
+        <h2 class="text-2xl font-bold mb-1">Buat Pesanan Baru</h2>
+        <p class="text-slate-500 dark:text-slate-400 text-sm mb-6">Tanpa login. Detail terkirim ke WhatsApp admin & tersimpan di riwayat.</p>
+
+        <form id="orderForm" class="space-y-4" novalidate>
+          <div class="grid sm:grid-cols-2 gap-4">
             <div>
-              <label class="block text-xs sm:text-sm font-medium mb-1">Nama Lengkap</label>
-              <input id="name" type="text" class="form-input" placeholder="Nama Anda" required>
+              <label for="name" class="block text-sm font-medium mb-1.5 text-slate-600 dark:text-slate-300">Nama Lengkap</label>
+              <input id="name" type="text" autocomplete="name" required class="w-full rounded-lg px-3 py-2 bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-slate-100 ring-1 ring-slate-300 dark:ring-slate-600 focus:ring-brand placeholder:text-slate-400 dark:placeholder:text-slate-500" placeholder="Nama Anda" />
             </div>
             <div>
-              <label class="block text-xs sm:text-sm font-medium mb-1">Email PayPal</label>
-              <input id="paypal_email" type="email" class="form-input" placeholder="email@paypal.com" required>
+              <label for="paypal_email" class="block text-sm font-medium mb-1.5 text-slate-600 dark:text-slate-300">Email PayPal</label>
+              <input id="paypal_email" type="email" autocomplete="email" required class="w-full rounded-lg px-3 py-2 bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-slate-100 ring-1 ring-slate-300 dark:ring-slate-600 focus:ring-brand placeholder:text-slate-400 dark:placeholder:text-slate-500" placeholder="email@paypal.com" />
             </div>
           </div>
-          <div class="grid sm:grid-cols-2 gap-3">
+
+          <div class="grid sm:grid-cols-2 gap-4">
             <div>
-              <label class="block text-xs sm:text-sm font-medium mb-1">Jenis Transaksi</label>
-              <select id="type" class="form-input" required>
+              <label for="type" class="block text-sm font-medium mb-1.5 text-slate-600 dark:text-slate-300">Jenis Transaksi</label>
+              <select id="type" required class="w-full rounded-lg px-3 py-2 bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-slate-100 ring-1 ring-slate-300 dark:ring-slate-600 focus:ring-brand">
                 <option value="convert">Convert (PayPal → Tujuan)</option>
                 <option value="topup">Topup (Tujuan → PayPal)</option>
               </select>
             </div>
             <div>
-              <label class="block text-xs sm:text-sm font-medium mb-1">Tujuan Penerimaan</label>
-              <button type="button" id="providerBtn" class="form-input text-left">Pilih Bank / E-Wallet</button>
-              <p id="selectedProvider" class="text-[11px] sm:text-xs text-slate-500 mt-1">Belum dipilih</p>
+              <label for="providerBtn" class="block text-sm font-medium mb-1.5 text-slate-600 dark:text-slate-300">Tujuan Penerimaan</label>
+              <button type="button" id="providerBtn" class="btn w-full h-10 rounded-lg px-3 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 ring-1 ring-slate-300 dark:ring-slate-600">Pilih Bank / E-Wallet</button>
+              <p id="selectedProvider" class="text-xs text-slate-500 dark:text-slate-400 mt-1.5">Belum dipilih</p>
             </div>
           </div>
-          <div class="grid sm:grid-cols-2 gap-3">
+
+          <div class="grid sm:grid-cols-2 gap-4">
             <div>
-              <label class="block text-xs sm:text-sm font-medium mb-1">No. Rekening / Akun</label>
-              <input id="account" type="text" class="form-input" placeholder="1234567890" required>
+              <label for="account" class="block text-sm font-medium mb-1.5 text-slate-600 dark:text-slate-300">No. Rekening / Akun</label>
+              <input id="account" type="text" required class="w-full rounded-lg px-3 py-2 bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-slate-100 ring-1 ring-slate-300 dark:ring-slate-600 focus:ring-brand placeholder:text-slate-400 dark:placeholder:text-slate-500" placeholder="Contoh: 1234567890" />
             </div>
             <div>
-              <label class="block text-xs sm:text-sm font-medium mb-1">Nominal (USD)</label>
-              <input id="usd" type="number" step="0.01" min="1" class="form-input" placeholder="0.00" required>
+              <label for="usd" class="block text-sm font-medium mb-1.5 text-slate-600 dark:text-slate-300">Nominal (USD)</label>
+              <input id="usd" type="number" step="0.01" min="0.01" required class="w-full rounded-lg px-3 py-2 bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-slate-100 ring-1 ring-slate-300 dark:ring-slate-600 focus:ring-brand placeholder:text-slate-400 dark:placeholder:text-slate-500" placeholder="0.00" />
             </div>
           </div>
-          <div class="flex justify-between rounded-lg bg-slate-100 dark:bg-slate-700/50 px-3 py-2 text-sm">
-            <span>Estimasi diterima (IDR):</span>
-            <span id="idr" class="font-semibold">Rp 0</span>
+
+          <div class="flex items-center justify-between rounded-lg bg-slate-100 dark:bg-slate-700/50 p-3">
+            <span class="text-sm text-slate-500 dark:text-slate-400">Estimasi diterima (IDR, kurs tetap):</span>
+            <span id="idr" class="font-semibold text-lg">Rp 0</span>
           </div>
-          <button id="submitBtn" type="submit" class="w-full h-11 sm:h-12 rounded-lg bg-accent hover:bg-accent-hover text-white font-semibold flex items-center justify-center">
-            <span>Kirim Order via WhatsApp</span>
-            <svg id="submit-spinner" class="w-5 h-5 ml-2 hidden animate-spin" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.37 0 0 5.37 0 12h4z"></path></svg>
+
+          <button id="submitBtn" type="submit" class="btn w-full h-12 flex items-center justify-center rounded-lg bg-brand hover:bg-brand-dark text-white font-semibold">
+            <span class="inline-block">Kirim Order via WhatsApp</span>
+            <svg id="submitSpinner" class="w-5 h-5 ml-2 hidden animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
           </button>
+          <p class="text-[11px] text-slate-500 dark:text-slate-400">Dengan mengirim, Anda setuju data disimpan untuk riwayat transaksi.</p>
         </form>
       </div>
 
-      <!-- SIDEBAR -->
-      <aside class="md:col-span-2 space-y-5">
-        <!-- KURS -->
-        <div class="card-glass bg-white/70 dark:bg-slate-800/70 rounded-2xl p-4 sm:p-6 ring-1 ring-slate-200 dark:ring-slate-800">
-          <h3 class="text-base sm:text-lg font-bold mb-3">Informasi Kurs</h3>
-          <div class="space-y-2 sm:space-y-3 text-sm sm:text-base">
-            <div class="p-3 sm:p-4 rounded-lg bg-slate-100 dark:bg-slate-800">
-              <div>Convert (tetap)</div><div id="fixedConvertBig" class="font-bold text-lg sm:text-2xl"></div>
+      <!-- Side: Kurs + Riwayat -->
+      <aside class="md:col-span-2 space-y-6 md:space-y-8">
+        <div class="glass bg-white/70 dark:bg-slate-800/70 ring-1 ring-slate-200 dark:ring-slate-800 rounded-2xl p-6">
+          <h3 class="text-lg font-bold mb-4">Informasi Kurs</h3>
+          <div class="space-y-3">
+            <div class="p-4 rounded-lg bg-slate-100 dark:bg-slate-800">
+              <div class="text-slate-500 dark:text-slate-400 text-sm">Convert (tetap)</div>
+              <div id="fixedConvertBig" class="mt-1 text-2xl font-bold"></div>
             </div>
-            <div class="p-3 sm:p-4 rounded-lg bg-slate-100 dark:bg-slate-800">
-              <div>Topup (tetap)</div><div id="fixedTopupBig" class="font-bold text-lg sm:text-2xl"></div>
+            <div class="p-4 rounded-lg bg-slate-100 dark:bg-slate-800">
+              <div class="text-slate-500 dark:text-slate-400 text-sm">Topup (tetap)</div>
+              <div id="fixedTopupBig" class="mt-1 text-2xl font-bold"></div>
             </div>
-            <div class="p-3 sm:p-4 rounded-lg bg-slate-100 dark:bg-slate-800">
-              <div class="flex justify-between items-center">
-                <span>Kurs Real-Time</span>
-                <button id="refreshRate" class="px-2 py-1 text-xs rounded bg-accent text-white">Refresh</button>
+            <div class="p-4 rounded-lg bg-slate-100 dark:bg-slate-800">
+              <div class="flex items-center justify-between">
+                <span class="text-sm text-slate-500 dark:text-slate-400">Kurs Real-Time (Info)</span>
+                <button id="refreshRate" class="btn text-xs px-2 py-1 rounded-md bg-brand/90 hover:bg-brand text-white">Refresh</button>
               </div>
-              <div id="liveRateBig" class="font-bold text-lg sm:text-2xl mt-1"></div>
-              <div id="liveMeta" class="text-[10px] sm:text-xs text-slate-500 mt-1"></div>
+              <div class="mt-1">
+                <div id="liveRateBig" class="text-2xl font-bold min-h-[32px]">Memuat…</div>
+                <div id="liveMeta" class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Sumber: —</div>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- HISTORY -->
-        <div class="card-glass bg-white/70 dark:bg-slate-800/70 rounded-2xl p-4 sm:p-6 ring-1 ring-slate-200 dark:ring-slate-800">
-          <div class="flex justify-between items-center mb-3">
-            <h3 class="text-base sm:text-lg font-bold">Riwayat Transaksi</h3>
-            <button id="reloadHistory" class="px-2 py-1 text-xs rounded bg-slate-200 dark:bg-slate-700">Reload</button>
+        <div class="glass bg-white/70 dark:bg-slate-800/70 ring-1 ring-slate-200 dark:ring-slate-800 rounded-2xl p-6">
+          <div class="flex items-center justify-between gap-4 mb-4">
+            <h3 class="text-lg font-bold">Riwayat Transaksi</h3>
+            <button id="reloadHistory" class="btn text-xs px-2 py-1 rounded-md bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 ring-1 ring-slate-300 dark:ring-slate-600">Reload</button>
           </div>
-          <div class="rounded-lg ring-1 ring-slate-200 dark:ring-slate-700 bg-slate-100 dark:bg-slate-900/50 overflow-hidden">
-            <div class="table-container max-h-72 overflow-y-auto overflow-x-auto">
-              <table class="min-w-full text-xs sm:text-sm text-left">
-                <thead class="bg-slate-200/60 dark:bg-slate-800/60">
-                  <tr>
-                    <th class="p-2 sm:p-3">Tanggal</th>
-                    <th class="p-2 sm:p-3">Tipe</th>
-                    <th class="p-2 sm:p-3">Provider</th>
-                    <th class="p-2 sm:p-3">Nama</th>
-                    <th class="p-2 sm:p-3">USD</th>
-                    <th class="p-2 sm:p-3">IDR</th>
-                  </tr>
-                </thead>
-                <tbody id="history" class="divide-y divide-slate-200 dark:divide-slate-700"></tbody>
-              </table>
+
+          <div class="rounded-lg ring-1 ring-slate-200 dark:ring-slate-700 bg-slate-50 dark:bg-slate-900/40 overflow-hidden">
+            <!-- Horizontal scroll for narrow screens -->
+            <div class="overflow-x-auto">
+              <!-- Vertical scroll wrapper -->
+              <div class="max-h-[420px] overflow-y-auto">
+                <table class="min-w-[720px] w-full text-left text-sm">
+                  <thead class="sticky-head bg-slate-200/60 dark:bg-slate-800/60 text-slate-600 dark:text-slate-300">
+                    <tr>
+                      <th class="p-3">Tanggal</th>
+                      <th class="p-3">Tipe</th>
+                      <th class="p-3">Kategori</th>
+                      <th class="p-3">Provider</th>
+                      <th class="p-3">Nama</th>
+                      <th class="p-3">USD</th>
+                      <th class="p-3">IDR</th>
+                    </tr>
+                  </thead>
+                  <tbody id="history" class="divide-y divide-slate-200 dark:divide-slate-700">
+                    <tr><td class="p-3" colspan="7">Memuat…</td></tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
-          <p id="historyState" class="hidden text-center text-xs sm:text-sm mt-3"></p>
+          <p id="historyState" class="hidden text-center text-slate-500 dark:text-slate-400 text-sm mt-4"></p>
         </div>
       </aside>
     </div>
   </main>
 
-  <!-- MODAL PROVIDER -->
-  <div id="providerModal" class="fixed inset-0 z-50 hidden">
-    <div id="providerOverlay" class="absolute inset-0 bg-black/60"></div>
-    <div class="relative mx-auto mt-20 w-full max-w-sm px-3">
-      <div class="rounded-2xl bg-white p-4 sm:p-5">
-        <div class="flex justify-between items-center mb-3">
-          <h3 class="text-base sm:text-lg font-semibold">Pilih Bank / E-Wallet</h3>
-          <button id="closeProvider" class="px-2 py-1 rounded bg-slate-100 text-xs">Tutup</button>
+  <!-- Provider Modal -->
+  <div id="providerModal" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="providerTitle">
+    <div id="providerOverlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm" aria-hidden="true"></div>
+    <div class="relative mx-auto mt-20 w-[92%] max-w-md">
+      <div class="rounded-2xl bg-white text-slate-800 shadow-2xl ring-1 ring-black/10 p-5">
+        <div class="flex items-center justify-between">
+          <h3 id="providerTitle" class="text-lg font-semibold">Pilih Bank / E-Wallet</h3>
+          <button id="closeProvider" class="btn rounded-lg px-2 py-1 text-sm bg-slate-100 hover:bg-slate-200">Tutup</button>
         </div>
-        <p class="text-xs sm:text-sm font-semibold mb-2">Bank Lokal</p>
-        <div class="grid grid-cols-2 gap-2">
-          <button class="opt-btn" data-category="Bank Lokal" data-provider="BCA">BCA</button>
-          <button class="opt-btn" data-category="Bank Lokal" data-provider="BRI">BRI</button>
-          <button class="opt-btn" data-category="Bank Lokal" data-provider="BNI">BNI</button>
-          <button class="opt-btn" data-category="Bank Lokal" data-provider="Mandiri">Mandiri</button>
+
+        <p class="mt-4 mb-2 text-sm font-semibold text-slate-500">Bank Lokal</p>
+        <div class="grid grid-cols-2 gap-3">
+          <button data-category="Bank Lokal" data-provider="BCA" class="opt-btn h-12 rounded-lg bg-slate-100 hover:bg-slate-200 ring-1 ring-slate-200 text-sm font-semibold">BCA</button>
+          <button data-category="Bank Lokal" data-provider="BRI" class="opt-btn h-12 rounded-lg bg-slate-100 hover:bg-slate-200 ring-1 ring-slate-200 text-sm font-semibold">BRI</button>
+          <button data-category="Bank Lokal" data-provider="BNI" class="opt-btn h-12 rounded-lg bg-slate-100 hover:bg-slate-200 ring-1 ring-slate-200 text-sm font-semibold">BNI</button>
+          <button data-category="Bank Lokal" data-provider="Mandiri" class="opt-btn h-12 rounded-lg bg-slate-100 hover:bg-slate-200 ring-1 ring-slate-200 text-sm font-semibold">Mandiri</button>
         </div>
-        <p class="text-xs sm:text-sm font-semibold mt-3 mb-2">E-Wallet</p>
-        <div class="grid grid-cols-2 gap-2">
-          <button class="opt-btn" data-category="E-Wallet" data-provider="OVO">OVO</button>
-          <button class="opt-btn" data-category="E-Wallet" data-provider="Dana">Dana</button>
-          <button class="opt-btn" data-category="E-Wallet" data-provider="GoPay">GoPay</button>
-          <button class="opt-btn" data-category="E-Wallet" data-provider="ShopeePay">ShopeePay</button>
+
+        <p class="mt-4 mb-2 text-sm font-semibold text-slate-500">E-Wallet</p>
+        <div class="grid grid-cols-2 gap-3">
+          <button data-category="E-Wallet" data-provider="OVO" class="opt-btn h-12 rounded-lg bg-slate-100 hover:bg-slate-200 ring-1 ring-slate-200 text-sm font-semibold">OVO</button>
+          <button data-category="E-Wallet" data-provider="Dana" class="opt-btn h-12 rounded-lg bg-slate-100 hover:bg-slate-200 ring-1 ring-slate-200 text-sm font-semibold">Dana</button>
+          <button data-category="E-Wallet" data-provider="GoPay" class="opt-btn h-12 rounded-lg bg-slate-100 hover:bg-slate-200 ring-1 ring-slate-200 text-sm font-semibold">GoPay</button>
+          <button data-category="E-Wallet" data-provider="ShopeePay" class="opt-btn h-12 rounded-lg bg-slate-100 hover:bg-slate-200 ring-1 ring-slate-200 text-sm font-semibold">ShopeePay</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- TOAST -->
-  <div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 translate-y-20 opacity-0 transition-all px-3 py-2 text-xs sm:text-sm rounded-lg text-white"></div>
+  <!-- Toast -->
+  <div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 translate-y-20 opacity-0 transition-all duration-300 px-4 py-2 rounded-lg text-sm font-semibold shadow-2xl text-white"></div>
 
-  <!-- SCRIPT -->
   <script type="module">
-    // === KONFIG SUPABASE ===
-    const SUPABASE_URL = "https://rhujpinlutjiztyonmas.supabase.co";
-    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJodWpwaW5sdXRqaXp0eW9ubWFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczMDQyOTIsImV4cCI6MjA3Mjg4MDI5Mn0.zcfDUOHTeBYydFFscwmy3U9yryHiItTVJPLRurUlBvY";
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    // ====== KONFIGURASI (ubah jika perlu) ======
+    const CONFIG = {
+      SUPABASE_URL : "https://rhujpinlutjiztyonmas.supabase.co",
+      SUPABASE_ANON: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJodWpwaW5sdXRqaXp0eW9ubWFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczMDQyOTIsImV4cCI6MjA3Mjg4MDI5Mn0.zcfDUOHTeBYydFFscwmy3U9yryHiItTVJPLRurUlBvY",
+      WA_ADMIN: "6285846005280",
+      RATES: { CONVERT: 12000, TOPUP: 17000 },
+      FETCH_TIMEOUT: 8000,
+      LOCALE: "id-ID",
+    };
 
-    // === ELEMENTS ===
-    const form = document.getElementById("orderForm");
-    const usdInput = document.getElementById("usd");
-    const typeInput = document.getElementById("type");
-    const idrOutput = document.getElementById("idr");
-    const submitBtn = document.getElementById("submitBtn");
-    const spinner = document.getElementById("submit-spinner");
-    const historyBody = document.getElementById("history");
-    const historyState = document.getElementById("historyState");
-    const reloadHistoryBtn = document.getElementById("reloadHistory");
+    // ====== STATE ======
+    const S = {
+      supabase: null,
+      selected: { category:null, provider:null },
+      liveRate: CONFIG.RATES.CONVERT,
+      submitting: false,
+      toastTimer: null
+    };
 
-    const toastEl = document.getElementById("toast");
+    // ====== HELPERS ======
+    const $ = (q)=>document.querySelector(q);
+    const rp = (n)=> new Intl.NumberFormat(CONFIG.LOCALE,{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(n);
+    const nf = (n)=> new Intl.NumberFormat(CONFIG.LOCALE,{maximumFractionDigits:2}).format(n);
+    const nowStr = ()=> new Date().toLocaleString(CONFIG.LOCALE);
 
-    // fixed kurs
-    const FIXED_CONVERT = 12000;
-    const FIXED_TOPUP = 17000;
-
-    // === FUNGSI TOAST ===
-    function showToast(msg, color="bg-accent") {
-      toastEl.textContent = msg;
-      toastEl.className = `fixed bottom-5 left-1/2 -translate-x-1/2 px-3 py-2 text-xs sm:text-sm rounded-lg text-white ${color}`;
-      toastEl.style.opacity = "1";
-      toastEl.style.transform = "translate(-50%,0)";
-      setTimeout(() => {
-        toastEl.style.opacity = "0";
-        toastEl.style.transform = "translate(-50%,80px)";
-      }, 3000);
+    function toast(msg, type="success"){
+      const el = $("#toast"); el.textContent = msg;
+      const bg = type==="error"?"bg-red-500":type==="info"?"bg-blue-500":"bg-emerald-500";
+      el.className = `fixed bottom-5 left-1/2 -translate-x-1/2 px-4 py-2 rounded-lg text-sm font-semibold shadow-2xl text-white ${bg}`;
+      el.classList.remove("translate-y-20","opacity-0");
+      clearTimeout(S.toastTimer); S.toastTimer = setTimeout(()=>{ el.classList.add("translate-y-20","opacity-0") }, 2400);
     }
 
-    // === HITUNG KONVERSI ===
-    function updateIDR() {
-      const usd = parseFloat(usdInput.value) || 0;
-      const type = typeInput.value;
-      let rate = type === "convert" ? FIXED_CONVERT : FIXED_TOPUP;
-      const idr = usd * rate;
-      idrOutput.textContent = "Rp " + idr.toLocaleString("id-ID");
+    function currentFixed(){ return $("#type").value === "convert" ? CONFIG.RATES.CONVERT : CONFIG.RATES.TOPUP; }
+    function updateIDR(){ const usd = parseFloat($("#usd").value)||0; $("#idr").textContent = rp(Math.round(usd*currentFixed())); }
+    function setFixedUI(){
+      $("#rateFixedConvert").textContent = rp(CONFIG.RATES.CONVERT);
+      $("#rateFixedTopup").textContent   = rp(CONFIG.RATES.TOPUP);
+      $("#fixedConvertBig").textContent  = rp(CONFIG.RATES.CONVERT);
+      $("#fixedTopupBig").textContent    = rp(CONFIG.RATES.TOPUP);
+      updateIDR();
     }
 
-    usdInput.addEventListener("input", updateIDR);
-    typeInput.addEventListener("change", updateIDR);
+    // ====== THEME ======
+    const THEME_KEY="xkay_theme";
+    function applyTheme(t){ document.documentElement.classList.toggle("dark", t==="dark"); $("#icon-dark").classList.toggle("hidden", t==="light"); $("#icon-light").classList.toggle("hidden", t==="dark"); localStorage.setItem(THEME_KEY,t); }
+    $("#themeToggle").addEventListener("click", ()=> applyTheme(localStorage.getItem(THEME_KEY)==="dark"?"light":"dark"));
+    applyTheme(localStorage.getItem(THEME_KEY)||"dark");
 
-    // === PROVIDER MODAL ===
-    const modal = document.getElementById("providerModal");
-    const providerBtn = document.getElementById("providerBtn");
-    const closeProvider = document.getElementById("closeProvider");
-    const overlay = document.getElementById("providerOverlay");
-    const selectedProvider = document.getElementById("selectedProvider");
-    let chosenProvider = null;
+    // ====== SUPABASE ======
+    S.supabase = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON);
 
-    providerBtn.addEventListener("click", () => { modal.classList.remove("hidden"); });
-    closeProvider.addEventListener("click", () => { modal.classList.add("hidden"); });
-    overlay.addEventListener("click", () => { modal.classList.add("hidden"); });
-    document.querySelectorAll(".opt-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        chosenProvider = btn.dataset.provider;
-        selectedProvider.textContent = chosenProvider;
-        modal.classList.add("hidden");
-        updateIDR();
-      });
+    // ====== LIVE RATE (multi-source + timeout + fallback) ======
+    function fetchJsonWithTimeout(url, ms=CONFIG.FETCH_TIMEOUT){
+      const ctl = new AbortController(); const t = setTimeout(()=>ctl.abort(), ms);
+      return fetch(url, {signal:ctl.signal}).then(r=>r.json()).finally(()=>clearTimeout(t));
+    }
+    async function src1(){ const j = await fetchJsonWithTimeout("https://api.exchangerate.host/latest?base=USD&symbols=IDR"); const v = Number(j?.rates?.IDR); if(!v) throw 0; return {rate:Math.round(v),src:"exchangerate.host"};}
+    async function src2(){ const j = await fetchJsonWithTimeout("https://open.er-api.com/v6/latest/USD"); const v = Number(j?.rates?.IDR); if(!v) throw 0; return {rate:Math.round(v),src:"open.er-api.com"};}
+    async function src3(){ const j = await fetchJsonWithTimeout("https://api.frankfurter.app/latest?from=USD&to=IDR"); const v = Number(j?.rates?.IDR); if(!v) throw 0; return {rate:Math.round(v),src:"frankfurter.app"};}
+
+    async function loadLive(){
+      $("#rateLive").textContent = $("#liveRateBig").textContent = "Memuat…";
+      $("#liveMeta").textContent = "Sumber: —";
+      try{
+        const res = await (Promise.any? Promise.any([src1(),src2(),src3()]) : src1().catch(src2).catch(src3));
+        if(!res?.rate) throw 0;
+        S.liveRate = res.rate;
+        $("#rateLive").textContent = rp(S.liveRate);
+        $("#liveRateBig").textContent = rp(S.liveRate);
+        $("#liveMeta").textContent = `Sumber: ${res.src} • ${nowStr()}`;
+      }catch(e){
+        // fallback to fixed convert
+        S.liveRate = CONFIG.RATES.CONVERT;
+        $("#rateLive").textContent = rp(S.liveRate);
+        $("#liveRateBig").textContent = rp(S.liveRate);
+        $("#liveMeta").textContent = "Gagal memuat kurs real-time (pakai fallback).";
+      }
+    }
+    $("#refreshRate").addEventListener("click", loadLive, {passive:true});
+
+    // ====== PROVIDER MODAL ======
+    const modal = $("#providerModal"); const overlay = $("#providerOverlay"); const btnProv = $("#providerBtn");
+    let opener = null;
+    function openModal(){ opener = document.activeElement; modal.classList.remove("hidden"); document.addEventListener("keydown", escClose); }
+    function closeModal(){ modal.classList.add("hidden"); document.removeEventListener("keydown", escClose); opener && opener.focus(); }
+    function escClose(e){ if(e.key==="Escape") closeModal(); }
+    btnProv.addEventListener("click", openModal, {passive:true});
+    $("#closeProvider").addEventListener("click", closeModal, {passive:true});
+    overlay.addEventListener("click", closeModal, {passive:true});
+    modal.addEventListener("click", (e)=>{
+      const b = e.target.closest(".opt-btn"); if(!b) return;
+      S.selected = { category:b.dataset.category, provider:b.dataset.provider };
+      $("#selectedProvider").textContent = `${S.selected.category} — ${S.selected.provider}`;
+      btnProv.textContent = S.selected.provider;
+      toast("Metode dipilih: "+S.selected.provider, "info");
+      closeModal();
     });
 
-    // === SUBMIT ===
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      spinner.classList.remove("hidden");
-      submitBtn.disabled = true;
+    // ====== VALIDATION ======
+    const isEmail = v=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+    const isName  = v=> v && v.trim().length>=3;
+    const isAcct  = v=> /^[a-zA-Z0-9.\-_ ]{5,}$/.test((v||"").trim());
 
-      const name = document.getElementById("name").value;
-      const email = document.getElementById("paypal_email").value;
-      const type = typeInput.value;
-      const usd = parseFloat(usdInput.value);
-      const account = document.getElementById("account").value;
-      const idr = usd * (type === "convert" ? FIXED_CONVERT : FIXED_TOPUP);
-
-      // simpan DB
-      const { error } = await supabase.from("orders").insert([{ 
-        name, paypal_email: email, type, provider: chosenProvider, account, usd, idr 
-      }]);
-
-      if (error) {
-        showToast("Gagal simpan data", "bg-red-600");
-      } else {
-        showToast("Order berhasil!");
-        loadHistory();
-        // kirim WA
-        const msg = `Halo Admin, saya ingin ${type}.\nNama: ${name}\nEmail PayPal: ${email}\nProvider: ${chosenProvider}\nAkun: ${account}\nUSD: ${usd}\nIDR: Rp ${idr.toLocaleString("id-ID")}`;
-        const url = `https://wa.me/6281234567890?text=${encodeURIComponent(msg)}`;
-        window.open(url, "_blank");
-        form.reset();
-        selectedProvider.textContent = "Belum dipilih";
+    // ====== HISTORY ======
+    async function loadHistory(){
+      const tbody = $("#history"); const state = $("#historyState");
+      // skeleton
+      tbody.innerHTML = Array.from({length:6}).map(()=>`<tr>${Array.from({length:7}).map(()=>`<td class="p-3"><div class="h-4 w-full rounded bg-slate-200 dark:bg-slate-700 animate-pulse"></div></td>`).join("")}</tr>`).join("");
+      state.classList.add("hidden");
+      try{
+        const { data, error } = await S.supabase.from("orders").select("*").order("created_at",{ascending:false}).limit(120);
+        if(error) throw error;
+        if(!data || !data.length){ tbody.innerHTML=""; state.textContent="Belum ada transaksi."; state.classList.remove("hidden"); return; }
+        tbody.innerHTML = data.map(r=>`
+          <tr>
+            <td class="p-3">${new Date(r.created_at).toLocaleString(CONFIG.LOCALE)}</td>
+            <td class="p-3 capitalize">${r.type??"-"}</td>
+            <td class="p-3">${r.target_type??"-"}</td>
+            <td class="p-3">${r.provider??"-"}</td>
+            <td class="p-3">${r.name??"-"}</td>
+            <td class="p-3">${nf(r.usd??0)}</td>
+            <td class="p-3 font-semibold">${rp(r.receive_idr??0)}</td>
+          </tr>
+        `).join("");
+      }catch(e){
+        console.error("[History] error:", e);
+        tbody.innerHTML=""; state.textContent="Gagal memuat riwayat. Coba Reload."; state.classList.remove("hidden");
       }
-      spinner.classList.add("hidden");
-      submitBtn.disabled = false;
+    }
+    $("#reloadHistory").addEventListener("click", loadHistory, {passive:true});
+
+    // ====== FORM ======
+    function toggleSubmit(disabled){
+      const btn=$("#submitBtn"), sp=$("#submitSpinner");
+      btn.disabled = disabled; sp.classList.toggle("hidden", !disabled);
+      btn.querySelector("span").style.opacity = disabled?0.6:1;
+      btn.classList.toggle("opacity-60", disabled);
+    }
+
+    $("#usd").addEventListener("input", updateIDR, {passive:true});
+    $("#type").addEventListener("change", updateIDR, {passive:true});
+
+    $("#orderForm").addEventListener("submit", async (e)=>{
+      e.preventDefault(); if(S.submitting) return;
+      const name = $("#name").value.trim();
+      const paypal_email = $("#paypal_email").value.trim();
+      const type = $("#type").value;
+      const account = $("#account").value.trim();
+      const usd = parseFloat($("#usd").value)||0;
+      if(!S.selected.provider){ return toast("Pilih tujuan penerimaan dulu.", "error"); }
+      if(!isName(name)){ return toast("Nama minimal 3 karakter.", "error"); }
+      if(!isEmail(paypal_email)){ return toast("Email tidak valid.", "error"); }
+      if(!isAcct(account)){ return toast("Nomor akun/rekening tidak valid.", "error"); }
+      if(!(usd>0)){ return toast("Nominal USD harus lebih dari 0.", "error"); }
+
+      const rate = currentFixed();
+      const receive_idr = Math.round(usd*rate);
+
+      const payload = {
+        type, name, paypal_email,
+        usd, rate, receive_idr,
+        target_type: S.selected.category, provider: S.selected.provider, account
+      };
+
+      // simpan + WA
+      try{
+        S.submitting=true; toggleSubmit(true);
+        const { error } = await S.supabase.from("orders").insert([payload]);
+        if(error) throw error;
+        toast("Pesanan tersimpan. Membuka WhatsApp…","success");
+      }catch(err){
+        console.error("[Insert] gagal:", err);
+        toast("Gagal simpan DB—tetap membuka WhatsApp.","error");
+      }finally{
+        S.submitting=false; toggleSubmit(false);
+      }
+
+      const waMsg = [
+        `Halo Admin Xkay Store, saya ingin ${type}:`,
+        ``,
+        `Nama: ${name}`,
+        `Email PayPal: ${paypal_email}`,
+        `Kategori: ${S.selected.category}`,
+        `Provider: ${S.selected.provider}`,
+        `Akun: ${account}`,
+        `Nominal: ${nf(usd)} USD = ${rp(receive_idr)} (kurs tetap ${rp(rate)})`,
+        `Kurs real-time saat ini: ${rp(S.liveRate)}`
+      ].join("\n");
+      window.open(`https://wa.me/${encodeURIComponent(CONFIG.WA_ADMIN)}?text=${encodeURIComponent(waMsg)}`, "_blank", "noopener");
+
+      // reset form + refresh history
+      $("#orderForm").reset();
+      S.selected = {category:null, provider:null};
+      $("#selectedProvider").textContent = "Belum dipilih";
+      $("#providerBtn").textContent = "Pilih Bank / E-Wallet";
+      updateIDR();
+      loadHistory();
     });
 
-    // === LOAD HISTORY ===
-    async function loadHistory() {
-      historyBody.innerHTML = "";
-      historyState.classList.add("hidden");
-      const { data, error } = await supabase.from("orders").select("*").order("created_at", { ascending: false }).limit(20);
-      if (error) {
-        historyState.textContent = "Gagal memuat data";
-        historyState.classList.remove("hidden");
-        return;
-      }
-      if (!data.length) {
-        historyState.textContent = "Belum ada transaksi";
-        historyState.classList.remove("hidden");
-        return;
-      }
-      data.forEach(row => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td class="p-2 sm:p-3">${new Date(row.created_at).toLocaleDateString("id-ID")}</td>
-          <td class="p-2 sm:p-3">${row.type}</td>
-          <td class="p-2 sm:p-3">${row.provider || "-"}</td>
-          <td class="p-2 sm:p-3">${row.name}</td>
-          <td class="p-2 sm:p-3">${row.usd}</td>
-          <td class="p-2 sm:p-3">Rp ${row.idr.toLocaleString("id-ID")}</td>
-        `;
-        historyBody.appendChild(tr);
-      });
+    // ====== INIT ======
+    function init(){
+      setFixedUI();
+      updateIDR();
+      loadLive();
+      loadHistory();
+      setInterval(loadLive, 10*60*1000); // refresh tiap 10 menit
     }
-
-    reloadHistoryBtn.addEventListener("click", loadHistory);
-    loadHistory();
-
-    // === TEMA ===
-    const themeToggle = document.getElementById("themeToggle");
-    const iconDark = document.getElementById("theme-icon-dark");
-    const iconLight = document.getElementById("theme-icon-light");
-
-    function applyTheme(theme) {
-      if (theme === "dark") {
-        document.documentElement.classList.add("dark");
-        iconDark.classList.add("hidden");
-        iconLight.classList.remove("hidden");
-      } else {
-        document.documentElement.classList.remove("dark");
-        iconDark.classList.remove("hidden");
-        iconLight.classList.add("hidden");
-      }
-    }
-
-    themeToggle.addEventListener("click", () => {
-      const current = localStorage.theme === "dark" ? "dark" : "light";
-      const next = current === "dark" ? "light" : "dark";
-      localStorage.theme = next;
-      applyTheme(next);
-    });
-    applyTheme(localStorage.theme || "light");
-
-    // === FIXED & LIVE RATE ===
-    function renderFixed() {
-      document.getElementById("rateFixedConvert").textContent = "Rp " + FIXED_CONVERT.toLocaleString("id-ID");
-      document.getElementById("rateFixedTopup").textContent = "Rp " + FIXED_TOPUP.toLocaleString("id-ID");
-      document.getElementById("fixedConvertBig").textContent = "Rp " + FIXED_CONVERT.toLocaleString("id-ID");
-      document.getElementById("fixedTopupBig").textContent = "Rp " + FIXED_TOPUP.toLocaleString("id-ID");
-    }
-    renderFixed();
-
-    async function fetchLive() {
-      try {
-        const res = await fetch("https://open.er-api.com/v6/latest/USD");
-        const json = await res.json();
-        const rate = json.rates.IDR;
-        document.getElementById("rateLive").textContent = "Rp " + Math.round(rate).toLocaleString("id-ID");
-        document.getElementById("liveRateBig").textContent = "Rp " + Math.round(rate).toLocaleString("id-ID");
-        document.getElementById("liveMeta").textContent = "Sumber: open.er-api.com";
-      } catch (e) {
-        document.getElementById("rateLive").textContent = "-";
-        document.getElementById("liveRateBig").textContent = "-";
-        document.getElementById("liveMeta").textContent = "Gagal memuat kurs live";
-      }
-    }
-    fetchLive();
-    document.getElementById("refreshRate").addEventListener("click", fetchLive);
-
+    document.addEventListener("DOMContentLoaded", init);
   </script>
 </body>
 </html>
