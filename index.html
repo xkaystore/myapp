@@ -1,222 +1,526 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Xkay Store | Convert & Topup PayPal</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Xkay Store • Convert & Topup PayPal</title>
+
+  <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Supabase -->
   <script src="https://unpkg.com/@supabase/supabase-js"></script>
 
-  <!-- Favicon -->
+  <!-- Brand Favicon (X putih, biru doff) -->
   <link rel="icon" href="data:image/svg+xml,
     <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
-      <rect width='100' height='100' rx='20' ry='20' fill='%230d47a1'/>
-      <text x='50%' y='55%' font-size='55' text-anchor='middle' fill='white' font-family='Arial, sans-serif'>X</text>
+      <defs>
+        <linearGradient id='g' x1='0' x2='1' y1='0' y2='1'>
+          <stop offset='0%' stop-color='%23133a7c'/>
+          <stop offset='100%' stop-color='%230d47a1'/>
+        </linearGradient>
+      </defs>
+      <rect width='100' height='100' rx='18' fill='url(%23g)'/>
+      <text x='50%' y='57%' font-size='56' text-anchor='middle' fill='white' font-family='Arial, sans-serif'>X</text>
     </svg>
   "/>
-</head>
-<body class="bg-blue-900 text-white font-sans min-h-screen flex flex-col">
 
-  <!-- Header -->
-  <header class="text-center p-6 bg-blue-800 shadow-md">
-    <h1 class="text-3xl font-bold">Xkay Store</h1>
-    <p class="mt-2">💸 Convert & Topup PayPal dengan mudah</p>
-    <div class="mt-3 space-y-1">
-      <p>Kurs Tetap: <span id="fixedRate" class="font-semibold">Rp 12.000</span></p>
-      <p>Kurs Real-Time: <span id="liveRate" class="font-semibold">Loading...</span></p>
+  <!-- Meta -->
+  <meta name="theme-color" content="#0d47a1" />
+  <style>
+    /* Scrollbar halus */
+    ::-webkit-scrollbar{height:8px;width:8px}
+    ::-webkit-scrollbar-thumb{background:#2b3f83;border-radius:999px}
+    ::-webkit-scrollbar-track{background:transparent}
+  </style>
+</head>
+<body class="min-h-screen text-white bg-gradient-to-br from-[#0f172a] via-[#0b2454] to-[#0a1a3a] selection:bg-white/20 selection:text-white">
+  <!-- Top Nav -->
+  <header class="sticky top-0 z-40 backdrop-blur-md bg-blue-900/40 border-b border-white/10">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-white/10 ring-1 ring-white/15 grid place-items-center">
+          <span class="text-xl font-bold">X</span>
+        </div>
+        <div>
+          <h1 class="text-lg sm:text-xl font-bold tracking-tight">Xkay Store</h1>
+          <p class="text-xs sm:text-sm text-white/70">Convert & Topup PayPal • cepat & aman</p>
+        </div>
+      </div>
+
+      <!-- Rates -->
+      <div class="hidden sm:flex items-center gap-5 text-sm">
+        <div class="px-3 py-2 rounded-xl bg-white/5 ring-1 ring-white/10">
+          <div class="text-white/60">Kurs Tetap</div>
+          <div id="fixedRate" class="font-semibold">Rp 12.000</div>
+        </div>
+        <div class="px-3 py-2 rounded-xl bg-white/5 ring-1 ring-white/10">
+          <div class="text-white/60">Kurs Real-Time</div>
+          <div id="liveRate" class="font-semibold animate-pulse">Loading…</div>
+        </div>
+      </div>
     </div>
   </header>
 
-  <!-- Form -->
-  <main class="flex-grow p-6">
-    <div class="bg-blue-800 rounded-2xl shadow-lg p-6 max-w-2xl mx-auto">
-      <h2 class="text-xl font-bold mb-4">Form Order</h2>
-      <form id="orderForm" class="space-y-4">
-        <input type="text" id="name" placeholder="Nama Lengkap" class="w-full p-3 rounded text-black" required>
-        <input type="email" id="paypal_email" placeholder="Email PayPal" class="w-full p-3 rounded text-black" required>
-        
-        <div>
-          <label class="block mb-2">Jenis Transaksi:</label>
-          <select id="type" class="w-full p-3 rounded text-black" required>
-            <option value="convert">Convert (PayPal → Bank/E-Wallet)</option>
-            <option value="topup">Topup (Bank/E-Wallet → PayPal)</option>
-          </select>
-        </div>
-
-        <div>
-          <label class="block mb-2">Pilih Kategori:</label>
-          <button type="button" onclick="openPopup()" class="bg-blue-600 px-4 py-2 rounded">Pilih Bank / E-Wallet</button>
-          <p id="selectedProvider" class="mt-2 italic text-gray-300">Belum dipilih</p>
-        </div>
-
-        <input type="text" id="account" placeholder="No Rekening / Akun" class="w-full p-3 rounded text-black" required>
-
-        <div>
-          <input type="number" id="usd" placeholder="Nominal (USD)" class="w-full p-3 rounded text-black" required>
-          <p class="mt-2">Setara (kurs tetap): <span id="idr">Rp 0</span></p>
-        </div>
-
-        <button type="submit" class="bg-green-600 px-6 py-3 rounded-lg w-full">Kirim Order</button>
-      </form>
+  <!-- Hero -->
+  <section class="relative">
+    <div class="absolute inset-0 pointer-events-none">
+      <!-- Glow -->
+      <div class="absolute -top-10 left-1/2 -translate-x-1/2 w-[800px] h-[800px] rounded-full bg-blue-500/20 blur-3xl"></div>
     </div>
-  </main>
+    <div class="max-w-6xl mx-auto px-4 pt-8 pb-2">
+      <div class="grid md:grid-cols-2 gap-6">
+        <!-- Order Card -->
+        <div class="rounded-2xl bg-white/10 backdrop-blur-md ring-1 ring-white/15 shadow-2xl p-5 sm:p-6">
+          <h2 class="text-xl font-semibold mb-1">Buat Order</h2>
+          <p class="text-white/70 text-sm mb-5">Tanpa login. Detail dikirim ke WhatsApp Admin, tersimpan di riwayat.</p>
 
-  <!-- Riwayat -->
-  <section class="p-6">
-    <div class="bg-blue-800 rounded-2xl shadow-lg p-6 max-w-5xl mx-auto overflow-x-auto">
-      <h2 class="text-xl font-bold mb-4">Riwayat Transaksi</h2>
-      <table class="w-full text-left text-sm border-collapse">
-        <thead class="bg-blue-700">
-          <tr>
-            <th class="p-2">Tanggal</th>
-            <th class="p-2">Nama</th>
-            <th class="p-2">Tipe</th>
-            <th class="p-2">Kategori</th>
-            <th class="p-2">Provider</th>
-            <th class="p-2">USD</th>
-            <th class="p-2">IDR</th>
-          </tr>
-        </thead>
-        <tbody id="history" class="divide-y divide-blue-600"></tbody>
-      </table>
-      <button onclick="exportCSV()" class="mt-4 bg-yellow-500 px-4 py-2 rounded text-black">Export CSV</button>
+          <form id="orderForm" class="space-y-4">
+            <div class="grid sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm mb-1 text-white/80">Nama Lengkap</label>
+                <input id="name" type="text" inputmode="text" autocomplete="name" required
+                  class="w-full rounded-xl px-3 py-2 text-black focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Nama Anda" />
+              </div>
+              <div>
+                <label class="block text-sm mb-1 text-white/80">Email PayPal</label>
+                <input id="paypal_email" type="email" autocomplete="email" required
+                  class="w-full rounded-xl px-3 py-2 text-black focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="email@paypal.com" />
+              </div>
+            </div>
+
+            <div class="grid sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm mb-1 text-white/80">Jenis Transaksi</label>
+                <select id="type" required
+                  class="w-full rounded-xl px-3 py-2 text-black focus:outline-none focus:ring-2 focus:ring-blue-400">
+                  <option value="convert">Convert (PayPal → Bank/E-Wallet)</option>
+                  <option value="topup">Topup (Bank/E-Wallet → PayPal)</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-sm mb-1 text-white/80">Tujuan Penerimaan</label>
+                <button type="button" id="providerBtn"
+                  class="w-full rounded-xl px-3 py-2 bg-blue-600 hover:bg-blue-500 transition focus:outline-none focus:ring-2 focus:ring-blue-300">
+                  Pilih Bank / E-Wallet
+                </button>
+                <p id="selectedProvider" class="text-xs text-white/70 mt-1">Belum dipilih</p>
+              </div>
+            </div>
+
+            <div class="grid sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm mb-1 text-white/80">No Rekening / Akun</label>
+                <input id="account" type="text" required
+                  class="w-full rounded-xl px-3 py-2 text-black focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Contoh: 1234567890 (BCA)" />
+              </div>
+              <div>
+                <label class="block text-sm mb-1 text-white/80">Nominal (USD)</label>
+                <input id="usd" type="number" step="0.01" min="0.01" required
+                  class="w-full rounded-xl px-3 py-2 text-black focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="0.00" />
+                <p class="text-xs text-white/70 mt-1">Dihitung dengan <span class="underline decoration-dotted">kurs tetap</span>.</p>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between rounded-xl bg-white/5 ring-1 ring-white/10 px-3 py-2">
+              <span class="text-sm text-white/80">Setara (IDR, kurs tetap):</span>
+              <span id="idr" class="font-semibold">Rp 0</span>
+            </div>
+
+            <button type="submit"
+              class="w-full rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-semibold py-3 transition focus:outline-none focus:ring-2 focus:ring-emerald-300">
+              Kirim Order via WhatsApp
+            </button>
+            <p class="text-[11px] text-white/60">Dengan mengirim, Anda setuju data disimpan untuk riwayat transaksi.</p>
+          </form>
+        </div>
+
+        <!-- Kurs & Tips -->
+        <aside class="rounded-2xl bg-white/5 backdrop-blur-md ring-1 ring-white/10 p-5 sm:p-6">
+          <h3 class="text-lg font-semibold mb-2">Informasi Kurs</h3>
+          <ul class="space-y-2 text-sm text-white/80">
+            <li>• <b>Kurs tetap</b> digunakan untuk perhitungan konversi IDR.</li>
+            <li>• <b>Kurs real-time</b> hanya sebagai informasi pasar saat ini.</li>
+            <li>• Anda dapat menyesuaikan kurs tetap di kode (nilai awal Rp 12.000).</li>
+          </ul>
+
+          <div class="mt-4 grid gap-3">
+            <div class="rounded-xl bg-white/10 ring-1 ring-white/10 p-3">
+              <div class="flex items-center justify-between">
+                <span class="text-sm text-white/70">Kurs Tetap</span>
+                <button id="editFixedRate" class="text-xs px-2 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                  Ubah
+                </button>
+              </div>
+              <div id="fixedRateLarge" class="mt-1 text-2xl font-bold">Rp 12.000</div>
+              <div id="fixedRateEdit" class="mt-2 hidden">
+                <div class="flex items-center gap-2">
+                  <input id="fixedInput" type="number" min="1000" step="1" class="w-full rounded-lg px-3 py-2 text-black" placeholder="12000" />
+                  <button id="saveFixed" class="px-3 py-2 rounded-lg bg-emerald-500 text-black font-semibold">Simpan</button>
+                </div>
+                <p class="text-[11px] text-white/60 mt-1">Tersimpan lokal (browser ini), tidak mengubah server.</p>
+              </div>
+            </div>
+
+            <div class="rounded-xl bg-white/10 ring-1 ring-white/10 p-3">
+              <div class="flex items-center justify-between">
+                <span class="text-sm text-white/70">Kurs Real-Time</span>
+                <button id="refreshRate" class="text-xs px-2 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                  Refresh
+                </button>
+              </div>
+              <div class="mt-1">
+                <div id="liveRateBig" class="text-2xl font-bold animate-pulse">Memuat…</div>
+                <div id="liveMeta" class="text-[11px] text-white/60 mt-1">Sumber: exchangerate.host</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-6 text-[12px] text-white/60">
+            Tip: Pastikan email PayPal benar dan rekening/akun tujuan aktif untuk mempercepat proses.
+          </div>
+        </aside>
+      </div>
     </div>
   </section>
 
-  <!-- Popup Provider -->
-  <div id="popup" class="fixed inset-0 bg-black bg-opacity-70 hidden items-center justify-center z-50">
-    <div class="bg-white text-black p-6 rounded-2xl max-w-md w-full">
-      <h3 class="text-lg font-bold mb-4">Pilih Bank / E-Wallet</h3>
-      <p class="mb-2 font-semibold">Bank Lokal</p>
-      <div class="grid grid-cols-2 gap-4 mb-4">
-        <button onclick="selectProvider('Bank Lokal','BCA')" class="p-3 bg-blue-200 rounded">BCA</button>
-        <button onclick="selectProvider('Bank Lokal','BRI')" class="p-3 bg-blue-200 rounded">BRI</button>
-        <button onclick="selectProvider('Bank Lokal','BNI')" class="p-3 bg-blue-200 rounded">BNI</button>
-        <button onclick="selectProvider('Bank Lokal','Mandiri')" class="p-3 bg-blue-200 rounded">Mandiri</button>
+  <!-- Riwayat -->
+  <section class="max-w-6xl mx-auto px-4 pt-2 pb-10">
+    <div class="rounded-2xl bg-white/5 backdrop-blur-md ring-1 ring-white/10 p-5 sm:p-6">
+      <div class="flex items-center justify-between gap-3 mb-3">
+        <h2 class="text-xl font-semibold">Riwayat Transaksi</h2>
+        <div class="flex items-center gap-2">
+          <button id="exportBtn" class="px-3 py-2 rounded-lg bg-yellow-400 text-black font-semibold">Export CSV</button>
+          <button id="reloadHistory" class="px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-500">Reload</button>
+        </div>
       </div>
-      <p class="mb-2 font-semibold">E-Wallet</p>
-      <div class="grid grid-cols-2 gap-4">
-        <button onclick="selectProvider('E-Wallet','OVO')" class="p-3 bg-green-200 rounded">OVO</button>
-        <button onclick="selectProvider('E-Wallet','Dana')" class="p-3 bg-green-200 rounded">Dana</button>
-        <button onclick="selectProvider('E-Wallet','Gopay')" class="p-3 bg-green-200 rounded">Gopay</button>
-        <button onclick="selectProvider('E-Wallet','ShopeePay')" class="p-3 bg-green-200 rounded">ShopeePay</button>
+
+      <div class="overflow-auto rounded-xl ring-1 ring-white/10">
+        <table class="min-w-full text-left text-sm">
+          <thead class="bg-white/10 text-white/80">
+            <tr>
+              <th class="px-3 py-2">Tanggal</th>
+              <th class="px-3 py-2">Nama</th>
+              <th class="px-3 py-2">Tipe</th>
+              <th class="px-3 py-2">Kategori</th>
+              <th class="px-3 py-2">Provider</th>
+              <th class="px-3 py-2">USD</th>
+              <th class="px-3 py-2">IDR</th>
+            </tr>
+          </thead>
+          <tbody id="history" class="divide-y divide-white/10">
+            <!-- Skeleton rows -->
+            <tr class="animate-pulse"><td class="px-3 py-2" colspan="7">Memuat data…</td></tr>
+          </tbody>
+        </table>
       </div>
-      <button onclick="closePopup()" class="mt-4 bg-red-500 text-white px-4 py-2 rounded">Tutup</button>
+      <p id="historyEmpty" class="hidden text-center text-white/60 text-sm mt-3">Belum ada transaksi.</p>
+    </div>
+  </section>
+
+  <!-- Modal Provider -->
+  <div id="providerModal" class="fixed inset-0 z-50 hidden" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+    <div class="relative mx-auto mt-24 w-[92%] max-w-md rounded-2xl bg-white text-black shadow-2xl ring-1 ring-black/10">
+      <div class="p-5">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-semibold">Pilih Bank / E-Wallet</h3>
+          <button id="closeProvider" class="rounded-lg px-2 py-1 text-sm bg-black/5 hover:bg-black/10">Tutup (Esc)</button>
+        </div>
+
+        <p class="mt-3 mb-1 text-sm font-semibold text-black/70">Bank Lokal</p>
+        <div class="grid grid-cols-2 gap-3">
+          <button data-category="Bank Lokal" data-provider="BCA" class="opt-btn">BCA</button>
+          <button data-category="Bank Lokal" data-provider="BRI" class="opt-btn">BRI</button>
+          <button data-category="Bank Lokal" data-provider="BNI" class="opt-btn">BNI</button>
+          <button data-category="Bank Lokal" data-provider="Mandiri" class="opt-btn">Mandiri</button>
+        </div>
+
+        <p class="mt-4 mb-1 text-sm font-semibold text-black/70">E-Wallet</p>
+        <div class="grid grid-cols-2 gap-3">
+          <button data-category="E-Wallet" data-provider="OVO" class="opt-btn">OVO</button>
+          <button data-category="E-Wallet" data-provider="Dana" class="opt-btn">Dana</button>
+          <button data-category="E-Wallet" data-provider="Gopay" class="opt-btn">Gopay</button>
+          <button data-category="E-Wallet" data-provider="ShopeePay" class="opt-btn">ShopeePay</button>
+        </div>
+      </div>
     </div>
   </div>
 
-<script type="module">
-  // ====== KONFIGURASI ======
-  const SUPABASE_URL = "https://rhujpinlutjiztyonmas.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJodWpwaW5sdXRqaXp0eW9ubWFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczMDQyOTIsImV4cCI6MjA3Mjg4MDI5Mn0.zcfDUOHTeBYydFFscwmy3U9yryHiItTVJPLRurUlBvY";
-  const DEFAULT_RATE = 12000; // Kurs tetap
-  const WA_ADMIN = "6285846005280";
+  <!-- Toast -->
+  <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 hidden px-4 py-2 rounded-xl bg-white text-black text-sm shadow-xl"></div>
 
-  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  let currentLiveRate = DEFAULT_RATE;
-  let selectedCategory = null;
-  let selectedProvider = null;
+  <script type="module">
+    // ================== KONFIGURASI ==================
+    const SUPABASE_URL  = "https://rhujpinlutjiztyonmas.supabase.co";
+    const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJodWpwaW5sdXRqaXp0eW9ubWFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczMDQyOTIsImV4cCI6MjA3Mjg4MDI5Mn0.zcfDUOHTeBYydFFscwmy3U9yryHiItTVJPLRurUlBvY";
+    const WA_ADMIN = "6285846005280";
+    const LS_FIXED_KEY = "xkay_fixed_rate";
+    const DEFAULT_RATE_INITIAL = 12000; // nilai awal (bisa diubah)
 
-  // ====== Fetch Kurs Real-Time ======
-  async function fetchRate() {
-    try {
-      const res = await fetch("https://api.exchangerate.host/latest?base=USD&symbols=IDR");
-      const data = await res.json();
-      currentLiveRate = data.rates.IDR || DEFAULT_RATE;
-    } catch {
-      currentLiveRate = DEFAULT_RATE;
-    }
-    document.getElementById("fixedRate").innerText = "Rp " + DEFAULT_RATE.toLocaleString();
-    document.getElementById("liveRate").innerText = "Rp " + currentLiveRate.toLocaleString();
-  }
-  fetchRate();
+    // ================== STATE ==================
+    const idLocale = "id-ID";
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+    let FIXED_RATE = Number(localStorage.getItem(LS_FIXED_KEY)) || DEFAULT_RATE_INITIAL;
+    let LIVE_RATE = FIXED_RATE;
+    let selected = { category: null, provider: null };
+    let modalOpener = null; // untuk mengembalikan fokus
 
-  // ====== Popup ======
-  function openPopup() {
-    document.getElementById("popup").style.display = "flex";
-  }
-  function closePopup() {
-    document.getElementById("popup").style.display = "none";
-  }
-  window.selectProvider = (category, provider) => {
-    selectedCategory = category;
-    selectedProvider = provider;
-    document.getElementById("selectedProvider").innerText = `${category} - ${provider}`;
-    closePopup();
-  };
+    // ================== HELPERS ==================
+    const rp = (n) => new Intl.NumberFormat(idLocale, { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(n);
+    const fmt = (n) => new Intl.NumberFormat(idLocale, { maximumFractionDigits: 2 }).format(n);
+    const qs  = (sel) => document.querySelector(sel);
+    const qsa = (sel) => Array.from(document.querySelectorAll(sel));
 
-  // ====== Form Handling ======
-  document.getElementById("usd").addEventListener("input", e => {
-    const usd = parseFloat(e.target.value) || 0;
-    const idr = usd * DEFAULT_RATE;
-    document.getElementById("idr").innerText = "Rp " + idr.toLocaleString();
-  });
-
-  document.getElementById("orderForm").addEventListener("submit", async e => {
-    e.preventDefault();
-    const name = document.getElementById("name").value;
-    const paypal_email = document.getElementById("paypal_email").value;
-    const type = document.getElementById("type").value;
-    const usd = parseFloat(document.getElementById("usd").value);
-    const idr = usd * DEFAULT_RATE;
-    const account = document.getElementById("account").value;
-
-    if (!selectedProvider) {
-      alert("Pilih Bank atau E-Wallet dulu!");
-      return;
+    function toast(msg, ok=true){
+      const el = qs("#toast");
+      el.textContent = msg;
+      el.className = "fixed bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-xl text-sm shadow-xl " + (ok ? "bg-emerald-400 text-black" : "bg-red-400 text-black");
+      el.style.display = "block";
+      setTimeout(()=>{ el.style.display="none"; }, 2200);
     }
 
-    // Simpan ke Supabase
-    await supabaseClient.from("orders").insert([{
-      type, name, paypal_email,
-      usd, rate: DEFAULT_RATE, receive_idr: idr,
-      target_type: selectedCategory, provider: selectedProvider, account
-    }]);
+    function setFixedUI(){
+      qs("#fixedRate").textContent = rp(FIXED_RATE);
+      qs("#fixedRateLarge").textContent = rp(FIXED_RATE);
+      // hitung ulang preview IDR
+      const usd = parseFloat(qs("#usd").value) || 0;
+      qs("#idr").textContent = rp(usd * FIXED_RATE);
+    }
 
-    // Kirim ke WA
-    const waText = `Halo Admin Xkay Store, saya ingin ${type}:\n\nNama: ${name}\nEmail PayPal: ${paypal_email}\nKategori: ${selectedCategory}\nProvider: ${selectedProvider}\nAkun: ${account}\nNominal: ${usd} USD = Rp ${idr.toLocaleString()} (kurs tetap Rp ${DEFAULT_RATE.toLocaleString()})\n\nKurs real-time saat ini: Rp ${currentLiveRate.toLocaleString()}`;
-    window.open(`https://wa.me/${WA_ADMIN}?text=${encodeURIComponent(waText)}`, "_blank");
+    // ================== KURS REAL-TIME ==================
+    async function fetchWithTimeout(url, ms=8000){
+      return Promise.race([
+        fetch(url),
+        new Promise((_,rej)=>setTimeout(()=>rej(new Error("timeout")), ms))
+      ]);
+    }
+    async function loadLiveRate(){
+      qs("#liveRate").textContent = "Memuat…";
+      qs("#liveRate").classList.add("animate-pulse");
+      qs("#liveRateBig").textContent = "Memuat…";
+      qs("#liveRateBig").classList.add("animate-pulse");
+      try{
+        // exchangerate.host: tidak butuh API key
+        const res = await fetchWithTimeout("https://api.exchangerate.host/latest?base=USD&symbols=IDR", 8000);
+        const data = await res.json();
+        const rate = Number(data?.rates?.IDR);
+        if(!rate || !isFinite(rate)) throw new Error("invalid rate");
+        LIVE_RATE = Math.round(rate);
+        const ts = new Date().toLocaleString(idLocale);
+        qs("#liveRate").textContent = rp(LIVE_RATE);
+        qs("#liveRateBig").textContent = rp(LIVE_RATE);
+        qs("#liveRate").classList.remove("animate-pulse");
+        qs("#liveRateBig").classList.remove("animate-pulse");
+        qs("#liveMeta").textContent = "Sumber: exchangerate.host • " + ts;
+      }catch(e){
+        LIVE_RATE = FIXED_RATE;
+        qs("#liveRate").textContent = rp(LIVE_RATE) + " (fallback)";
+        qs("#liveRateBig").textContent = rp(LIVE_RATE) + " (fallback)";
+        qs("#liveRate").classList.remove("animate-pulse");
+        qs("#liveRateBig").classList.remove("animate-pulse");
+        qs("#liveMeta").textContent = "Gagal memuat, gunakan tombol Refresh";
+      }
+    }
 
-    e.target.reset();
-    document.getElementById("selectedProvider").innerText = "Belum dipilih";
-    fetchHistory();
-  });
+    // ================== MODAL PROVIDER ==================
+    const modal = qs("#providerModal");
+    const providerBtn = qs("#providerBtn");
+    const closeProvider = qs("#closeProvider");
 
-  // ====== Riwayat ======
-  async function fetchHistory() {
-    const { data } = await supabaseClient.from("orders").select("*").order("created_at", { ascending: false });
-    const tbody = document.getElementById("history");
-    tbody.innerHTML = "";
-    data.forEach(row => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td class="p-2">${new Date(row.created_at).toLocaleString()}</td>
-        <td class="p-2">${row.name}</td>
-        <td class="p-2">${row.type}</td>
-        <td class="p-2">${row.target_type}</td>
-        <td class="p-2">${row.provider}</td>
-        <td class="p-2">${row.usd}</td>
-        <td class="p-2">Rp ${row.receive_idr.toLocaleString()}</td>
-      `;
-      tbody.appendChild(tr);
+    function openModal(){
+      modalOpener = document.activeElement;
+      modal.classList.remove("hidden");
+      modal.setAttribute("aria-hidden","false");
+      // fokuskan tombol pertama
+      const first = modal.querySelector(".opt-btn");
+      first && first.focus();
+      document.addEventListener("keydown", escClose);
+    }
+    function closeModal(){
+      modal.classList.add("hidden");
+      modal.setAttribute("aria-hidden","true");
+      document.removeEventListener("keydown", escClose);
+      if(modalOpener) modalOpener.focus();
+    }
+    function escClose(e){ if(e.key === "Escape") closeModal(); }
+
+    providerBtn.addEventListener("click", openModal);
+    closeProvider.addEventListener("click", closeModal);
+    modal.addEventListener("click", (e)=>{ if(e.target === modal) closeModal(); });
+
+    // style untuk pilihan provider
+    const styleOptBtn = "opt-btn px-3 py-2 rounded-xl bg-black/5 hover:bg-black/10 ring-1 ring-black/10 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm";
+    qsa(".opt-btn").forEach(b=> b.className = styleOptBtn);
+    modal.addEventListener("click", (e)=>{
+      const btn = e.target.closest(".opt-btn");
+      if(!btn) return;
+      selected.category = btn.dataset.category;
+      selected.provider = btn.dataset.provider;
+      qs("#selectedProvider").textContent = `${selected.category} — ${selected.provider}`;
+      toast("Metode dipilih: " + selected.provider);
+      closeModal();
     });
-  }
-  fetchHistory();
 
-  // ====== Export CSV ======
-  async function exportCSV() {
-    const { data } = await supabaseClient.from("orders").select("*");
-    let csv = "Tanggal,Nama,Tipe,Kategori,Provider,USD,IDR\n";
-    data.forEach(row => {
-      csv += `${row.created_at},${row.name},${row.type},${row.target_type},${row.provider},${row.usd},${row.receive_idr}\n`;
+    // ================== FORM ==================
+    const usdInput = qs("#usd");
+    usdInput.addEventListener("input", ()=>{
+      const usd = parseFloat(usdInput.value) || 0;
+      qs("#idr").textContent = rp(usd * FIXED_RATE);
     });
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "riwayat.csv";
-    a.click();
-  }
-</script>
+
+    const orderForm = qs("#orderForm");
+    orderForm.addEventListener("submit", async (e)=>{
+      e.preventDefault();
+      const name = qs("#name").value.trim();
+      const paypal_email = qs("#paypal_email").value.trim();
+      const type = qs("#type").value;
+      const account = qs("#account").value.trim();
+      const usd = Math.max(0, parseFloat(qs("#usd").value) || 0);
+      const idr = Math.round(usd * FIXED_RATE);
+
+      if(!selected.provider){
+        toast("Pilih Bank / E-Wallet dulu.", false);
+        qs("#providerBtn").focus();
+        return;
+      }
+      if(usd <= 0){
+        toast("Nominal USD harus lebih dari 0.", false);
+        usdInput.focus();
+        return;
+      }
+
+      // Simpan ke Supabase (RLS: insert publik)
+      try{
+        const { error } = await supabaseClient.from("orders").insert([{
+          type, name, paypal_email,
+          usd, rate: FIXED_RATE, receive_idr: idr,
+          target_type: selected.category, provider: selected.provider, account
+        }]);
+        if(error) throw error;
+      }catch(err){
+        console.error(err);
+        toast("Gagal menyimpan ke database.", false);
+        // tetap lanjut ke WA agar tidak menghambat user
+      }
+
+      // Kirim ke WhatsApp
+      const waText = [
+        `Halo Admin Xkay Store, saya ingin ${type}:`,
+        ``,
+        `Nama: ${name}`,
+        `Email PayPal: ${paypal_email}`,
+        `Kategori: ${selected.category}`,
+        `Provider: ${selected.provider}`,
+        `Akun: ${account}`,
+        `Nominal: ${fmt(usd)} USD = ${rp(idr)} (kurs tetap ${rp(FIXED_RATE)})`,
+        ``,
+        `Kurs real-time saat ini: ${rp(LIVE_RATE)}`
+      ].join("\n");
+      window.open(`https://wa.me/${WA_ADMIN}?text=${encodeURIComponent(waText)}`, "_blank");
+
+      orderForm.reset();
+      selected = { category:null, provider:null };
+      qs("#selectedProvider").textContent = "Belum dipilih";
+      qs("#idr").textContent = rp(0);
+      loadHistory();
+      toast("Order dibuat. Mengarah ke WhatsApp…");
+    });
+
+    // ================== RIWAYAT ==================
+    async function loadHistory(){
+      const tbody = qs("#history");
+      const empty = qs("#historyEmpty");
+      tbody.innerHTML = `<tr class="animate-pulse"><td class="px-3 py-2" colspan="7">Memuat data…</td></tr>`;
+      empty.classList.add("hidden");
+      try{
+        const { data, error } = await supabaseClient.from("orders").select("*").order("created_at", { ascending:false });
+        if(error) throw error;
+        tbody.innerHTML = "";
+        if(!data || !data.length){
+          empty.classList.remove("hidden");
+          return;
+        }
+        for(const row of data){
+          const tr = document.createElement("tr");
+          const cells = [
+            new Date(row.created_at).toLocaleString(idLocale),
+            row.name ?? "-",
+            row.type ?? "-",
+            row.target_type ?? "-",
+            row.provider ?? "-",
+            (row.usd ?? 0).toLocaleString(idLocale, { maximumFractionDigits: 2 }),
+            rp(row.receive_idr ?? 0)
+          ];
+          for(const c of cells){
+            const td = document.createElement("td");
+            td.className = "px-3 py-2";
+            td.textContent = c; // safe text
+            tr.appendChild(td);
+          }
+          tbody.appendChild(tr);
+        }
+      }catch(e){
+        console.error(e);
+        tbody.innerHTML = "";
+        empty.classList.remove("hidden");
+        empty.textContent = "Gagal memuat riwayat. Coba Reload.";
+      }
+    }
+
+    // Export CSV
+    async function exportCSV(){
+      try{
+        const { data, error } = await supabaseClient.from("orders").select("*");
+        if(error) throw error;
+        const head = ["Tanggal","Nama","Tipe","Kategori","Provider","USD","IDR"];
+        const rows = (data||[]).map(r => [
+          r.created_at,
+          (r.name||""),
+          (r.type||""),
+          (r.target_type||""),
+          (r.provider||""),
+          (r.usd||0),
+          (r.receive_idr||0)
+        ]);
+        const csv = [head, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n");
+        const blob = new Blob([csv], { type:"text/csv;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url; a.download = "riwayat_xkay_store.csv"; a.click();
+        URL.revokeObjectURL(url);
+        toast("CSV terunduh");
+      }catch(e){
+        console.error(e);
+        toast("Gagal export CSV.", false);
+      }
+    }
+
+    // ================== FIXED RATE: UI EDIT (local only) ==================
+    qs("#editFixedRate").addEventListener("click", ()=>{
+      qs("#fixedRateEdit").classList.toggle("hidden");
+      qs("#fixedInput").value = FIXED_RATE;
+      qs("#fixedInput").focus();
+    });
+    qs("#saveFixed").addEventListener("click", ()=>{
+      const val = Math.floor(Number(qs("#fixedInput").value));
+      if(!val || val < 1000){ toast("Nilai kurs tidak valid.", false); return; }
+      FIXED_RATE = val;
+      localStorage.setItem(LS_FIXED_KEY, String(FIXED_RATE));
+      setFixedUI();
+      toast("Kurs tetap diperbarui.");
+      qs("#fixedRateEdit").classList.add("hidden");
+    });
+
+    // ================== EVENT BINDINGS ==================
+    qs("#refreshRate").addEventListener("click", loadLiveRate);
+    qs("#reloadHistory").addEventListener("click", loadHistory);
+    qs("#exportBtn").addEventListener("click", exportCSV);
+
+    // ================== INIT ==================
+    setFixedUI();
+    await loadLiveRate();
+    await loadHistory();
+  </script>
 </body>
 </html>
