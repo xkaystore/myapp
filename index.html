@@ -109,7 +109,7 @@
   // ====== KONFIGURASI ======
   const SUPABASE_URL = "https://rhujpinlutjiztyonmas.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJodWpwaW5sdXRqaXp0eW9ubWFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczMDQyOTIsImV4cCI6MjA3Mjg4MDI5Mn0.zcfDUOHTeBYydFFscwmy3U9yryHiItTVJPLRurUlBvY";
-  const DEFAULT_RATE = 12000;
+  const DEFAULT_RATE = 12000; // Kurs tetap
   const WA_ADMIN = "6285846005280";
 
   const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -133,11 +133,10 @@
 
   // ====== Popup ======
   function openPopup() {
-    document.getElementById("popup").classList.remove("hidden");
-    document.getElementById("popup").classList.add("flex");
+    document.getElementById("popup").style.display = "flex";
   }
   function closePopup() {
-    document.getElementById("popup").classList.add("hidden");
+    document.getElementById("popup").style.display = "none";
   }
   window.selectProvider = (category, provider) => {
     selectedCategory = category;
@@ -175,7 +174,7 @@
     }]);
 
     // Kirim ke WA
-    const waText = `Halo Admin Xkay Store, saya ingin ${type}:\nNama: ${name}\nEmail PayPal: ${paypal_email}\nKategori: ${selectedCategory}\nProvider: ${selectedProvider}\nAkun: ${account}\nNominal: ${usd} USD = Rp ${idr.toLocaleString()} (kurs tetap Rp ${DEFAULT_RATE.toLocaleString()})`;
+    const waText = `Halo Admin Xkay Store, saya ingin ${type}:\nNama: ${name}\nEmail PayPal: ${paypal_email}\nKategori: ${selectedCategory}\nProvider: ${selectedProvider}\nAkun: ${account}\nNominal: ${usd} USD = Rp ${idr.toLocaleString()} (kurs tetap Rp ${DEFAULT_RATE.toLocaleString()})\n\nKurs real-time saat ini: Rp ${currentLiveRate.toLocaleString()}`;
     window.open(`https://wa.me/${WA_ADMIN}?text=${encodeURIComponent(waText)}`, "_blank");
 
     e.target.reset();
