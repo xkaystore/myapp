@@ -7,7 +7,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/@supabase/supabase-js"></script>
 
-  <!-- Favicon Xkay Store -->
+  <!-- Favicon -->
   <link rel="icon" href="data:image/svg+xml,
     <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
       <rect width='100' height='100' rx='20' ry='20' fill='%230d47a1'/>
@@ -15,7 +15,7 @@
     </svg>
   "/>
 </head>
-<body class="bg-blue-900 text-white font-sans min-h-screen">
+<body class="bg-blue-900 text-white font-sans min-h-screen flex flex-col">
 
   <!-- Header -->
   <header class="text-center p-6 bg-blue-800 shadow-md">
@@ -28,7 +28,7 @@
   </header>
 
   <!-- Form -->
-  <main class="p-6">
+  <main class="flex-grow p-6">
     <div class="bg-blue-800 rounded-2xl shadow-lg p-6 max-w-2xl mx-auto">
       <h2 class="text-xl font-bold mb-4">Form Order</h2>
       <form id="orderForm" class="space-y-4">
@@ -63,10 +63,10 @@
 
   <!-- Riwayat -->
   <section class="p-6">
-    <div class="bg-blue-800 rounded-2xl shadow-lg p-6 max-w-4xl mx-auto">
+    <div class="bg-blue-800 rounded-2xl shadow-lg p-6 max-w-5xl mx-auto overflow-x-auto">
       <h2 class="text-xl font-bold mb-4">Riwayat Transaksi</h2>
-      <table class="w-full text-left text-sm">
-        <thead>
+      <table class="w-full text-left text-sm border-collapse">
+        <thead class="bg-blue-700">
           <tr>
             <th class="p-2">Tanggal</th>
             <th class="p-2">Nama</th>
@@ -77,14 +77,14 @@
             <th class="p-2">IDR</th>
           </tr>
         </thead>
-        <tbody id="history" class="divide-y divide-blue-700"></tbody>
+        <tbody id="history" class="divide-y divide-blue-600"></tbody>
       </table>
       <button onclick="exportCSV()" class="mt-4 bg-yellow-500 px-4 py-2 rounded text-black">Export CSV</button>
     </div>
   </section>
 
   <!-- Popup Provider -->
-  <div id="popup" class="fixed inset-0 bg-black bg-opacity-70 hidden items-center justify-center">
+  <div id="popup" class="fixed inset-0 bg-black bg-opacity-70 hidden items-center justify-center z-50">
     <div class="bg-white text-black p-6 rounded-2xl max-w-md w-full">
       <h3 class="text-lg font-bold mb-4">Pilih Bank / E-Wallet</h3>
       <p class="mb-2 font-semibold">Bank Lokal</p>
@@ -174,7 +174,7 @@
     }]);
 
     // Kirim ke WA
-    const waText = `Halo Admin Xkay Store, saya ingin ${type}:\nNama: ${name}\nEmail PayPal: ${paypal_email}\nKategori: ${selectedCategory}\nProvider: ${selectedProvider}\nAkun: ${account}\nNominal: ${usd} USD = Rp ${idr.toLocaleString()} (kurs tetap Rp ${DEFAULT_RATE.toLocaleString()})\n\nKurs real-time saat ini: Rp ${currentLiveRate.toLocaleString()}`;
+    const waText = `Halo Admin Xkay Store, saya ingin ${type}:\n\nNama: ${name}\nEmail PayPal: ${paypal_email}\nKategori: ${selectedCategory}\nProvider: ${selectedProvider}\nAkun: ${account}\nNominal: ${usd} USD = Rp ${idr.toLocaleString()} (kurs tetap Rp ${DEFAULT_RATE.toLocaleString()})\n\nKurs real-time saat ini: Rp ${currentLiveRate.toLocaleString()}`;
     window.open(`https://wa.me/${WA_ADMIN}?text=${encodeURIComponent(waText)}`, "_blank");
 
     e.target.reset();
