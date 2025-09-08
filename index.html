@@ -18,6 +18,7 @@ body {
   background: #f9fafb;
   color: #111;
   transition: background 0.4s, color 0.4s, margin-left 0.4s;
+  transition: background 0.4s ease, color 0.4s ease;
 }
 
 /* Navbar */
@@ -222,6 +223,7 @@ body.dark .sidebar ul li a .tooltip {
   padding: 40px 20px;
   background: #e5e7eb;
   transition: background 0.4s, color 0.4s;
+  transition: background 0.4s ease, color 0.4s ease;
 }
 
 .header h1 {
@@ -240,6 +242,7 @@ body.dark .sidebar ul li a .tooltip {
 
 .history {
   margin-top: 30px;
+  transition: background 0.4s ease, color 0.4s ease;
 }
 
 .history h2 {
@@ -254,6 +257,7 @@ body.dark .sidebar ul li a .tooltip {
   border: 1px solid #ccc;
   border-radius: 6px;
   transition: border 0.3s, background 0.3s, color 0.3s;
+  transition: background 0.4s ease, color 0.4s ease;
 }
 
 #searchInput:focus {
@@ -265,6 +269,9 @@ body.dark .sidebar ul li a .tooltip {
 .history table {
   width: 100%;
   border-collapse: collapse;
+  display: block;
+  overflow-x: auto;
+  white-space: nowrap;
 }
 
 .history th, .history td {
@@ -291,6 +298,7 @@ body.dark .sidebar ul li a .tooltip {
   color: white;
   margin-top: 40px;
   transition: background 0.4s, color 0.4s;
+  transition: background 0.4s ease, color 0.4s ease;
 }
 
 /* Dark Mode */
@@ -370,8 +378,7 @@ body.dark #searchInput {
   .sidebar.collapsed ul li a .tooltip {
     display: block;
   }
-}
-</style></head>
+}</style></head>
 <body>
   <!-- Navbar -->
   <nav class="navbar">
@@ -473,131 +480,99 @@ body.dark #searchInput {
 
   <script src="script.js"></script>
 
-<script type="text/javascript" id="dcoder_script">const sidebar = document.getElementById('sidebar');
-const sidebarToggle = document.getElementById('sidebarToggle');
-const closeSidebar = document.getElementById('closeSidebar');
-const collapseSidebar = document.getElementById('collapseSidebar');
-const darkModeToggle = document.getElementById('darkModeToggle');
-const overlay = document.getElementById('overlay');
-const sidebarLinks = document.querySelectorAll('.sidebar ul li a');
-const searchInput = document.getElementById('searchInput');
-const table = document.getElementById('transactionTable');
-const tbody = table.getElementsByTagName('tbody')[0];
+<script type="text/javascript" id="dcoder_script">// Toggle sidebar
+const sidebar = document.getElementById("sidebar");
+const overlay = document.getElementById("overlay");
+const sidebarToggle = document.getElementById("sidebarToggle");
+const closeSidebar = document.getElementById("closeSidebar");
+const collapseSidebar = document.getElementById("collapseSidebar");
 
-function isDesktop() {
-  return window.innerWidth >= 1024;
-}
+// Dark mode
+const darkModeToggle = document.getElementById("darkModeToggle");
 
-// Animasi klik tombol
-function animateButton(btn) {
-  btn.style.transform = "scale(1.3) rotate(15deg)";
-  setTimeout(() => {
-    btn.style.transform = "scale(1) rotate(0)";
-  }, 250);
-}
+// Search + table
+const searchInput = document.getElementById("searchInput");
+const table = document.getElementById("transactionTable");
+const headers = table.querySelectorAll("th");
 
-// Toggle sidebar (mobile)
-sidebarToggle.addEventListener('click', () => {
-  if (!isDesktop()) {
-    sidebar.classList.add('active');
-    overlay.classList.add('active');
-  }
-  animateButton(sidebarToggle);
+// Sidebar buka/tutup
+sidebarToggle.addEventListener("click", () => {
+  sidebar.classList.add("active");
+  overlay.classList.add("active");
 });
 
-// Tutup sidebar (mobile)
-function closeSidebarMenu() {
-  if (!isDesktop()) {
-    sidebar.classList.remove('active');
-    overlay.classList.remove('active');
-  }
-}
-
-if (closeSidebar) closeSidebar.addEventListener('click', () => {
-  closeSidebarMenu();
-  animateButton(closeSidebar);
+closeSidebar.addEventListener("click", () => {
+  sidebar.classList.remove("active");
+  overlay.classList.remove("active");
 });
 
-if (overlay) overlay.addEventListener('click', closeSidebarMenu);
+overlay.addEventListener("click", () => {
+  sidebar.classList.remove("active");
+  overlay.classList.remove("active");
+});
 
 // Collapse sidebar (desktop)
-if (collapseSidebar) {
-  collapseSidebar.addEventListener('click', () => {
-    if (isDesktop()) {
-      sidebar.classList.toggle('collapsed');
-      document.body.classList.toggle('sidebar-collapsed');
-      document.querySelector('.navbar').classList.toggle('sidebar-collapsed');
+collapseSidebar.addEventListener("click", () => {
+  sidebar.classList.toggle("collapsed");
+  document.body.classList.toggle("sidebar-collapsed");
+  document.querySelector(".navbar").classList.toggle("sidebar-collapsed");
+  localStorage.setItem("sidebarCollapsed", sidebar.classList.contains("collapsed"));
+});
 
-      collapseSidebar.textContent = sidebar.classList.contains('collapsed') ? '➡️' : '⬅️';
-      animateButton(collapseSidebar);
-    }
-  });
+// Restore state
+if (localStorage.getItem("sidebarCollapsed") === "true") {
+  sidebar.classList.add("collapsed");
+  document.body.classList.add("sidebar-collapsed");
+  document.querySelector(".navbar").classList.add("sidebar-collapsed");
 }
 
-// Klik link sidebar
-sidebarLinks.forEach(link => {
-  link.addEventListener('click', () => {
-    sidebarLinks.forEach(l => l.classList.remove('active'));
-    link.classList.add('active');
-    closeSidebarMenu();
-  });
+// Apply saved theme
+if (localStorage.getItem("theme") === "dark") {
+  document.body.classList.add("dark");
+  darkModeToggle.textContent = "☀️";
+}
+
+// Toggle
+darkModeToggle.addEventListener("click", () => {
+  document.body.classList.toggle("dark");
+  const isDark = document.body.classList.contains("dark");
+  darkModeToggle.textContent = isDark ? "☀️" : "🌙";
+  localStorage.setItem("theme", isDark ? "dark" : "light");
 });
 
-// Dark mode toggle
-darkModeToggle.addEventListener('click', () => {
-  document.body.classList.toggle('dark');
-  animateButton(darkModeToggle);
-});
-
-// 🔎 Search filter tabel transaksi
-searchInput.addEventListener('keyup', () => {
+// Search filter
+searchInput.addEventListener("input", () => {
   const filter = searchInput.value.toLowerCase();
-  const rows = tbody.getElementsByTagName('tr');
-
-  for (let i = 0; i < rows.length; i++) {
-    const cells = rows[i].getElementsByTagName('td');
-    let match = false;
-
-    for (let j = 0; j < cells.length; j++) {
-      if (cells[j]) {
-        const textValue = cells[j].textContent || cells[j].innerText;
-        if (textValue.toLowerCase().indexOf(filter) > -1) {
-          match = true;
-          break;
-        }
-      }
-    }
-    rows[i].style.display = match ? "" : "none";
-  }
+  const rows = table.querySelectorAll("tbody tr");
+  
+  rows.forEach(row => {
+    const text = row.innerText.toLowerCase();
+    row.style.display = text.includes(filter) ? "" : "none";
+  });
 });
 
-// 🔄 Sort tabel transaksi
-let sortDirections = {};
+// Sorting
+headers.forEach(header => {
+  header.addEventListener("click", () => {
+    const colIndex = header.getAttribute("data-col");
+    const tbody = table.querySelector("tbody");
+    const rows = Array.from(tbody.querySelectorAll("tr"));
+    const ascending = header.classList.toggle("asc");
 
-function sortTable(colIndex) {
-  const rows = Array.from(tbody.querySelectorAll("tr"));
-  const isNumeric = colIndex >= 2; // USD & IDR kolom angka
-  const direction = sortDirections[colIndex] === "asc" ? "desc" : "asc";
+    rows.sort((a, b) => {
+      const valA = a.children[colIndex].innerText;
+      const valB = b.children[colIndex].innerText;
 
-  rows.sort((a, b) => {
-    const aText = a.children[colIndex].innerText.trim();
-    const bText = b.children[colIndex].innerText.trim();
+      if (!isNaN(parseFloat(valA)) && !isNaN(parseFloat(valB))) {
+        return ascending ? valA - valB : valB - valA;
+      } else {
+        return ascending
+          ? valA.localeCompare(valB)
+          : valB.localeCompare(valA);
+      }
+    });
 
-    let aVal = isNumeric ? parseFloat(aText.replace(/[^0-9.-]+/g, "")) : aText.toLowerCase();
-    let bVal = isNumeric ? parseFloat(bText.replace(/[^0-9.-]+/g, "")) : bText.toLowerCase();
-
-    if (aVal < bVal) return direction === "asc" ? -1 : 1;
-    if (aVal > bVal) return direction === "asc" ? 1 : -1;
-    return 0;
+    rows.forEach(row => tbody.appendChild(row));
   });
-
-  rows.forEach(row => tbody.appendChild(row));
-
-  sortDirections[colIndex] = direction;
-}
-
-// Event listener untuk klik header tabel
-table.querySelectorAll("th").forEach((th, index) => {
-  th.addEventListener("click", () => sortTable(index));
 });
 </script></body></html>
