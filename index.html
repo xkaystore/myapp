@@ -6,6 +6,14 @@
   <title>Xkay Store | Convert & Topup PayPal</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/@supabase/supabase-js"></script>
+
+  <!-- Favicon Xkay Store -->
+  <link rel="icon" href="data:image/svg+xml,
+    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
+      <rect width='100' height='100' rx='20' ry='20' fill='%230d47a1'/>
+      <text x='50%' y='55%' font-size='55' text-anchor='middle' fill='white' font-family='Arial, sans-serif'>X</text>
+    </svg>
+  "/>
 </head>
 <body class="bg-blue-900 text-white font-sans min-h-screen">
 
@@ -13,7 +21,10 @@
   <header class="text-center p-6 bg-blue-800 shadow-md">
     <h1 class="text-3xl font-bold">Xkay Store</h1>
     <p class="mt-2">💸 Convert & Topup PayPal dengan mudah</p>
-    <p class="mt-1">Kurs Real-Time: <span id="rate" class="font-semibold">Loading...</span></p>
+    <div class="mt-3 space-y-1">
+      <p>Kurs Tetap: <span id="fixedRate" class="font-semibold">Rp 12.000</span></p>
+      <p>Kurs Real-Time: <span id="liveRate" class="font-semibold">Loading...</span></p>
+    </div>
   </header>
 
   <!-- Form -->
@@ -42,7 +53,7 @@
 
         <div>
           <input type="number" id="usd" placeholder="Nominal (USD)" class="w-full p-3 rounded text-black" required>
-          <p class="mt-2">Setara: <span id="idr">Rp 0</span></p>
+          <p class="mt-2">Setara (kurs tetap): <span id="idr">Rp 0</span></p>
         </div>
 
         <button type="submit" class="bg-green-600 px-6 py-3 rounded-lg w-full">Kirim Order</button>
@@ -60,6 +71,7 @@
             <th class="p-2">Tanggal</th>
             <th class="p-2">Nama</th>
             <th class="p-2">Tipe</th>
+            <th class="p-2">Kategori</th>
             <th class="p-2">Provider</th>
             <th class="p-2">USD</th>
             <th class="p-2">IDR</th>
@@ -75,43 +87,51 @@
   <div id="popup" class="fixed inset-0 bg-black bg-opacity-70 hidden items-center justify-center">
     <div class="bg-white text-black p-6 rounded-2xl max-w-md w-full">
       <h3 class="text-lg font-bold mb-4">Pilih Bank / E-Wallet</h3>
+      <p class="mb-2 font-semibold">Bank Lokal</p>
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <button onclick="selectProvider('Bank Lokal','BCA')" class="p-3 bg-blue-200 rounded">BCA</button>
+        <button onclick="selectProvider('Bank Lokal','BRI')" class="p-3 bg-blue-200 rounded">BRI</button>
+        <button onclick="selectProvider('Bank Lokal','BNI')" class="p-3 bg-blue-200 rounded">BNI</button>
+        <button onclick="selectProvider('Bank Lokal','Mandiri')" class="p-3 bg-blue-200 rounded">Mandiri</button>
+      </div>
+      <p class="mb-2 font-semibold">E-Wallet</p>
       <div class="grid grid-cols-2 gap-4">
-        <button onclick="selectProvider('bank','BCA')" class="p-3 bg-blue-200 rounded">BCA</button>
-        <button onclick="selectProvider('bank','BRI')" class="p-3 bg-blue-200 rounded">BRI</button>
-        <button onclick="selectProvider('bank','BNI')" class="p-3 bg-blue-200 rounded">BNI</button>
-        <button onclick="selectProvider('bank','Mandiri')" class="p-3 bg-blue-200 rounded">Mandiri</button>
-        <button onclick="selectProvider('ewallet','OVO')" class="p-3 bg-green-200 rounded">OVO</button>
-        <button onclick="selectProvider('ewallet','Dana')" class="p-3 bg-green-200 rounded">Dana</button>
-        <button onclick="selectProvider('ewallet','Gopay')" class="p-3 bg-green-200 rounded">Gopay</button>
-        <button onclick="selectProvider('ewallet','ShopeePay')" class="p-3 bg-green-200 rounded">ShopeePay</button>
+        <button onclick="selectProvider('E-Wallet','OVO')" class="p-3 bg-green-200 rounded">OVO</button>
+        <button onclick="selectProvider('E-Wallet','Dana')" class="p-3 bg-green-200 rounded">Dana</button>
+        <button onclick="selectProvider('E-Wallet','Gopay')" class="p-3 bg-green-200 rounded">Gopay</button>
+        <button onclick="selectProvider('E-Wallet','ShopeePay')" class="p-3 bg-green-200 rounded">ShopeePay</button>
       </div>
       <button onclick="closePopup()" class="mt-4 bg-red-500 text-white px-4 py-2 rounded">Tutup</button>
     </div>
   </div>
 
 <script type="module">
+  // ====== KONFIGURASI ======
   const SUPABASE_URL = "https://rhujpinlutjiztyonmas.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJodWpwaW5sdXRqaXp0eW9ubWFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczMDQyOTIsImV4cCI6MjA3Mjg4MDI5Mn0.zcfDUOHTeBYydFFscwmy3U9yryHiItTVJPLRurUlBvY";
   const DEFAULT_RATE = 12000;
   const WA_ADMIN = "6285846005280";
 
   const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  let currentRate = DEFAULT_RATE;
-  let selectedType = null;
+  let currentLiveRate = DEFAULT_RATE;
+  let selectedCategory = null;
   let selectedProvider = null;
 
+  // ====== Fetch Kurs Real-Time ======
   async function fetchRate() {
     try {
       const res = await fetch("https://api.exchangerate.host/latest?base=USD&symbols=IDR");
       const data = await res.json();
-      currentRate = data.rates.IDR || DEFAULT_RATE;
+      currentLiveRate = data.rates.IDR || DEFAULT_RATE;
     } catch {
-      currentRate = DEFAULT_RATE;
+      currentLiveRate = DEFAULT_RATE;
     }
-    document.getElementById("rate").innerText = "Rp " + currentRate.toLocaleString();
+    document.getElementById("fixedRate").innerText = "Rp " + DEFAULT_RATE.toLocaleString();
+    document.getElementById("liveRate").innerText = "Rp " + currentLiveRate.toLocaleString();
   }
   fetchRate();
 
+  // ====== Popup ======
   function openPopup() {
     document.getElementById("popup").classList.remove("hidden");
     document.getElementById("popup").classList.add("flex");
@@ -119,16 +139,17 @@
   function closePopup() {
     document.getElementById("popup").classList.add("hidden");
   }
-  window.selectProvider = (type, provider) => {
-    selectedType = type;
+  window.selectProvider = (category, provider) => {
+    selectedCategory = category;
     selectedProvider = provider;
-    document.getElementById("selectedProvider").innerText = `${type.toUpperCase()} - ${provider}`;
+    document.getElementById("selectedProvider").innerText = `${category} - ${provider}`;
     closePopup();
   };
 
+  // ====== Form Handling ======
   document.getElementById("usd").addEventListener("input", e => {
     const usd = parseFloat(e.target.value) || 0;
-    const idr = usd * currentRate;
+    const idr = usd * DEFAULT_RATE;
     document.getElementById("idr").innerText = "Rp " + idr.toLocaleString();
   });
 
@@ -138,7 +159,7 @@
     const paypal_email = document.getElementById("paypal_email").value;
     const type = document.getElementById("type").value;
     const usd = parseFloat(document.getElementById("usd").value);
-    const idr = usd * currentRate;
+    const idr = usd * DEFAULT_RATE;
     const account = document.getElementById("account").value;
 
     if (!selectedProvider) {
@@ -146,13 +167,15 @@
       return;
     }
 
+    // Simpan ke Supabase
     await supabaseClient.from("orders").insert([{
       type, name, paypal_email,
-      usd, rate: currentRate, receive_idr: idr,
-      target_type: selectedType, provider: selectedProvider, account
+      usd, rate: DEFAULT_RATE, receive_idr: idr,
+      target_type: selectedCategory, provider: selectedProvider, account
     }]);
 
-    const waText = `Halo Admin, saya ingin ${type}:\nNama: ${name}\nEmail PayPal: ${paypal_email}\nProvider: ${selectedProvider}\nAkun: ${account}\nNominal: ${usd} USD = Rp ${idr.toLocaleString()}`;
+    // Kirim ke WA
+    const waText = `Halo Admin Xkay Store, saya ingin ${type}:\nNama: ${name}\nEmail PayPal: ${paypal_email}\nKategori: ${selectedCategory}\nProvider: ${selectedProvider}\nAkun: ${account}\nNominal: ${usd} USD = Rp ${idr.toLocaleString()} (kurs tetap Rp ${DEFAULT_RATE.toLocaleString()})`;
     window.open(`https://wa.me/${WA_ADMIN}?text=${encodeURIComponent(waText)}`, "_blank");
 
     e.target.reset();
@@ -160,6 +183,7 @@
     fetchHistory();
   });
 
+  // ====== Riwayat ======
   async function fetchHistory() {
     const { data } = await supabaseClient.from("orders").select("*").order("created_at", { ascending: false });
     const tbody = document.getElementById("history");
@@ -170,6 +194,7 @@
         <td class="p-2">${new Date(row.created_at).toLocaleString()}</td>
         <td class="p-2">${row.name}</td>
         <td class="p-2">${row.type}</td>
+        <td class="p-2">${row.target_type}</td>
         <td class="p-2">${row.provider}</td>
         <td class="p-2">${row.usd}</td>
         <td class="p-2">Rp ${row.receive_idr.toLocaleString()}</td>
@@ -179,11 +204,12 @@
   }
   fetchHistory();
 
+  // ====== Export CSV ======
   async function exportCSV() {
     const { data } = await supabaseClient.from("orders").select("*");
-    let csv = "Tanggal,Nama,Tipe,Provider,USD,IDR\n";
+    let csv = "Tanggal,Nama,Tipe,Kategori,Provider,USD,IDR\n";
     data.forEach(row => {
-      csv += `${row.created_at},${row.name},${row.type},${row.provider},${row.usd},${row.receive_idr}\n`;
+      csv += `${row.created_at},${row.name},${row.type},${row.target_type},${row.provider},${row.usd},${row.receive_idr}\n`;
     });
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
