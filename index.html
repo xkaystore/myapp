@@ -1,561 +1,205 @@
 <!DOCTYPE html>
-<html lang="id" data-theme="dark">
+<html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Xkay Store • Convert & Topup PayPal</title>
-
-  <!-- Tailwind (enable dark mode via class) -->
-  <script>
-    window.tailwind = { config: { darkMode: 'class' } };
-  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Xkay Store - Convert & Topup PayPal</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Supabase -->
   <script src="https://unpkg.com/@supabase/supabase-js"></script>
 
   <!-- Favicon -->
   <link rel="icon" href="data:image/svg+xml,
     <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
-      <defs><linearGradient id='g' x1='0' x2='1' y1='0' y2='1'>
-        <stop offset='0%' stop-color='%23133a7c'/><stop offset='100%' stop-color='%230d47a1'/>
-      </linearGradient></defs>
-      <rect width='100' height='100' rx='18' fill='url(%23g)'/>
-      <text x='50%' y='57%' font-size='56' text-anchor='middle' fill='white' font-family='Arial, sans-serif'>X</text>
+      <rect width='100' height='100' rx='20' ry='20' fill='%230d47a1'/>
+      <text x='50%' y='55%' font-size='55' text-anchor='middle' fill='white' font-family='Arial'>X</text>
     </svg>
   "/>
-  <meta name="theme-color" content="#0d47a1" />
-
-  <style>
-    /* Scrollbar halus */
-    ::-webkit-scrollbar{height:8px;width:8px}
-    ::-webkit-scrollbar-thumb{background:#2b3f83;border-radius:999px}
-    ::-webkit-scrollbar-track{background:transparent}
-
-    /* THEME OVERRIDES (light) — pakai class .theme-light pada body */
-    body.theme-light {
-      color: #0f172a;
-      background: radial-gradient(80% 80% at 50% 20%, #e6eefc 0%, #dfe7fb 40%, #eaf0ff 100%) fixed;
-    }
-    body.theme-light .themed {
-      background: rgba(255,255,255,0.75) !important;
-      color: #0f172a !important;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border-color: rgba(0,0,0,0.08) !important;
-    }
-    body.theme-light .themed-strong {
-      background: rgba(255,255,255,0.9) !important;
-      border-color: rgba(0,0,0,0.08) !important;
-    }
-    body.theme-light .txt-dim { color:#334155 !important; }
-    body.theme-light .btn-primary { background:#0d47a1 !important; color:#fff !important; }
-    body.theme-light .btn-primary:hover { background:#1155c1 !important; }
-    body.theme-light .ring-dim { border-color: rgba(0,0,0,0.08) !important; }
-    /* Sticky thead for vertical scroll table */
-    .sticky-head th { position: sticky; top: 0; z-index: 1; }
-  </style>
 </head>
+<body class="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-100 min-h-screen flex flex-col">
 
-<body class="min-h-screen text-white bg-gradient-to-br from-[#0f172a] via-[#0b2454] to-[#0a1a3a] selection:bg-white/20 selection:text-white">
-  <!-- Top Nav -->
-  <header class="themed-strong sticky top-0 z-40 backdrop-blur-md bg-blue-900/40 border-b border-white/10">
-    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-2xl bg-white/10 ring-1 ring-white/15 grid place-items-center themed">
-          <span class="text-xl font-bold">X</span>
-        </div>
-        <div>
-          <h1 class="text-lg sm:text-xl font-bold tracking-tight">Xkay Store</h1>
-          <p class="text-xs sm:text-sm text-white/70 txt-dim">Convert & Topup PayPal • cepat & aman</p>
-        </div>
-      </div>
-
-      <!-- Right: Rates + Theme toggle -->
-      <div class="flex items-center gap-3 sm:gap-5 text-sm">
-        <div class="px-3 py-2 rounded-xl bg-white/5 ring-1 ring-white/10 themed">
-          <div class="text-white/60 txt-dim">Kurs Tetap</div>
-          <div id="fixedRate" class="font-semibold">Rp 12.000</div>
-        </div>
-        <div class="px-3 py-2 rounded-xl bg-white/5 ring-1 ring-white/10 themed">
-          <div class="text-white/60 txt-dim">Kurs Real-Time</div>
-          <div id="liveRate" class="font-semibold">Loading…</div>
-        </div>
-        <button id="themeToggle" class="hidden sm:inline-flex px-3 py-2 rounded-xl bg-white/10 ring-1 ring-white/15 hover:bg-white/20 themed btn-primary">
-          Toggle Theme
-        </button>
-      </div>
-    </div>
+  <!-- Header -->
+  <header class="bg-blue-700 text-white p-4 flex justify-between items-center shadow">
+    <h1 class="text-xl font-bold">Xkay Store</h1>
+    <button id="darkToggle" class="px-3 py-1 bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200 rounded">🌙</button>
   </header>
 
-  <!-- Hero -->
-  <section class="relative">
-    <div class="absolute inset-0 pointer-events-none">
-      <div class="absolute -top-10 left-1/2 -translate-x-1/2 w-[800px] h-[800px] rounded-full bg-blue-500/20 blur-3xl"></div>
-    </div>
-    <div class="max-w-6xl mx-auto px-4 pt-6 pb-2">
-      <div class="grid md:grid-cols-2 gap-6">
-        <!-- Order Card -->
-        <div class="themed rounded-2xl bg-white/10 backdrop-blur-md ring-1 ring-white/15 shadow-2xl p-5 sm:p-6">
-          <div class="flex items-center justify-between mb-1">
-            <h2 class="text-xl font-semibold">Buat Order</h2>
-            <button id="themeToggleSm" class="sm:hidden px-3 py-2 rounded-xl bg-white/10 ring-1 ring-white/15 hover:bg-white/20 themed btn-primary">
-              Theme
-            </button>
-          </div>
-          <p class="text-white/70 text-sm mb-5 txt-dim">Tanpa login. Detail dikirim ke WhatsApp Admin, tersimpan di riwayat.</p>
-
-          <form id="orderForm" class="space-y-4" novalidate>
-            <div class="grid sm:grid-cols-2 gap-4">
-              <div>
-                <label class="block text-sm mb-1 text-white/80 txt-dim">Nama Lengkap</label>
-                <input id="name" type="text" autocomplete="name" required
-                  class="w-full rounded-xl px-3 py-2 text-black focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Nama Anda" />
-              </div>
-              <div>
-                <label class="block text-sm mb-1 text-white/80 txt-dim">Email PayPal</label>
-                <input id="paypal_email" type="email" autocomplete="email" required
-                  class="w-full rounded-xl px-3 py-2 text-black focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="email@paypal.com" />
-              </div>
-            </div>
-
-            <div class="grid sm:grid-cols-2 gap-4">
-              <div>
-                <label class="block text-sm mb-1 text-white/80 txt-dim">Jenis Transaksi</label>
-                <select id="type" required
-                  class="w-full rounded-xl px-3 py-2 text-black focus:outline-none focus:ring-2 focus:ring-blue-400">
-                  <option value="convert">Convert (PayPal → Bank/E-Wallet)</option>
-                  <option value="topup">Topup (Bank/E-Wallet → PayPal)</option>
-                </select>
-              </div>
-
-              <div>
-                <label class="block text-sm mb-1 text-white/80 txt-dim">Tujuan Penerimaan</label>
-                <button type="button" id="providerBtn"
-                  class="w-full rounded-xl px-3 py-2 bg-blue-600 hover:bg-blue-500 transition focus:outline-none focus:ring-2 focus:ring-blue-300 btn-primary">
-                  Pilih Bank / E-Wallet
-                </button>
-                <p id="selectedProvider" class="text-xs text-white/70 mt-1 txt-dim">Belum dipilih</p>
-              </div>
-            </div>
-
-            <div class="grid sm:grid-cols-2 gap-4">
-              <div>
-                <label class="block text-sm mb-1 text-white/80 txt-dim">No Rekening / Akun</label>
-                <input id="account" type="text" required
-                  class="w-full rounded-xl px-3 py-2 text-black focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Contoh: 1234567890 (BCA)" />
-              </div>
-              <div>
-                <label class="block text-sm mb-1 text-white/80 txt-dim">Nominal (USD)</label>
-                <input id="usd" type="number" step="0.01" min="0.01" required
-                  class="w-full rounded-xl px-3 py-2 text-black focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="0.00" />
-                <p class="text-xs text-white/70 mt-1 txt-dim">Dihitung dengan <span class="underline decoration-dotted">kurs tetap</span>.</p>
-              </div>
-            </div>
-
-            <div class="flex items-center justify-between rounded-xl bg-white/5 ring-1 ring-white/10 px-3 py-2 themed">
-              <span class="text-sm text-white/80 txt-dim">Setara (IDR, kurs tetap):</span>
-              <span id="idr" class="font-semibold">Rp 0</span>
-            </div>
-
-            <button id="submitBtn" type="submit"
-              class="w-full rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-semibold py-3 transition focus:outline-none focus:ring-2 focus:ring-emerald-300">
-              Kirim Order via WhatsApp
-            </button>
-            <p class="text-[11px] text-white/60 txt-dim">Dengan mengirim, Anda setuju data disimpan untuk riwayat transaksi.</p>
-          </form>
-        </div>
-
-        <!-- Kurs & Info -->
-        <aside class="themed rounded-2xl bg-white/5 backdrop-blur-md ring-1 ring-white/10 p-5 sm:p-6">
-          <h3 class="text-lg font-semibold mb-2">Informasi Kurs</h3>
-          <ul class="space-y-2 text-sm text-white/80 txt-dim">
-            <li>• <b>Kurs tetap</b> digunakan untuk perhitungan IDR (bisa diubah di kode).</li>
-            <li>• <b>Kurs real-time</b> hanya info pasar saat ini (multi-sumber).</li>
-          </ul>
-
-          <div class="mt-4 grid gap-3">
-            <div class="themed rounded-xl bg-white/10 ring-1 ring-white/10 p-3">
-              <div class="text-white/60 txt-dim text-sm">Kurs Tetap</div>
-              <div id="fixedRateLarge" class="mt-1 text-2xl font-bold">Rp 12.000</div>
-              <div class="text-[11px] text-white/60 mt-1 txt-dim">Ubah nilai di kode: <code>DEFAULT_RATE_INITIAL</code>.</div>
-            </div>
-
-            <div class="themed rounded-xl bg-white/10 ring-1 ring-white/10 p-3">
-              <div class="flex items-center justify-between">
-                <span class="text-sm text-white/70 txt-dim">Kurs Real-Time</span>
-                <button id="refreshRate" class="text-xs px-2 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-300 btn-primary">
-                  Refresh
-                </button>
-              </div>
-              <div class="mt-1">
-                <div id="liveRateBig" class="text-2xl font-bold">Memuat…</div>
-                <div id="liveMeta" class="text-[11px] text-white/60 mt-1 txt-dim">Sumber: exchangerate.host</div>
-              </div>
-            </div>
-          </div>
-        </aside>
-      </div>
+  <!-- Kurs -->
+  <section class="p-4 grid gap-2 text-center">
+    <h2 class="text-lg font-semibold">Kurs</h2>
+    <div class="grid gap-1">
+      <p>Convert (Tetap): <span class="font-bold text-blue-700">Rp 12.000</span></p>
+      <p>Topup (Tetap): <span class="font-bold text-blue-700">Rp 17.000</span></p>
+      <p>Real-time: <span id="liveRate" class="font-bold text-green-600">Loading...</span></p>
     </div>
   </section>
 
-  <!-- Riwayat -->
-  <section class="max-w-6xl mx-auto px-4 pt-2 pb-10">
-    <div class="themed rounded-2xl bg-white/5 backdrop-blur-md ring-1 ring-white/10 p-5 sm:p-6">
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
-        <h2 class="text-xl font-semibold">Riwayat Transaksi</h2>
-        <div class="flex items-center gap-2">
-          <button id="exportBtn" class="px-3 py-2 rounded-lg bg-yellow-400 text-black font-semibold">Export CSV</button>
-          <button id="reloadHistory" class="px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 btn-primary">Reload</button>
-        </div>
-      </div>
+  <!-- Form -->
+  <section class="p-4">
+    <form id="orderForm" class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow grid gap-3 max-w-lg mx-auto">
+      <h2 class="text-lg font-semibold">Form Order</h2>
 
-      <div class="rounded-xl ring-1 ring-white/10 themed-strong overflow-hidden">
-        <!-- Wrapper scroll vertikal -->
-        <div class="max-h-[360px] overflow-y-auto">
-          <table class="min-w-full text-left text-sm">
-            <thead class="bg-white/10 text-white/80 sticky-head themed">
-              <tr>
-                <th class="px-3 py-2">Tanggal</th>
-                <th class="px-3 py-2">Nama</th>
-                <th class="px-3 py-2">Tipe</th>
-                <th class="px-3 py-2">Kategori</th>
-                <th class="px-3 py-2">Provider</th>
-                <th class="px-3 py-2">USD</th>
-                <th class="px-3 py-2">IDR</th>
-              </tr>
-            </thead>
-            <tbody id="history" class="divide-y divide-white/10">
-              <tr class="animate-pulse"><td class="px-3 py-2" colspan="7">Memuat data…</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <p id="historyEmpty" class="hidden text-center text-white/60 text-sm mt-3 txt-dim">Belum ada transaksi.</p>
-    </div>
+      <select id="type" class="p-2 rounded border dark:bg-gray-700">
+        <option value="convert">Convert Saldo</option>
+        <option value="topup">Topup PayPal</option>
+      </select>
+
+      <input id="name" type="text" placeholder="Nama Lengkap" class="p-2 rounded border dark:bg-gray-700" required>
+      <input id="paypalEmail" type="email" placeholder="Email PayPal" class="p-2 rounded border dark:bg-gray-700" required>
+      
+      <button type="button" onclick="openPopup()" class="p-2 bg-blue-600 text-white rounded">Pilih Bank / E-Wallet</button>
+      <p id="selectedProvider" class="text-sm text-gray-500">Belum dipilih</p>
+
+      <input id="account" type="text" placeholder="No Rekening / Akun" class="p-2 rounded border dark:bg-gray-700" required>
+      <input id="usd" type="number" min="1" placeholder="Nominal USD" class="p-2 rounded border dark:bg-gray-700" required>
+
+      <button type="submit" class="p-2 bg-green-600 text-white rounded hover:bg-green-700">Kirim Order</button>
+    </form>
   </section>
 
-  <!-- Modal Provider -->
-  <div id="providerModal" class="fixed inset-0 z-50 hidden" aria-hidden="true" role="dialog" aria-modal="true">
-    <div id="providerOverlay" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
-    <div class="relative mx-auto mt-24 w-[92%] max-w-md rounded-2xl bg-white text-black shadow-2xl ring-1 ring-black/10">
-      <div class="p-5">
-        <div class="flex items-center justify-between">
-          <h3 class="text-lg font-semibold">Pilih Bank / E-Wallet</h3>
-          <button id="closeProvider" class="rounded-lg px-2 py-1 text-sm bg-black/5 hover:bg-black/10">Tutup (Esc)</button>
-        </div>
-
-        <p class="mt-3 mb-1 text-sm font-semibold text-black/70">Bank Lokal</p>
-        <div class="grid grid-cols-2 gap-3">
-          <button data-category="Bank Lokal" data-provider="BCA" class="opt-btn">BCA</button>
-          <button data-category="Bank Lokal" data-provider="BRI" class="opt-btn">BRI</button>
-          <button data-category="Bank Lokal" data-provider="BNI" class="opt-btn">BNI</button>
-          <button data-category="Bank Lokal" data-provider="Mandiri" class="opt-btn">Mandiri</button>
-        </div>
-
-        <p class="mt-4 mb-1 text-sm font-semibold text-black/70">E-Wallet</p>
-        <div class="grid grid-cols-2 gap-3">
-          <button data-category="E-Wallet" data-provider="OVO" class="opt-btn">OVO</button>
-          <button data-category="E-Wallet" data-provider="Dana" class="opt-btn">Dana</button>
-          <button data-category="E-Wallet" data-provider="Gopay" class="opt-btn">Gopay</button>
-          <button data-category="E-Wallet" data-provider="ShopeePay" class="opt-btn">ShopeePay</button>
-        </div>
+  <!-- Popup Provider -->
+  <div id="popup" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center">
+    <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow max-w-sm w-full">
+      <h3 class="font-semibold mb-2">Pilih Provider</h3>
+      <div class="grid grid-cols-2 gap-2">
+        <button onclick="selectProvider('Bank','BCA')" class="p-2 bg-blue-500 text-white rounded">BCA</button>
+        <button onclick="selectProvider('Bank','BRI')" class="p-2 bg-blue-500 text-white rounded">BRI</button>
+        <button onclick="selectProvider('E-Wallet','OVO')" class="p-2 bg-purple-500 text-white rounded">OVO</button>
+        <button onclick="selectProvider('E-Wallet','Dana')" class="p-2 bg-purple-500 text-white rounded">Dana</button>
       </div>
+      <button onclick="closePopup()" class="mt-3 px-3 py-1 bg-red-500 text-white rounded">Tutup</button>
     </div>
   </div>
 
+  <!-- Riwayat -->
+  <section class="p-4 flex-1">
+    <h2 class="text-lg font-semibold mb-2">Riwayat Transaksi</h2>
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow overflow-hidden">
+      <div class="overflow-y-auto max-h-80">
+        <table class="min-w-full text-sm">
+          <thead class="bg-gray-200 dark:bg-gray-700">
+            <tr>
+              <th class="px-2 py-1">Tanggal</th>
+              <th class="px-2 py-1">Type</th>
+              <th class="px-2 py-1">Nama</th>
+              <th class="px-2 py-1">USD</th>
+              <th class="px-2 py-1">IDR</th>
+              <th class="px-2 py-1">Provider</th>
+            </tr>
+          </thead>
+          <tbody id="historyTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
   <!-- Toast -->
-  <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 hidden px-4 py-2 rounded-xl bg-white text-black text-sm shadow-xl"></div>
+  <div id="toast" class="fixed bottom-5 right-5 bg-green-600 text-white px-4 py-2 rounded shadow hidden">Order berhasil dikirim!</div>
 
+  <!-- Script -->
   <script type="module">
-    // ================== KONFIGURASI ==================
-    const SUPABASE_URL  = "https://rhujpinlutjiztyonmas.supabase.co";
-    const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJodWpwaW5sdXRqaXp0eW9ubWFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczMDQyOTIsImV4cCI6MjA3Mjg4MDI5Mn0.zcfDUOHTeBYydFFscwmy3U9yryHiItTVJPLRurUlBvY";
-    const WA_ADMIN      = "6285846005280";
+    const SUPABASE_URL = "https://rhujpinlutjiztyonmas.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...";
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const WA_ADMIN = "6285846005280";
 
-    // Ubah kurs tetap disini (tombol UI dihapus)
-    const DEFAULT_RATE_INITIAL = 12000;
+    const FIXED_RATE_CONVERT = 12000;
+    const FIXED_RATE_TOPUP = 17000;
 
-    // ================== STATE & HELPERS ==================
-    const idLocale = "id-ID";
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-    let FIXED_RATE = DEFAULT_RATE_INITIAL;
-    let LIVE_RATE  = FIXED_RATE;
-    let selected   = { category: null, provider: null };
-    let modalOpener = null;
+    let selectedCategory = null;
+    let selectedProvider = null;
 
-    const qs  = (sel) => document.querySelector(sel);
-    const qsa = (sel) => Array.from(document.querySelectorAll(sel));
-    const rp  = (n) => new Intl.NumberFormat(idLocale, { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(n);
-    const fmt = (n) => new Intl.NumberFormat(idLocale, { maximumFractionDigits: 2 }).format(n);
+    // Popup
+    function openPopup() { document.getElementById("popup").style.display = "flex"; }
+    function closePopup() { document.getElementById("popup").style.display = "none"; }
+    window.selectProvider = (cat, prov) => {
+      selectedCategory = cat; selectedProvider = prov;
+      document.getElementById("selectedProvider").innerText = `${cat} - ${prov}`;
+      closePopup();
+    };
 
-    function toast(msg, ok=true){
-      const el = qs("#toast"); el.textContent = msg;
-      el.className = "fixed bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-xl text-sm shadow-xl " + (ok ? "bg-emerald-400 text-black" : "bg-red-400 text-black");
-      el.style.display = "block"; setTimeout(()=>{ el.style.display="none"; }, 2200);
-    }
-    function setFixedUI(){
-      qs("#fixedRate").textContent = rp(FIXED_RATE);
-      qs("#fixedRateLarge").textContent = rp(FIXED_RATE);
-      const usd = parseFloat(qs("#usd").value) || 0;
-      qs("#idr").textContent = rp(usd * FIXED_RATE);
-    }
-
-    // ================== THEME TOGGLE ==================
-    const THEME_KEY = "xkay_theme"; // 'dark' | 'light'
-    function applyTheme(t){
-      const body = document.body;
-      if(t === "light"){ body.classList.add("theme-light"); document.documentElement.dataset.theme = "light"; }
-      else { body.classList.remove("theme-light"); document.documentElement.dataset.theme = "dark"; }
-      localStorage.setItem(THEME_KEY, t);
-    }
-    function toggleTheme(){
-      const curr = localStorage.getItem(THEME_KEY) || "dark";
-      applyTheme(curr === "dark" ? "light" : "dark");
-    }
-
-    // ================== KURS REAL-TIME (Multi-sumber) ==================
-    async function fetchWithTimeout(url, ms=8000){
-      return Promise.race([
-        fetch(url),
-        new Promise((_, rej)=>setTimeout(()=>rej(new Error("timeout")), ms))
-      ]);
-    }
-    async function getRate_exchangerate_host(){
-      const res = await fetchWithTimeout("https://api.exchangerate.host/latest?base=USD&symbols=IDR", 8000);
-      const data = await res.json();
-      const v = Number(data?.rates?.IDR);
-      if(!v || !isFinite(v)) throw new Error("exchangerate.host invalid data");
-      return Math.round(v);
-    }
-    async function getRate_open_er_api(){
-      const res = await fetchWithTimeout("https://open.er-api.com/v6/latest/USD", 8000);
-      const data = await res.json();
-      const v = Number(data?.rates?.IDR);
-      if(!v || !isFinite(v)) throw new Error("open.er-api invalid data");
-      return Math.round(v);
-    }
-    async function loadLiveRate(){
-      const liveSmall = qs("#liveRate");
-      const liveBig   = qs("#liveRateBig");
-      const meta      = qs("#liveMeta");
-      liveSmall.textContent = "Memuat…";
-      liveBig.textContent   = "Memuat…";
-
-      try{
-        LIVE_RATE = await getRate_exchangerate_host();
-        meta.textContent = "Sumber: exchangerate.host • " + new Date().toLocaleString(idLocale);
-      }catch(e1){
-        console.warn("exchangerate.host gagal:", e1);
-        try{
-          LIVE_RATE = await getRate_open_er_api();
-          meta.textContent = "Sumber: open.er-api.com • " + new Date().toLocaleString(idLocale);
-        }catch(e2){
-          console.warn("open.er-api gagal:", e2);
-          LIVE_RATE = FIXED_RATE; // fallback
-          meta.textContent = "Gagal muat kurs real-time (pakai fallback).";
-        }
+    // Fetch Kurs Real-time
+    async function fetchRate() {
+      let rate = null;
+      try {
+        const r1 = await fetch("https://api.exchangerate.host/latest?base=USD&symbols=IDR");
+        if (r1.ok) { rate = (await r1.json()).rates.IDR; }
+      } catch {}
+      if (!rate) {
+        try {
+          const r2 = await fetch("https://open.er-api.com/v6/latest/USD");
+          if (r2.ok) { rate = (await r2.json()).rates.IDR; }
+        } catch {}
       }
-      liveSmall.textContent = rp(LIVE_RATE);
-      liveBig.textContent   = rp(LIVE_RATE);
+      document.getElementById("liveRate").innerText = rate ? "Rp " + rate.toLocaleString() : "Gagal ambil kurs";
+    }
+    fetchRate();
+
+    // Toast
+    function showToast(msg) {
+      const toast = document.getElementById("toast");
+      toast.innerText = msg;
+      toast.classList.remove("hidden");
+      setTimeout(()=>toast.classList.add("hidden"),3000);
     }
 
-    // ================== MODAL PROVIDER ==================
-    const modal = qs("#providerModal");
-    const overlay = qs("#providerOverlay");
-    const providerBtn = qs("#providerBtn");
-    const closeProvider = qs("#closeProvider");
-    const styleOptBtn = "opt-btn px-3 py-2 rounded-xl bg-black/5 hover:bg-black/10 ring-1 ring-black/10 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm";
-    qsa(".opt-btn").forEach(b=> b.className = styleOptBtn);
-
-    function openModal(){
-      modalOpener = document.activeElement;
-      modal.classList.remove("hidden");
-      modal.setAttribute("aria-hidden","false");
-      const first = modal.querySelector(".opt-btn"); first && first.focus();
-      document.addEventListener("keydown", onEscClose, { once:false });
+    // Load History
+    async function loadHistory() {
+      const { data } = await supabaseClient.from("orders").select("*").order("created_at",{ascending:false}).limit(20);
+      const tbody = document.getElementById("historyTable");
+      tbody.innerHTML = "";
+      data.forEach(row=>{
+        tbody.innerHTML += `
+          <tr class="border-b dark:border-gray-700">
+            <td class="px-2 py-1">${new Date(row.created_at).toLocaleString()}</td>
+            <td class="px-2 py-1">${row.type}</td>
+            <td class="px-2 py-1">${row.name}</td>
+            <td class="px-2 py-1">${row.usd}</td>
+            <td class="px-2 py-1">Rp ${row.receive_idr.toLocaleString()}</td>
+            <td class="px-2 py-1">${row.provider}</td>
+          </tr>`;
+      });
     }
-    function closeModal(){
-      modal.classList.add("hidden");
-      modal.setAttribute("aria-hidden","true");
-      document.removeEventListener("keydown", onEscClose, { once:false });
-      if(modalOpener) modalOpener.focus();
-    }
-    function onEscClose(e){ if(e.key === "Escape") closeModal(); }
+    loadHistory();
 
-    providerBtn.addEventListener("click", openModal, { passive:true });
-    closeProvider.addEventListener("click", closeModal, { passive:true });
-    overlay.addEventListener("click", closeModal, { passive:true });
-
-    modal.addEventListener("click", (e)=>{
-      const btn = e.target.closest(".opt-btn");
-      if(!btn) return;
-      selected.category = btn.dataset.category;
-      selected.provider = btn.dataset.provider;
-      qs("#selectedProvider").textContent = `${selected.category} — ${selected.provider}`;
-      toast("Metode dipilih: " + selected.provider);
-      closeModal();
-    });
-
-    // ================== VALIDASI KETAT ==================
-    function isValidEmail(email){
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    }
-    function isValidName(name){
-      return name && name.trim().length >= 3;
-    }
-    function isValidAccount(acc){
-      // Boleh angka/huruf, minimal 5
-      return /^[a-zA-Z0-9.\-_]{5,}$/.test(acc.trim());
-    }
-
-    // ================== FORM ==================
-    const usdInput = qs("#usd");
-    usdInput.addEventListener("input", ()=>{
-      const usd = parseFloat(usdInput.value) || 0;
-      qs("#idr").textContent = rp(usd * FIXED_RATE);
-    });
-
-    const orderForm = qs("#orderForm");
-    const submitBtn = qs("#submitBtn");
-    orderForm.addEventListener("submit", async (e)=>{
+    // Form
+    document.getElementById("orderForm").addEventListener("submit", async(e)=>{
       e.preventDefault();
-      submitBtn.disabled = true; submitBtn.textContent = "Memproses…";
+      const type = document.getElementById("type").value;
+      const name = document.getElementById("name").value.trim();
+      const paypalEmail = document.getElementById("paypalEmail").value.trim();
+      const usd = parseFloat(document.getElementById("usd").value);
+      const account = document.getElementById("account").value.trim();
 
-      const name = qs("#name").value.trim();
-      const paypal_email = qs("#paypal_email").value.trim();
-      const type = qs("#type").value;
-      const account = qs("#account").value.trim();
-      const usd = Math.max(0, parseFloat(qs("#usd").value) || 0);
-      const idr = Math.round(usd * FIXED_RATE);
-
-      // Validasi
-      if(!selected.provider){
-        toast("Pilih Bank / E-Wallet dulu.", false);
-        submitBtn.disabled = false; submitBtn.textContent = "Kirim Order via WhatsApp"; return;
+      if(!name || !paypalEmail || !usd || !account || !selectedProvider) {
+        showToast("Harap lengkapi semua data");
+        return;
       }
-      if(!isValidName(name)){ toast("Nama minimal 3 karakter.", false); submitBtn.disabled=false; submitBtn.textContent="Kirim Order via WhatsApp"; return; }
-      if(!isValidEmail(paypal_email)){ toast("Email tidak valid.", false); submitBtn.disabled=false; submitBtn.textContent="Kirim Order via WhatsApp"; return; }
-      if(!isValidAccount(account)){ toast("Akun/Rekening minimal 5 karakter (huruf/angka . - _).", false); submitBtn.disabled=false; submitBtn.textContent="Kirim Order via WhatsApp"; return; }
-      if(!(usd > 0)){ toast("Nominal USD harus lebih dari 0.", false); submitBtn.disabled=false; submitBtn.textContent="Kirim Order via WhatsApp"; return; }
+      if(!paypalEmail.includes("@")) { showToast("Email tidak valid"); return; }
 
-      let savedOK = false;
-      try{
-        const { error } = await supabaseClient.from("orders").insert([{
-          type, name, paypal_email,
-          usd, rate: FIXED_RATE, receive_idr: idr,
-          target_type: selected.category, provider: selected.provider, account
-        }]);
-        if(error) throw error;
-        savedOK = true;
-        toast("Order tersimpan. Membuka WhatsApp…", true);
-      }catch(err){
-        console.error("[DB] insert gagal:", err);
-        toast("DB error—tetap membuka WhatsApp.", false);
-      }
+      const rate = type==="convert"?FIXED_RATE_CONVERT:FIXED_RATE_TOPUP;
+      const receive_idr = usd * rate;
 
-      // Kirim ke WhatsApp
-      const waText = [
-        `Halo Admin Xkay Store, saya ingin ${type}:`,
-        ``,
-        `Nama: ${name}`,
-        `Email PayPal: ${paypal_email}`,
-        `Kategori: ${selected.category}`,
-        `Provider: ${selected.provider}`,
-        `Akun: ${account}`,
-        `Nominal: ${fmt(usd)} USD = ${rp(idr)} (kurs tetap ${rp(FIXED_RATE)})`,
-        ``,
-        `Kurs real-time saat ini: ${rp(LIVE_RATE)}`
-      ].join("\n");
-      window.open(`https://wa.me/${WA_ADMIN}?text=${encodeURIComponent(waText)}`, "_blank");
+      const { error } = await supabaseClient.from("orders").insert([{
+        type, name, paypal_email:paypalEmail, usd, rate, receive_idr,
+        target_type:selectedCategory, provider:selectedProvider, account
+      }]);
+      if(error){ showToast("Gagal simpan order"); return; }
 
-      if(savedOK){
-        orderForm.reset();
-        selected = { category:null, provider:null };
-        qs("#selectedProvider").textContent = "Belum dipilih";
-        qs("#idr").textContent = rp(0);
-        loadHistory();
-      }
-      submitBtn.disabled = false; submitBtn.textContent = "Kirim Order via WhatsApp";
+      // WA
+      const msg = `Halo Admin, saya ingin ${type} PayPal:\nNama: ${name}\nEmail: ${paypalEmail}\nUSD: ${usd}\nKurs: Rp${rate}\nTerima: Rp${receive_idr}\n${selectedCategory}: ${selectedProvider}\nAkun: ${account}`;
+      window.open(`https://wa.me/${WA_ADMIN}?text=${encodeURIComponent(msg)}`,"_blank");
+
+      e.target.reset();
+      document.getElementById("selectedProvider").innerText="Belum dipilih";
+      selectedCategory=null; selectedProvider=null;
+      loadHistory();
+      showToast("Order berhasil dikirim!");
     });
 
-    // ================== RIWAYAT ==================
-    async function loadHistory(){
-      const tbody = qs("#history");
-      const empty = qs("#historyEmpty");
-      tbody.innerHTML = `<tr class="animate-pulse"><td class="px-3 py-2" colspan="7">Memuat data…</td></tr>`;
-      empty.classList.add("hidden");
-      try{
-        const { data, error } = await supabaseClient.from("orders").select("*").order("created_at", { ascending:false });
-        if(error) throw error;
-        tbody.innerHTML = "";
-        if(!data || !data.length){ empty.classList.remove("hidden"); return; }
-        for(const row of data){
-          const tr = document.createElement("tr");
-          const cells = [
-            new Date(row.created_at).toLocaleString(idLocale),
-            row.name ?? "-",
-            row.type ?? "-",
-            row.target_type ?? "-",
-            row.provider ?? "-",
-            (row.usd ?? 0).toLocaleString(idLocale, { maximumFractionDigits: 2 }),
-            rp(row.receive_idr ?? 0)
-          ];
-          for(const c of cells){
-            const td = document.createElement("td");
-            td.className = "px-3 py-2";
-            td.textContent = c;
-            tr.appendChild(td);
-          }
-          tbody.appendChild(tr);
-        }
-      }catch(e){
-        console.error("[DB] load history gagal:", e);
-        tbody.innerHTML = "";
-        empty.classList.remove("hidden");
-        empty.textContent = "Gagal memuat riwayat. Coba Reload.";
-      }
-    }
-
-    async function exportCSV(){
-      try{
-        const { data, error } = await supabaseClient.from("orders").select("*");
-        if(error) throw error;
-        const head = ["Tanggal","Nama","Tipe","Kategori","Provider","USD","IDR"];
-        const rows = (data||[]).map(r => [
-          r.created_at, r.name||"", r.type||"", r.target_type||"", r.provider||"", r.usd||0, r.receive_idr||0
-        ]);
-        const csv = [head, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n");
-        const blob = new Blob([csv], { type:"text/csv;charset=utf-8" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a"); a.href = url; a.download = "riwayat_xkay_store.csv"; a.click();
-        URL.revokeObjectURL(url);
-        toast("CSV terunduh");
-      }catch(e){
-        console.error("[CSV] export gagal:", e);
-        toast("Gagal export CSV.", false);
-      }
-    }
-
-    // ================== Bind Buttons ==================
-    qs("#refreshRate").addEventListener("click", loadLiveRate, { passive:true });
-    qs("#reloadHistory").addEventListener("click", loadHistory, { passive:true });
-    qs("#exportBtn").addEventListener("click", exportCSV, { passive:true });
-    qs("#themeToggle").addEventListener("click", toggleTheme, { passive:true });
-    qs("#themeToggleSm").addEventListener("click", toggleTheme, { passive:true });
-
-    // ================== INIT ==================
-    (async function init(){
-      // Apply saved theme
-      const savedTheme = localStorage.getItem(THEME_KEY) || "dark";
-      applyTheme(savedTheme);
-
-      // styling tombol provider
-      qsa(".opt-btn").forEach(b=> b.className = "opt-btn px-3 py-2 rounded-xl bg-black/5 hover:bg-black/10 ring-1 ring-black/10 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm");
-
-      setFixedUI();
-      await loadLiveRate();
-      await loadHistory();
-    })();
+    // Dark Mode
+    document.getElementById("darkToggle").addEventListener("click",()=>{
+      document.documentElement.classList.toggle("dark");
+    });
   </script>
 </body>
 </html>
