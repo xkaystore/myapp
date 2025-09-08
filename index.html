@@ -10,24 +10,18 @@
   <!-- Supabase -->
   <script src="https://unpkg.com/@supabase/supabase-js"></script>
 
-  <!-- Brand Favicon (X putih, biru doff) -->
+  <!-- Favicon -->
   <link rel="icon" href="data:image/svg+xml,
     <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
-      <defs>
-        <linearGradient id='g' x1='0' x2='1' y1='0' y2='1'>
-          <stop offset='0%' stop-color='%23133a7c'/>
-          <stop offset='100%' stop-color='%230d47a1'/>
-        </linearGradient>
-      </defs>
+      <defs><linearGradient id='g' x1='0' x2='1' y1='0' y2='1'>
+        <stop offset='0%' stop-color='%23133a7c'/><stop offset='100%' stop-color='%230d47a1'/>
+      </linearGradient></defs>
       <rect width='100' height='100' rx='18' fill='url(%23g)'/>
       <text x='50%' y='57%' font-size='56' text-anchor='middle' fill='white' font-family='Arial, sans-serif'>X</text>
     </svg>
   "/>
-
-  <!-- Meta -->
   <meta name="theme-color" content="#0d47a1" />
   <style>
-    /* Scrollbar halus */
     ::-webkit-scrollbar{height:8px;width:8px}
     ::-webkit-scrollbar-thumb{background:#2b3f83;border-radius:999px}
     ::-webkit-scrollbar-track{background:transparent}
@@ -55,7 +49,7 @@
         </div>
         <div class="px-3 py-2 rounded-xl bg-white/5 ring-1 ring-white/10">
           <div class="text-white/60">Kurs Real-Time</div>
-          <div id="liveRate" class="font-semibold animate-pulse">Loading…</div>
+          <div id="liveRate" class="font-semibold">Loading…</div>
         </div>
       </div>
     </div>
@@ -64,7 +58,6 @@
   <!-- Hero -->
   <section class="relative">
     <div class="absolute inset-0 pointer-events-none">
-      <!-- Glow -->
       <div class="absolute -top-10 left-1/2 -translate-x-1/2 w-[800px] h-[800px] rounded-full bg-blue-500/20 blur-3xl"></div>
     </div>
     <div class="max-w-6xl mx-auto px-4 pt-8 pb-2">
@@ -74,11 +67,11 @@
           <h2 class="text-xl font-semibold mb-1">Buat Order</h2>
           <p class="text-white/70 text-sm mb-5">Tanpa login. Detail dikirim ke WhatsApp Admin, tersimpan di riwayat.</p>
 
-          <form id="orderForm" class="space-y-4">
+          <form id="orderForm" class="space-y-4" novalidate>
             <div class="grid sm:grid-cols-2 gap-4">
               <div>
                 <label class="block text-sm mb-1 text-white/80">Nama Lengkap</label>
-                <input id="name" type="text" inputmode="text" autocomplete="name" required
+                <input id="name" type="text" autocomplete="name" required
                   class="w-full rounded-xl px-3 py-2 text-black focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Nama Anda" />
               </div>
               <div>
@@ -127,7 +120,7 @@
               <span id="idr" class="font-semibold">Rp 0</span>
             </div>
 
-            <button type="submit"
+            <button id="submitBtn" type="submit"
               class="w-full rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-semibold py-3 transition focus:outline-none focus:ring-2 focus:ring-emerald-300">
               Kirim Order via WhatsApp
             </button>
@@ -135,13 +128,13 @@
           </form>
         </div>
 
-        <!-- Kurs & Tips -->
+        <!-- Kurs & Tools -->
         <aside class="rounded-2xl bg-white/5 backdrop-blur-md ring-1 ring-white/10 p-5 sm:p-6">
           <h3 class="text-lg font-semibold mb-2">Informasi Kurs</h3>
           <ul class="space-y-2 text-sm text-white/80">
-            <li>• <b>Kurs tetap</b> digunakan untuk perhitungan konversi IDR.</li>
+            <li>• <b>Kurs tetap</b> digunakan untuk perhitungan IDR.</li>
             <li>• <b>Kurs real-time</b> hanya sebagai informasi pasar saat ini.</li>
-            <li>• Anda dapat menyesuaikan kurs tetap di kode (nilai awal Rp 12.000).</li>
+            <li>• Anda bisa menyesuaikan kurs tetap di kotak di bawah (tersimpan di browser).</li>
           </ul>
 
           <div class="mt-4 grid gap-3">
@@ -165,19 +158,17 @@
             <div class="rounded-xl bg-white/10 ring-1 ring-white/10 p-3">
               <div class="flex items-center justify-between">
                 <span class="text-sm text-white/70">Kurs Real-Time</span>
-                <button id="refreshRate" class="text-xs px-2 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-300">
-                  Refresh
-                </button>
+                <div class="flex items-center gap-2">
+                  <button id="refreshRate" class="text-xs px-2 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                    Refresh
+                  </button>
+                </div>
               </div>
               <div class="mt-1">
-                <div id="liveRateBig" class="text-2xl font-bold animate-pulse">Memuat…</div>
+                <div id="liveRateBig" class="text-2xl font-bold">Memuat…</div>
                 <div id="liveMeta" class="text-[11px] text-white/60 mt-1">Sumber: exchangerate.host</div>
               </div>
             </div>
-          </div>
-
-          <div class="mt-6 text-[12px] text-white/60">
-            Tip: Pastikan email PayPal benar dan rekening/akun tujuan aktif untuk mempercepat proses.
           </div>
         </aside>
       </div>
@@ -209,7 +200,6 @@
             </tr>
           </thead>
           <tbody id="history" class="divide-y divide-white/10">
-            <!-- Skeleton rows -->
             <tr class="animate-pulse"><td class="px-3 py-2" colspan="7">Memuat data…</td></tr>
           </tbody>
         </table>
@@ -220,7 +210,7 @@
 
   <!-- Modal Provider -->
   <div id="providerModal" class="fixed inset-0 z-50 hidden" aria-hidden="true" role="dialog" aria-modal="true">
-    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+    <div id="providerOverlay" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
     <div class="relative mx-auto mt-24 w-[92%] max-w-md rounded-2xl bg-white text-black shadow-2xl ring-1 ring-black/10">
       <div class="p-5">
         <div class="flex items-center justify-between">
@@ -254,104 +244,110 @@
     // ================== KONFIGURASI ==================
     const SUPABASE_URL  = "https://rhujpinlutjiztyonmas.supabase.co";
     const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJodWpwaW5sdXRqaXp0eW9ubWFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczMDQyOTIsImV4cCI6MjA3Mjg4MDI5Mn0.zcfDUOHTeBYydFFscwmy3U9yryHiItTVJPLRurUlBvY";
-    const WA_ADMIN = "6285846005280";
-    const LS_FIXED_KEY = "xkay_fixed_rate";
-    const DEFAULT_RATE_INITIAL = 12000; // nilai awal (bisa diubah)
+    const WA_ADMIN      = "6285846005280";
+    const LS_FIXED_KEY  = "xkay_fixed_rate";
+    const DEFAULT_RATE_INITIAL = 12000;
 
-    // ================== STATE ==================
+    // ================== STATE & HELPERS ==================
     const idLocale = "id-ID";
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
     let FIXED_RATE = Number(localStorage.getItem(LS_FIXED_KEY)) || DEFAULT_RATE_INITIAL;
-    let LIVE_RATE = FIXED_RATE;
-    let selected = { category: null, provider: null };
-    let modalOpener = null; // untuk mengembalikan fokus
+    let LIVE_RATE  = FIXED_RATE;
+    let selected   = { category: null, provider: null };
+    let modalOpener = null;
 
-    // ================== HELPERS ==================
-    const rp = (n) => new Intl.NumberFormat(idLocale, { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(n);
-    const fmt = (n) => new Intl.NumberFormat(idLocale, { maximumFractionDigits: 2 }).format(n);
     const qs  = (sel) => document.querySelector(sel);
     const qsa = (sel) => Array.from(document.querySelectorAll(sel));
+    const rp  = (n) => new Intl.NumberFormat(idLocale, { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(n);
+    const fmt = (n) => new Intl.NumberFormat(idLocale, { maximumFractionDigits: 2 }).format(n);
 
     function toast(msg, ok=true){
-      const el = qs("#toast");
-      el.textContent = msg;
+      const el = qs("#toast"); el.textContent = msg;
       el.className = "fixed bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-xl text-sm shadow-xl " + (ok ? "bg-emerald-400 text-black" : "bg-red-400 text-black");
-      el.style.display = "block";
-      setTimeout(()=>{ el.style.display="none"; }, 2200);
+      el.style.display = "block"; setTimeout(()=>{ el.style.display="none"; }, 2200);
     }
-
     function setFixedUI(){
       qs("#fixedRate").textContent = rp(FIXED_RATE);
       qs("#fixedRateLarge").textContent = rp(FIXED_RATE);
-      // hitung ulang preview IDR
       const usd = parseFloat(qs("#usd").value) || 0;
       qs("#idr").textContent = rp(usd * FIXED_RATE);
     }
 
-    // ================== KURS REAL-TIME ==================
+    // ================== KURS REAL-TIME (Multi-sumber) ==================
     async function fetchWithTimeout(url, ms=8000){
       return Promise.race([
         fetch(url),
-        new Promise((_,rej)=>setTimeout(()=>rej(new Error("timeout")), ms))
+        new Promise((_, rej)=>setTimeout(()=>rej(new Error("timeout")), ms))
       ]);
     }
+    async function getRate_exchangerate_host(){
+      const res = await fetchWithTimeout("https://api.exchangerate.host/latest?base=USD&symbols=IDR", 8000);
+      const data = await res.json();
+      const v = Number(data?.rates?.IDR);
+      if(!v || !isFinite(v)) throw new Error("exchangerate.host invalid data");
+      return Math.round(v);
+    }
+    async function getRate_open_er_api(){
+      const res = await fetchWithTimeout("https://open.er-api.com/v6/latest/USD", 8000);
+      const data = await res.json();
+      const v = Number(data?.rates?.IDR);
+      if(!v || !isFinite(v)) throw new Error("open.er-api invalid data");
+      return Math.round(v);
+    }
     async function loadLiveRate(){
-      qs("#liveRate").textContent = "Memuat…";
-      qs("#liveRate").classList.add("animate-pulse");
-      qs("#liveRateBig").textContent = "Memuat…";
-      qs("#liveRateBig").classList.add("animate-pulse");
+      const liveSmall = qs("#liveRate");
+      const liveBig   = qs("#liveRateBig");
+      const meta      = qs("#liveMeta");
+      liveSmall.textContent = "Memuat…";
+      liveBig.textContent   = "Memuat…";
+
       try{
-        // exchangerate.host: tidak butuh API key
-        const res = await fetchWithTimeout("https://api.exchangerate.host/latest?base=USD&symbols=IDR", 8000);
-        const data = await res.json();
-        const rate = Number(data?.rates?.IDR);
-        if(!rate || !isFinite(rate)) throw new Error("invalid rate");
-        LIVE_RATE = Math.round(rate);
-        const ts = new Date().toLocaleString(idLocale);
-        qs("#liveRate").textContent = rp(LIVE_RATE);
-        qs("#liveRateBig").textContent = rp(LIVE_RATE);
-        qs("#liveRate").classList.remove("animate-pulse");
-        qs("#liveRateBig").classList.remove("animate-pulse");
-        qs("#liveMeta").textContent = "Sumber: exchangerate.host • " + ts;
-      }catch(e){
-        LIVE_RATE = FIXED_RATE;
-        qs("#liveRate").textContent = rp(LIVE_RATE) + " (fallback)";
-        qs("#liveRateBig").textContent = rp(LIVE_RATE) + " (fallback)";
-        qs("#liveRate").classList.remove("animate-pulse");
-        qs("#liveRateBig").classList.remove("animate-pulse");
-        qs("#liveMeta").textContent = "Gagal memuat, gunakan tombol Refresh";
+        // Try 1: exchangerate.host
+        LIVE_RATE = await getRate_exchangerate_host();
+        meta.textContent = "Sumber: exchangerate.host • " + new Date().toLocaleString(idLocale);
+      }catch(e1){
+        console.warn("exchangerate.host gagal:", e1);
+        try{
+          // Try 2: open.er-api.com
+          LIVE_RATE = await getRate_open_er_api();
+          meta.textContent = "Sumber: open.er-api.com • " + new Date().toLocaleString(idLocale);
+        }catch(e2){
+          console.warn("open.er-api gagal:", e2);
+          LIVE_RATE = FIXED_RATE; // fallback
+          meta.textContent = "Gagal muat kurs real-time (pakai fallback).";
+        }
       }
+      liveSmall.textContent = rp(LIVE_RATE);
+      liveBig.textContent   = rp(LIVE_RATE);
     }
 
     // ================== MODAL PROVIDER ==================
     const modal = qs("#providerModal");
+    const overlay = qs("#providerOverlay");
     const providerBtn = qs("#providerBtn");
     const closeProvider = qs("#closeProvider");
+    const styleOptBtn = "opt-btn px-3 py-2 rounded-xl bg-black/5 hover:bg-black/10 ring-1 ring-black/10 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm";
+    qsa(".opt-btn").forEach(b=> b.className = styleOptBtn);
 
     function openModal(){
       modalOpener = document.activeElement;
       modal.classList.remove("hidden");
       modal.setAttribute("aria-hidden","false");
-      // fokuskan tombol pertama
-      const first = modal.querySelector(".opt-btn");
-      first && first.focus();
-      document.addEventListener("keydown", escClose);
+      const first = modal.querySelector(".opt-btn"); first && first.focus();
+      document.addEventListener("keydown", onEscClose, { once:false });
     }
     function closeModal(){
       modal.classList.add("hidden");
       modal.setAttribute("aria-hidden","true");
-      document.removeEventListener("keydown", escClose);
+      document.removeEventListener("keydown", onEscClose, { once:false });
       if(modalOpener) modalOpener.focus();
     }
-    function escClose(e){ if(e.key === "Escape") closeModal(); }
+    function onEscClose(e){ if(e.key === "Escape") closeModal(); }
 
-    providerBtn.addEventListener("click", openModal);
-    closeProvider.addEventListener("click", closeModal);
-    modal.addEventListener("click", (e)=>{ if(e.target === modal) closeModal(); });
+    providerBtn.addEventListener("click", openModal, { passive:true });
+    closeProvider.addEventListener("click", closeModal, { passive:true });
+    overlay.addEventListener("click", closeModal, { passive:true });
 
-    // style untuk pilihan provider
-    const styleOptBtn = "opt-btn px-3 py-2 rounded-xl bg-black/5 hover:bg-black/10 ring-1 ring-black/10 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm";
-    qsa(".opt-btn").forEach(b=> b.className = styleOptBtn);
     modal.addEventListener("click", (e)=>{
       const btn = e.target.closest(".opt-btn");
       if(!btn) return;
@@ -370,8 +366,11 @@
     });
 
     const orderForm = qs("#orderForm");
+    const submitBtn = qs("#submitBtn");
     orderForm.addEventListener("submit", async (e)=>{
       e.preventDefault();
+      submitBtn.disabled = true; submitBtn.textContent = "Memproses…";
+
       const name = qs("#name").value.trim();
       const paypal_email = qs("#paypal_email").value.trim();
       const type = qs("#type").value;
@@ -381,16 +380,16 @@
 
       if(!selected.provider){
         toast("Pilih Bank / E-Wallet dulu.", false);
-        qs("#providerBtn").focus();
-        return;
+        submitBtn.disabled = false; submitBtn.textContent = "Kirim Order via WhatsApp";
+        qs("#providerBtn").focus(); return;
       }
-      if(usd <= 0){
-        toast("Nominal USD harus lebih dari 0.", false);
-        usdInput.focus();
+      if(!name || !paypal_email || !usd || usd <= 0){
+        toast("Isi semua data dengan benar.", false);
+        submitBtn.disabled = false; submitBtn.textContent = "Kirim Order via WhatsApp";
         return;
       }
 
-      // Simpan ke Supabase (RLS: insert publik)
+      // Simpan ke Supabase (best-effort; kalau gagal tetap lanjut WA)
       try{
         const { error } = await supabaseClient.from("orders").insert([{
           type, name, paypal_email,
@@ -399,9 +398,8 @@
         }]);
         if(error) throw error;
       }catch(err){
-        console.error(err);
-        toast("Gagal menyimpan ke database.", false);
-        // tetap lanjut ke WA agar tidak menghambat user
+        console.error("[DB] insert gagal:", err);
+        toast("Gagal menyimpan ke database (akan tetap membuka WhatsApp).", false);
       }
 
       // Kirim ke WhatsApp
@@ -417,12 +415,13 @@
         ``,
         `Kurs real-time saat ini: ${rp(LIVE_RATE)}`
       ].join("\n");
-      window.open(`https://wa.me/${WA_ADMIN}?text=${encodeURIComponent(waText)}`, "_blank");
+      window.open(`https://wa.me/6285846005280?text=${encodeURIComponent(waText)}`, "_blank");
 
       orderForm.reset();
       selected = { category:null, provider:null };
       qs("#selectedProvider").textContent = "Belum dipilih";
       qs("#idr").textContent = rp(0);
+      submitBtn.disabled = false; submitBtn.textContent = "Kirim Order via WhatsApp";
       loadHistory();
       toast("Order dibuat. Mengarah ke WhatsApp…");
     });
@@ -437,10 +436,7 @@
         const { data, error } = await supabaseClient.from("orders").select("*").order("created_at", { ascending:false });
         if(error) throw error;
         tbody.innerHTML = "";
-        if(!data || !data.length){
-          empty.classList.remove("hidden");
-          return;
-        }
+        if(!data || !data.length){ empty.classList.remove("hidden"); return; }
         for(const row of data){
           const tr = document.createElement("tr");
           const cells = [
@@ -455,48 +451,39 @@
           for(const c of cells){
             const td = document.createElement("td");
             td.className = "px-3 py-2";
-            td.textContent = c; // safe text
+            td.textContent = c;
             tr.appendChild(td);
           }
           tbody.appendChild(tr);
         }
       }catch(e){
-        console.error(e);
+        console.error("[DB] load history gagal:", e);
         tbody.innerHTML = "";
         empty.classList.remove("hidden");
         empty.textContent = "Gagal memuat riwayat. Coba Reload.";
       }
     }
-
-    // Export CSV
     async function exportCSV(){
       try{
         const { data, error } = await supabaseClient.from("orders").select("*");
         if(error) throw error;
         const head = ["Tanggal","Nama","Tipe","Kategori","Provider","USD","IDR"];
         const rows = (data||[]).map(r => [
-          r.created_at,
-          (r.name||""),
-          (r.type||""),
-          (r.target_type||""),
-          (r.provider||""),
-          (r.usd||0),
-          (r.receive_idr||0)
+          r.created_at, r.name||"", r.type||"", r.target_type||"", r.provider||"", r.usd||0, r.receive_idr||0
         ]);
         const csv = [head, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n");
         const blob = new Blob([csv], { type:"text/csv;charset=utf-8" });
         const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url; a.download = "riwayat_xkay_store.csv"; a.click();
+        const a = document.createElement("a"); a.href = url; a.download = "riwayat_xkay_store.csv"; a.click();
         URL.revokeObjectURL(url);
         toast("CSV terunduh");
       }catch(e){
-        console.error(e);
+        console.error("[CSV] export gagal:", e);
         toast("Gagal export CSV.", false);
       }
     }
 
-    // ================== FIXED RATE: UI EDIT (local only) ==================
+    // ================== Fixed Rate UI (Local) ==================
     qs("#editFixedRate").addEventListener("click", ()=>{
       qs("#fixedRateEdit").classList.toggle("hidden");
       qs("#fixedInput").value = FIXED_RATE;
@@ -512,15 +499,19 @@
       qs("#fixedRateEdit").classList.add("hidden");
     });
 
-    // ================== EVENT BINDINGS ==================
-    qs("#refreshRate").addEventListener("click", loadLiveRate);
-    qs("#reloadHistory").addEventListener("click", loadHistory);
-    qs("#exportBtn").addEventListener("click", exportCSV);
+    // ================== Bind Buttons (satu kali) ==================
+    qs("#refreshRate").addEventListener("click", loadLiveRate, { passive:true });
+    qs("#reloadHistory").addEventListener("click", loadHistory, { passive:true });
+    qs("#exportBtn").addEventListener("click", exportCSV, { passive:true });
 
     // ================== INIT ==================
-    setFixedUI();
-    await loadLiveRate();
-    await loadHistory();
+    (async function init(){
+      // styling tombol provider (pastikan class terpasang)
+      qsa(".opt-btn").forEach(b=> b.className = "opt-btn px-3 py-2 rounded-xl bg-black/5 hover:bg-black/10 ring-1 ring-black/10 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm");
+      setFixedUI();
+      await loadLiveRate();
+      await loadHistory();
+    })();
   </script>
 </body>
 </html>
