@@ -17,8 +17,7 @@
 body {
   background: #f9fafb;
   color: #111;
-  transition: background 0.4s, color 0.4s, margin-left 0.4s;
-  transition: background 0.4s ease, color 0.4s ease;
+  transition: background 0.4s ease, color 0.4s ease, margin-left 0.4s;
 }
 
 /* Navbar */
@@ -222,7 +221,6 @@ body.dark .sidebar ul li a .tooltip {
   text-align: center;
   padding: 40px 20px;
   background: #e5e7eb;
-  transition: background 0.4s, color 0.4s;
   transition: background 0.4s ease, color 0.4s ease;
 }
 
@@ -242,7 +240,6 @@ body.dark .sidebar ul li a .tooltip {
 
 .history {
   margin-top: 30px;
-  transition: background 0.4s ease, color 0.4s ease;
 }
 
 .history h2 {
@@ -257,7 +254,6 @@ body.dark .sidebar ul li a .tooltip {
   border: 1px solid #ccc;
   border-radius: 6px;
   transition: border 0.3s, background 0.3s, color 0.3s;
-  transition: background 0.4s ease, color 0.4s ease;
 }
 
 #searchInput:focus {
@@ -269,9 +265,6 @@ body.dark .sidebar ul li a .tooltip {
 .history table {
   width: 100%;
   border-collapse: collapse;
-  display: block;
-  overflow-x: auto;
-  white-space: nowrap;
 }
 
 .history th, .history td {
@@ -286,38 +279,62 @@ body.dark .sidebar ul li a .tooltip {
   background: #f3f4f6;
 }
 
+/* Header tabel */
 .history th {
   user-select: none;
   position: relative;
   cursor: pointer;
-  padding-right: 22px; /* ruang untuk panah */
+  padding-right: 28px; /* ruang panah */
+  transition: background 0.3s ease, color 0.3s ease;
 }
+
+/* Hover efek untuk header */
+.history th:hover {
+  background: #e0e7ff;
+  color: #111;
+}
+
+body.dark .history th:hover {
+  background: #2563eb;
+  color: #fff;
+}
+
+/* Panah indikator */
 .history th::after {
   content: "";
   position: absolute;
   right: 8px;
   opacity: 0.6;
-  font-size: 12px;
+  font-size: 14px;
 }
 .history th.asc::after  { content: "⬆️"; }
 .history th.desc::after { content: "⬇️"; }
 
-/* Highlight kolom yang sedang di-sort */
+/* Highlight kolom aktif */
 .history th.sorted {
-  background: #dbeafe; /* biru muda */
+  background: #dbeafe;
 }
-
 body.dark .history th.sorted {
-  background: #1e3a8a; /* biru gelap untuk dark mode */
+  background: #1e3a8a;
   color: #fff;
 }
 
 .history td.sorted {
   background: rgba(37, 99, 235, 0.1);
 }
-
 body.dark .history td.sorted {
   background: rgba(255, 255, 255, 0.1);
+}
+
+/* Animasi fade-in saat baris tabel berubah */
+.history tbody tr {
+  opacity: 0;
+  transform: translateY(5px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.history tbody tr.show {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 /* Footer */
@@ -327,7 +344,6 @@ body.dark .history td.sorted {
   background: #1f2937;
   color: white;
   margin-top: 40px;
-  transition: background 0.4s, color 0.4s;
   transition: background 0.4s ease, color 0.4s ease;
 }
 
@@ -408,7 +424,8 @@ body.dark #searchInput {
   .sidebar.collapsed ul li a .tooltip {
     display: block;
   }
-}</style></head> 
+}
+</style></head> 
  <body> <!-- Navbar --> 
   <nav class="navbar"> 
    <div class="navbar-left"> <button id="sidebarToggle" class="icon-btn">☰</button> 
@@ -634,4 +651,8 @@ headers.forEach(th => {
     rows.forEach(r => r.cells[colIndex].classList.add("sorted"));
 
   });
-});</script></body></html>
+});
+
+// Pastikan semua baris muncul saat load pertama
+document.querySelectorAll(".history tbody tr").forEach(tr => tr.classList.add("show"));
+</script></body></html>
