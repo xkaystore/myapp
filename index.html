@@ -1,517 +1,197 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Convert & Topup Saldo PayPal</title>
-
-  <!-- Desain Biru Doff Elegan -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root{
-      --bg:#0b1b3a;       /* biru doff gelap */
-      --card:#0f254d;     /* biru doff */
-      --card-2:#103060;
-      --primary:#1e88e5;  /* biru modern */
-      --primary-2:#1565c0;
-      --text:#e7efff;
-      --muted:#a9b7d6;
-      --line:rgba(255,255,255,.12);
-      --accent:#00e5ff;
-      --success:#22c55e;
-      --warn:#f59e0b;
-      --danger:#ef4444;
-    }
-    *{box-sizing:border-box}
-    html,body{margin:0;background:linear-gradient(180deg,var(--bg),#0a1833);color:var(--text);font-family:Poppins,system-ui,Segoe UI,Roboto,Arial,sans-serif}
-    .container{max-width:1100px;margin:32px auto;padding:0 16px}
-    .header{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:16px}
-    .brand{display:flex;gap:12px;align-items:center}
-    .logo{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--primary),var(--primary-2));display:grid;place-items:center;font-weight:700}
-    .card{background:linear-gradient(180deg,var(--card),var(--card-2));border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 10px 30px rgba(0,0,0,.3)}
-    .grid{display:grid;gap:16px}
-    @media(min-width:900px){.grid-2{grid-template-columns:1.2fr .8fr}}
-    h1{font-size:22px;margin:0}
-    h2{font-size:18px;margin:0 0 8px}
-    h3{font-size:16px;margin:0 0 8px;color:#cfe0ff}
-    .muted{color:var(--muted)}
-    label{display:block;margin:10px 0 6px;font-size:13px;color:#cfe0ff}
-    input,select,button{font:inherit}
-    input,select{width:100%;padding:12px 12px;border-radius:12px;border:1px solid var(--line);background:#0b1f46;color:var(--text)}
-    input:focus,select:focus{outline:2px solid var(--primary);outline-offset:1px}
-    .row{display:flex;gap:10px;flex-wrap:wrap}
-    .btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:#0c2452;color:var(--text);padding:10px 14px;border-radius:12px;cursor:pointer;transition:.2s}
-    .btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(0,0,0,.25)}
-    .btn-primary{background:linear-gradient(90deg,var(--primary),var(--primary-2));border:none}
-    .btn-outline{background:transparent}
-    .btn-danger{background:linear-gradient(90deg,var(--danger),#dc2626);border:none}
-    .chip{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border-radius:999px;background:#0c2452;border:1px solid var(--line);font-size:12px}
-    .rate-box{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
-    .big{font-size:22px;font-weight:700}
-    .pill{padding:4px 10px;border-radius:999px;background:#0c2452;border:1px solid var(--line);font-size:12px}
-    .ok{color:var(--success)} .warn{color:var(--warn)} .bad{color:var(--danger)}
-    table{width:100%;border-collapse:separate;border-spacing:0 10px}
-    th,td{padding:10px 12px;text-align:left;font-size:13px}
-    thead th{color:#cfe0ff}
-    tbody tr{background:linear-gradient(180deg,#0e244d,#0d2147);border:1px solid var(--line)}
-    tr td:first-child,tr th:first-child{border-top-left-radius:12px;border-bottom-left-radius:12px}
-    tr td:last-child,tr th:last-child{border-top-right-radius:12px;border-bottom-right-radius:12px}
-    .footer{margin-top:14px;font-size:12px;color:#b9c7e8}
-    /* Modal grid */
-    .modal{position:fixed;inset:0;background:rgba(3,10,26,.6);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:20px;z-index:999}
-    .modal.show{display:flex}
-    .modal-card{max-width:760px;width:100%;background:linear-gradient(180deg,#0e254f,#0e2b5e);border:1px solid var(--line);border-radius:18px;padding:16px}
-    .grid-choices{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-    @media(min-width:680px){.grid-choices{grid-template-columns:repeat(4,1fr)}}
-    .choice{display:flex;flex-direction:column;gap:6px;align-items:flex-start;padding:12px;border-radius:14px;background:#0c2452;border:1px solid var(--line);cursor:pointer}
-    .choice:hover{outline:2px solid var(--primary)}
-    .choice .title{font-weight:600}
-    .choice .hint{font-size:12px;color:var(--muted)}
-    .tabs{display:flex;gap:8px;margin-bottom:10px}
-    .tab{padding:8px 12px;border-radius:999px;background:#0c2452;border:1px solid var(--line);cursor:pointer}
-    .tab.active{background:linear-gradient(90deg,var(--primary),var(--primary-2));border:none}
-    .badge{display:inline-block;padding:6px 10px;border-radius:999px;background:#0c2452;border:1px solid var(--line);font-size:12px;color:var(--muted)}
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Xkay Store | Convert & Topup PayPal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/@supabase/supabase-js"></script>
 </head>
-<body>
-  <div class="container">
-    <div class="header">
-      <div class="brand">
-        <div class="logo">PP</div>
+<body class="bg-blue-900 text-white font-sans min-h-screen">
+
+  <!-- Header -->
+  <header class="text-center p-6 bg-blue-800 shadow-md">
+    <h1 class="text-3xl font-bold">Xkay Store</h1>
+    <p class="mt-2">💸 Convert & Topup PayPal dengan mudah</p>
+    <p class="mt-1">Kurs Real-Time: <span id="rate" class="font-semibold">Loading...</span></p>
+  </header>
+
+  <!-- Form -->
+  <main class="p-6">
+    <div class="bg-blue-800 rounded-2xl shadow-lg p-6 max-w-2xl mx-auto">
+      <h2 class="text-xl font-bold mb-4">Form Order</h2>
+      <form id="orderForm" class="space-y-4">
+        <input type="text" id="name" placeholder="Nama Lengkap" class="w-full p-3 rounded text-black" required>
+        <input type="email" id="paypal_email" placeholder="Email PayPal" class="w-full p-3 rounded text-black" required>
+        
         <div>
-          <h1>Convert & Topup Saldo PayPal</h1>
-          <div class="muted">Sederhana • Stylish • Tanpa Login • WhatsApp → Admin</div>
+          <label class="block mb-2">Jenis Transaksi:</label>
+          <select id="type" class="w-full p-3 rounded text-black" required>
+            <option value="convert">Convert (PayPal → Bank/E-Wallet)</option>
+            <option value="topup">Topup (Bank/E-Wallet → PayPal)</option>
+          </select>
         </div>
-      </div>
-      <div class="rate-box card">
+
         <div>
-          <div class="muted" style="font-size:12px">Kurs Real-time (USD → IDR)</div>
-          <div id="rateNow" class="big">Memuat...</div>
+          <label class="block mb-2">Pilih Kategori:</label>
+          <button type="button" onclick="openPopup()" class="bg-blue-600 px-4 py-2 rounded">Pilih Bank / E-Wallet</button>
+          <p id="selectedProvider" class="mt-2 italic text-gray-300">Belum dipilih</p>
         </div>
-        <span id="rateStatus" class="pill">Status: -</span>
-        <button id="btnRefreshRate" class="btn btn-outline">Refresh Kurs</button>
-      </div>
+
+        <input type="text" id="account" placeholder="No Rekening / Akun" class="w-full p-3 rounded text-black" required>
+
+        <div>
+          <input type="number" id="usd" placeholder="Nominal (USD)" class="w-full p-3 rounded text-black" required>
+          <p class="mt-2">Setara: <span id="idr">Rp 0</span></p>
+        </div>
+
+        <button type="submit" class="bg-green-600 px-6 py-3 rounded-lg w-full">Kirim Order</button>
+      </form>
     </div>
+  </main>
 
-    <div class="grid grid-2">
-      <!-- Form -->
-      <div class="card">
-        <h2>Form Transaksi</h2>
-        <div class="row">
-          <button id="btnTypeConvert" class="btn btn-primary">Convert Saldo</button>
-          <button id="btnTypeTopup" class="btn">Topup Saldo PayPal</button>
-          <span id="selectedType" class="chip">Jenis: <strong id="typeText">Convert</strong></span>
-        </div>
-
-        <label>Nama Lengkap</label>
-        <input id="name" placeholder="Nama sesuai KTP / Rekening" />
-
-        <label>Email PayPal</label>
-        <input id="paypalEmail" type="email" placeholder="email@paypal.com" />
-
-        <div class="row">
-          <div style="flex:1">
-            <label>Nominal (USD)</label>
-            <input id="amountUsd" type="number" step="0.01" placeholder="contoh: 25.50" />
-          </div>
-          <div style="flex:1">
-            <label>Rate (IDR per USD)</label>
-            <input id="rateInput" type="number" step="1" placeholder="mis. 12000" />
-          </div>
-        </div>
-
-        <div class="row">
-          <div style="flex:1">
-            <label>Hasil Konversi (IDR)</label>
-            <input id="amountIdr" type="text" readonly />
-          </div>
-          <div style="flex:1">
-            <label>Status Kurs</label>
-            <input id="rateInfo" type="text" readonly />
-          </div>
-        </div>
-
-        <div class="row" style="align-items:center;margin-top:4px">
-          <span class="badge">Pilih tujuan dana:</span>
-          <button id="btnPickBank" class="btn btn-outline">Pilih Bank Lokal</button>
-          <button id="btnPickWallet" class="btn btn-outline">Pilih E-Wallet</button>
-          <span id="pickedTarget" class="chip">Belum dipilih</span>
-        </div>
-
-        <label>No. Rekening / Akun Tujuan</label>
-        <input id="accountNumber" placeholder="Nomor rekening / akun e-wallet" />
-
-        <div class="row" style="margin-top:12px">
-          <button id="btnSubmit" class="btn btn-primary">Kirim Order via WhatsApp + Simpan</button>
-          <button id="btnReset" class="btn">Reset</button>
-        </div>
-
-        <div class="footer">
-          Kurs real-time dari exchangerate.host (fallback ke 12.000 jika gagal).
-          <br/>WA Admin: <strong>6285846005280</strong>.
-        </div>
-      </div>
-
-      <!-- Info / Bantuan -->
-      <div class="card">
-        <h2>Ringkasan</h2>
-        <div class="muted">Pastikan data benar. Setelah tekan kirim, WA akan terbuka dengan format pesan otomatis ke admin.</div>
-        <ul>
-          <li>Jenis: <span id="sumType">Convert</span></li>
-          <li>Tujuan: <span id="sumTarget">-</span></li>
-          <li>USD: <span id="sumUsd">0</span></li>
-          <li>Rate: <span id="sumRate">-</span></li>
-          <li>Diterima/Topup (IDR): <span id="sumIdr">-</span></li>
-        </ul>
-        <div class="footer">
-          <span class="pill">Tanpa Login</span>
-          <span class="pill">DB: Supabase</span>
-          <span class="pill">Export CSV</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Riwayat -->
-    <div class="card" style="margin-top:16px">
-      <div class="row" style="justify-content:space-between;align-items:center">
-        <h2>📑 Riwayat Transaksi</h2>
-        <div class="row">
-          <button id="btnReload" class="btn btn-outline">Muat Ulang</button>
-          <button id="btnExport" class="btn">Export CSV</button>
-        </div>
-      </div>
-      <table>
+  <!-- Riwayat -->
+  <section class="p-6">
+    <div class="bg-blue-800 rounded-2xl shadow-lg p-6 max-w-4xl mx-auto">
+      <h2 class="text-xl font-bold mb-4">Riwayat Transaksi</h2>
+      <table class="w-full text-left text-sm">
         <thead>
           <tr>
-            <th>Waktu</th>
-            <th>Jenis</th>
-            <th>Nama</th>
-            <th>Email PayPal</th>
-            <th>USD</th>
-            <th>Rate</th>
-            <th>IDR</th>
-            <th>Tujuan</th>
-            <th>Akun</th>
+            <th class="p-2">Tanggal</th>
+            <th class="p-2">Nama</th>
+            <th class="p-2">Tipe</th>
+            <th class="p-2">Provider</th>
+            <th class="p-2">USD</th>
+            <th class="p-2">IDR</th>
           </tr>
         </thead>
-        <tbody id="ordersBody"></tbody>
+        <tbody id="history" class="divide-y divide-blue-700"></tbody>
       </table>
-      <div class="footer">Data disimpan di Supabase. Untuk produksi, tambahkan kebijakan privasi, ToS, dan kepatuhan KYC/AML sesuai hukum.</div>
+      <button onclick="exportCSV()" class="mt-4 bg-yellow-500 px-4 py-2 rounded text-black">Export CSV</button>
     </div>
-  </div>
+  </section>
 
-  <!-- Modal Pilihan -->
-  <div id="pickerModal" class="modal" aria-hidden="true">
-    <div class="modal-card">
-      <div class="tabs">
-        <div id="tabBank" class="tab active">Bank Lokal</div>
-        <div id="tabWallet" class="tab">E-Wallet</div>
-        <div style="flex:1"></div>
-        <button id="btnCloseModal" class="btn btn-outline">Tutup</button>
+  <!-- Popup Provider -->
+  <div id="popup" class="fixed inset-0 bg-black bg-opacity-70 hidden items-center justify-center">
+    <div class="bg-white text-black p-6 rounded-2xl max-w-md w-full">
+      <h3 class="text-lg font-bold mb-4">Pilih Bank / E-Wallet</h3>
+      <div class="grid grid-cols-2 gap-4">
+        <button onclick="selectProvider('bank','BCA')" class="p-3 bg-blue-200 rounded">BCA</button>
+        <button onclick="selectProvider('bank','BRI')" class="p-3 bg-blue-200 rounded">BRI</button>
+        <button onclick="selectProvider('bank','BNI')" class="p-3 bg-blue-200 rounded">BNI</button>
+        <button onclick="selectProvider('bank','Mandiri')" class="p-3 bg-blue-200 rounded">Mandiri</button>
+        <button onclick="selectProvider('ewallet','OVO')" class="p-3 bg-green-200 rounded">OVO</button>
+        <button onclick="selectProvider('ewallet','Dana')" class="p-3 bg-green-200 rounded">Dana</button>
+        <button onclick="selectProvider('ewallet','Gopay')" class="p-3 bg-green-200 rounded">Gopay</button>
+        <button onclick="selectProvider('ewallet','ShopeePay')" class="p-3 bg-green-200 rounded">ShopeePay</button>
       </div>
-      <div id="choices" class="grid-choices"></div>
+      <button onclick="closePopup()" class="mt-4 bg-red-500 text-white px-4 py-2 rounded">Tutup</button>
     </div>
   </div>
 
-  <!-- Supabase + Logika -->
-  <script type="module">
-    // ====== KONFIGURASI ======
-    // Ganti dengan kredensial proyekmu
-    const SUPABASE_URL = "https://YOUR-PROJECT.supabase.co";
-    const SUPABASE_ANON_KEY = "YOUR-ANON-KEY";
-    // Kurs default jika API gagal
-    const DEFAULT_RATE = 12000;
-    // Nomor WA Admin
-    const WA_ADMIN = "6285846005280";
+<script type="module">
+  const SUPABASE_URL = "https://rhujpinlutjiztyonmas.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJodWpwaW5sdXRqaXp0eW9ubWFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczMDQyOTIsImV4cCI6MjA3Mjg4MDI5Mn0.zcfDUOHTeBYydFFscwmy3U9yryHiItTVJPLRurUlBvY";
+  const DEFAULT_RATE = 12000;
+  const WA_ADMIN = "6285846005280";
 
-    // ====== SQL RLS (jalankan di Supabase SQL Editor) ======
-    /*
-    create table if not exists orders (
-      id uuid primary key default uuid_generate_v4(),
-      created_at timestamp default now(),
-      type text check (type in ('convert','topup')),
-      name text,
-      paypal_email text,
-      usd numeric,
-      rate numeric,
-      receive_idr numeric,
-      target_type text check (target_type in ('bank','ewallet')),
-      provider text,
-      account text
-    );
-    alter table orders enable row level security;
-    create policy "public insert" on orders for insert to public with check (true);
-    create policy "public select" on orders for select to public using (true);
-    */
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  let currentRate = DEFAULT_RATE;
+  let selectedType = null;
+  let selectedProvider = null;
 
-    // ====== Import Supabase JS ======
-    import { createClient } from "https://esm.sh/@supabase/supabase-js";
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    // ====== Elemen ======
-    const rateNowEl = document.getElementById("rateNow");
-    const rateStatusEl = document.getElementById("rateStatus");
-    const btnRefreshRate = document.getElementById("btnRefreshRate");
-    const rateInput = document.getElementById("rateInput");
-    const amountUsd = document.getElementById("amountUsd");
-    const amountIdr = document.getElementById("amountIdr");
-    const rateInfo = document.getElementById("rateInfo");
-
-    const btnTypeConvert = document.getElementById("btnTypeConvert");
-    const btnTypeTopup = document.getElementById("btnTypeTopup");
-    const typeText = document.getElementById("typeText");
-    const selectedType = document.getElementById("selectedType");
-    const sumType = document.getElementById("sumType");
-
-    const btnPickBank = document.getElementById("btnPickBank");
-    const btnPickWallet = document.getElementById("btnPickWallet");
-    const pickedTarget = document.getElementById("pickedTarget");
-    const sumTarget = document.getElementById("sumTarget");
-
-    const nameEl = document.getElementById("name");
-    const emailEl = document.getElementById("paypalEmail");
-    const accountEl = document.getElementById("accountNumber");
-
-    const sumUsd = document.getElementById("sumUsd");
-    const sumRate = document.getElementById("sumRate");
-    const sumIdr = document.getElementById("sumIdr");
-
-    const btnSubmit = document.getElementById("btnSubmit");
-    const btnReset = document.getElementById("btnReset");
-    const btnReload = document.getElementById("btnReload");
-    const btnExport = document.getElementById("btnExport");
-    const ordersBody = document.getElementById("ordersBody");
-
-    // Modal
-    const modal = document.getElementById("pickerModal");
-    const tabBank = document.getElementById("tabBank");
-    const tabWallet = document.getElementById("tabWallet");
-    const choices = document.getElementById("choices");
-    const btnCloseModal = document.getElementById("btnCloseModal");
-
-    // Data pilihan
-    const BANKS = [
-      "BCA","BRI","BNI","Mandiri","CIMB Niaga","BTN","Permata","OCBC NISP","Danamon","Maybank"
-    ];
-    const WALLETS = [
-      "OVO","Dana","GoPay","ShopeePay","LinkAja","Sakuku","Jenius","SeaBank","Blu BCA"
-    ];
-
-    // State
-    let currentRate = DEFAULT_RATE;
-    let lastRateFromApi = null;
-    let type = "convert"; // 'convert' | 'topup'
-    let targetType = null; // 'bank' | 'ewallet'
-    let provider = null;   // nama bank/wallet
-
-    // ====== Util ======
-    const fmtIDR = (n) => new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(+n||0);
-    function openModal(kind){
-      modal.classList.add("show");
-      if(kind === 'bank'){ tabBank.classList.add("active"); tabWallet.classList.remove("active"); renderChoices('bank'); }
-      else { tabWallet.classList.add("active"); tabBank.classList.remove("active"); renderChoices('ewallet'); }
+  async function fetchRate() {
+    try {
+      const res = await fetch("https://api.exchangerate.host/latest?base=USD&symbols=IDR");
+      const data = await res.json();
+      currentRate = data.rates.IDR || DEFAULT_RATE;
+    } catch {
+      currentRate = DEFAULT_RATE;
     }
-    function closeModal(){ modal.classList.remove("show"); }
-    function renderChoices(kind){
-      choices.innerHTML = "";
-      const items = kind==='bank' ? BANKS : WALLETS;
-      items.forEach(name=>{
-        const div = document.createElement("div");
-        div.className = "choice";
-        div.innerHTML = `<div class="title">${name}</div><div class="hint">${kind==='bank'?'Bank Lokal':'E-Wallet'}</div>`;
-        div.onclick = ()=>{
-          targetType = kind;
-          provider = name;
-          pickedTarget.innerHTML = `${kind.toUpperCase()} • <strong>${name}</strong>`;
-          sumTarget.textContent = `${kind} • ${name}`;
-          closeModal();
-          updateSummary();
-        };
-        choices.appendChild(div);
-      });
-    }
-    tabBank.onclick = ()=>{ tabBank.classList.add("active"); tabWallet.classList.remove("active"); renderChoices('bank'); };
-    tabWallet.onclick = ()=>{ tabWallet.classList.add("active"); tabBank.classList.remove("active"); renderChoices('ewallet'); };
-    btnCloseModal.onclick = closeModal;
+    document.getElementById("rate").innerText = "Rp " + currentRate.toLocaleString();
+  }
+  fetchRate();
 
-    // ====== Rate (API real-time) ======
-    async function fetchRate(){
-      rateStatusEl.textContent = "Status: mengambil...";
-      try{
-        // exchangerate.host (gratis, tanpa API key)
-        const res = await fetch("https://api.exchangerate.host/latest?base=USD&symbols=IDR");
-        const data = await res.json();
-        const r = data?.rates?.IDR;
-        if(typeof r === "number" && r > 0){
-          lastRateFromApi = r;
-          currentRate = Math.round(r); // dibulatkan biar rapi
-          rateNowEl.textContent = fmtIDR(currentRate) + " / USD";
-          rateStatusEl.textContent = "Status: real-time ✓";
-          rateStatusEl.className = "pill ok";
-          // Isi ke input rate bila kosong
-          if(!rateInput.value) rateInput.value = currentRate;
-          updateConversion();
-          return;
-        }
-        throw new Error("Invalid rate");
-      }catch(e){
-        currentRate = DEFAULT_RATE;
-        rateNowEl.textContent = fmtIDR(currentRate) + " / USD (fallback)";
-        rateStatusEl.textContent = "Status: fallback";
-        rateStatusEl.className = "pill warn";
-        if(!rateInput.value) rateInput.value = currentRate;
-        updateConversion();
-      }
-    }
-    btnRefreshRate.onclick = fetchRate;
+  function openPopup() {
+    document.getElementById("popup").classList.remove("hidden");
+    document.getElementById("popup").classList.add("flex");
+  }
+  function closePopup() {
+    document.getElementById("popup").classList.add("hidden");
+  }
+  window.selectProvider = (type, provider) => {
+    selectedType = type;
+    selectedProvider = provider;
+    document.getElementById("selectedProvider").innerText = `${type.toUpperCase()} - ${provider}`;
+    closePopup();
+  };
 
-    // ====== Jenis Transaksi ======
-    function setType(t){
-      type = t;
-      typeText.textContent = t==='convert' ? "Convert" : "Topup";
-      sumType.textContent = typeText.textContent;
-      btnTypeConvert.classList.toggle("btn-primary", t==='convert');
-      btnTypeTopup.classList.toggle("btn-primary", t==='topup');
-      updateSummary();
-    }
-    btnTypeConvert.onclick=()=>setType("convert");
-    btnTypeTopup.onclick=()=>setType("topup");
+  document.getElementById("usd").addEventListener("input", e => {
+    const usd = parseFloat(e.target.value) || 0;
+    const idr = usd * currentRate;
+    document.getElementById("idr").innerText = "Rp " + idr.toLocaleString();
+  });
 
-    // ====== Pilih Target ======
-    btnPickBank.onclick = ()=> openModal('bank');
-    btnPickWallet.onclick = ()=> openModal('ewallet');
+  document.getElementById("orderForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    const name = document.getElementById("name").value;
+    const paypal_email = document.getElementById("paypal_email").value;
+    const type = document.getElementById("type").value;
+    const usd = parseFloat(document.getElementById("usd").value);
+    const idr = usd * currentRate;
+    const account = document.getElementById("account").value;
 
-    // ====== Konversi ======
-    function updateConversion(){
-      const usd = parseFloat(amountUsd.value || "0");
-      const rate = parseFloat(rateInput.value || currentRate || DEFAULT_RATE);
-      const idr = Math.max(0, Math.round(usd * rate));
-      amountIdr.value = fmtIDR(idr);
-      rateInfo.value = lastRateFromApi ? `Real-time ${fmtIDR(currentRate)}/USD` : `Fallback ${fmtIDR(DEFAULT_RATE)}/USD`;
-      sumUsd.textContent = usd.toFixed(2);
-      sumRate.textContent = fmtIDR(rate) + "/USD";
-      sumIdr.textContent = fmtIDR(idr);
-      return {usd, rate, idr};
-    }
-    amountUsd.oninput = updateConversion;
-    rateInput.oninput = updateConversion;
-
-    // ====== Submit ======
-    async function submitOrder(){
-      const {usd, rate, idr} = updateConversion();
-      const name = (nameEl.value||"").trim();
-      const email = (emailEl.value||"").trim();
-      const account = (accountEl.value||"").trim();
-
-      if(!name || !email || !usd || !rate || !targetType || !provider || !account){
-        alert("Lengkapi semua data (nama, email, USD, rate, tujuan, akun) sebelum kirim.");
-        return;
-      }
-
-      // Simpan ke Supabase
-      const payload = {
-        type, name, paypal_email: email,
-        usd, rate, receive_idr: idr,
-        target_type: targetType, provider, account
-      };
-      const { error } = await supabase.from("orders").insert([payload]);
-      if(error){ alert("Gagal simpan ke database: " + error.message); return; }
-
-      // WhatsApp
-      const header = type==='convert' ? "Convert Saldo PayPal" : "Topup Saldo PayPal";
-      const pesan = [
-        `Halo Admin, saya ingin ${header}:`,
-        ``,
-        `Nama: ${name}`,
-        `Email PayPal: ${email}`,
-        `Jenis: ${type.toUpperCase()}`,
-        `USD: ${usd.toFixed(2)} | Rate: ${rate.toLocaleString('id-ID')} | IDR: ${idr.toLocaleString('id-ID')}`,
-        `Tujuan: ${targetType} - ${provider}`,
-        `Akun: ${account}`,
-        ``,
-        `Dikirim otomatis dari web.`
-      ].join("\n");
-      const waUrl = `https://wa.me/${WA_ADMIN}?text=${encodeURIComponent(pesan)}`;
-      window.location.href = waUrl;
-
-      await loadOrders();
+    if (!selectedProvider) {
+      alert("Pilih Bank atau E-Wallet dulu!");
+      return;
     }
 
-    // ====== Reset ======
-    function resetForm(){
-      nameEl.value = "";
-      emailEl.value = "";
-      amountUsd.value = "";
-      rateInput.value = currentRate || DEFAULT_RATE;
-      amountIdr.value = "";
-      rateInfo.value = "";
-      accountEl.value = "";
-      targetType = null; provider = null;
-      pickedTarget.textContent = "Belum dipilih";
-      sumTarget.textContent = "-";
-      setType("convert");
-      updateConversion();
-    }
+    await supabaseClient.from("orders").insert([{
+      type, name, paypal_email,
+      usd, rate: currentRate, receive_idr: idr,
+      target_type: selectedType, provider: selectedProvider, account
+    }]);
 
-    // ====== Riwayat ======
-    async function loadOrders(){
-      const { data, error } = await supabase.from("orders")
-        .select("*")
-        .order("created_at",{ascending:false});
-      if(error){ console.error(error); return; }
-      ordersBody.innerHTML = "";
-      for(const o of data){
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td class="muted">${new Date(o.created_at).toLocaleString('id-ID')}</td>
-          <td>${(o.type||'').toUpperCase()}</td>
-          <td>${escapeHtml(o.name||'')}</td>
-          <td class="muted">${escapeHtml(o.paypal_email||'')}</td>
-          <td>${(+o.usd||0).toFixed(2)}</td>
-          <td>${(+o.rate||0).toLocaleString('id-ID')}</td>
-          <td><strong>${fmtIDR(o.receive_idr||0)}</strong></td>
-          <td>${escapeHtml(o.target_type||'-')} • ${escapeHtml(o.provider||'-')}</td>
-          <td class="muted">${escapeHtml(o.account||'')}</td>
-        `;
-        ordersBody.appendChild(tr);
-      }
-    }
+    const waText = `Halo Admin, saya ingin ${type}:\nNama: ${name}\nEmail PayPal: ${paypal_email}\nProvider: ${selectedProvider}\nAkun: ${account}\nNominal: ${usd} USD = Rp ${idr.toLocaleString()}`;
+    window.open(`https://wa.me/${WA_ADMIN}?text=${encodeURIComponent(waText)}`, "_blank");
 
-    function exportCSV(){
-      const rows = [["waktu","jenis","nama","email_paypal","usd","rate","idr","target_type","provider","account"]];
-      const trs = ordersBody.querySelectorAll("tr");
-      trs.forEach(tr=>{
-        const tds = Array.from(tr.querySelectorAll("td")).map(td=>td.innerText);
-        // tds: [waktu, jenis, nama, email, usd, rate, idr, target, akun]
-        const [waktu, jenis, nama, email, usd, rate, idr, target, akun] = tds;
-        const [target_type, provider] = (target||" - ").split(" • ").map(s=>s.trim());
-        rows.push([waktu, jenis, nama, email, usd, rate, idr, target_type, provider, akun]);
-      });
-      const csv = rows.map(r=>r.map(cell=>{
-        const c = String(cell??"");
-        return /[",\n]/.test(c) ? `"${c.replaceAll('"','""')}"` : c;
-      }).join(",")).join("\n");
-      const blob = new Blob([csv],{type:"text/csv"});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url; a.download = "riwayat-transaksi.csv"; a.click();
-      URL.revokeObjectURL(url);
-    }
+    e.target.reset();
+    document.getElementById("selectedProvider").innerText = "Belum dipilih";
+    fetchHistory();
+  });
 
-    // ====== Helpers ======
-    function escapeHtml(s){ return String(s).replace(/[&<>\"']/g,m=>({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[m])) }
+  async function fetchHistory() {
+    const { data } = await supabaseClient.from("orders").select("*").order("created_at", { ascending: false });
+    const tbody = document.getElementById("history");
+    tbody.innerHTML = "";
+    data.forEach(row => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td class="p-2">${new Date(row.created_at).toLocaleString()}</td>
+        <td class="p-2">${row.name}</td>
+        <td class="p-2">${row.type}</td>
+        <td class="p-2">${row.provider}</td>
+        <td class="p-2">${row.usd}</td>
+        <td class="p-2">Rp ${row.receive_idr.toLocaleString()}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+  fetchHistory();
 
-    // ====== Events ======
-    btnSubmit.onclick = submitOrder;
-    btnReset.onclick = resetForm;
-    btnReload.onclick = loadOrders;
-    btnExport.onclick = exportCSV;
-
-    // ====== Init ======
-    await fetchRate();
-    setType("convert");
-    updateConversion();
-    await loadOrders();
-  </script>
+  async function exportCSV() {
+    const { data } = await supabaseClient.from("orders").select("*");
+    let csv = "Tanggal,Nama,Tipe,Provider,USD,IDR\n";
+    data.forEach(row => {
+      csv += `${row.created_at},${row.name},${row.type},${row.provider},${row.usd},${row.receive_idr}\n`;
+    });
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "riwayat.csv";
+    a.click();
+  }
+</script>
 </body>
 </html>
