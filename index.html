@@ -1,36 +1,19 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Xkay Store • Convert & Topup PayPal</title>
-
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-  <!-- Tailwind CSS -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Xkay Store - Convert & Topup PayPal</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: { sans: ['Inter', 'sans-serif'] },
-          colors: { accent: { DEFAULT: '#2563EB', hover: '#1D4ED8' } },
-        },
-      },
-    };
-  </script>
 </head>
 <body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 min-h-screen antialiased selection:bg-accent/20">
 
-  <!-- HEADER -->
-  <header class="sticky top-0 z-40 bg-white/70 dark:bg-slate-900/70 ring-1 ring-slate-200 dark:ring-slate-800 backdrop-blur-md">
+  <!-- ========== HEADER ========== -->
+  <header class="sticky top-0 z-40 bg-white/80 dark:bg-slate-900/80 ring-1 ring-slate-200 dark:ring-slate-800 backdrop-blur">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between py-4">
-        <!-- Logo -->
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-accent grid place-items-center">
+          <div class="w-10 h-10 rounded-xl bg-blue-600 grid place-items-center">
             <span class="text-xl font-semibold text-white">X</span>
           </div>
           <div>
@@ -38,97 +21,100 @@
             <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">Convert & Topup PayPal</p>
           </div>
         </div>
-
-        <!-- Right side -->
-        <div class="flex items-center gap-2 sm:gap-4">
-          <!-- Kurs (hidden on mobile) -->
-          <div class="hidden sm:flex items-center gap-4 text-sm font-medium">
-            <div class="text-center">
-              <div class="text-slate-500 dark:text-slate-400">Convert</div>
-              <div id="rateFixedConvert" class="text-slate-700 dark:text-slate-200"></div>
-            </div>
-            <div class="text-center">
-              <div class="text-slate-500 dark:text-slate-400">Topup</div>
-              <div id="rateFixedTopup" class="text-slate-700 dark:text-slate-200"></div>
-            </div>
-            <div class="text-center">
-              <div class="text-slate-500 dark:text-slate-400">Live</div>
-              <div id="rateLive" class="min-w-[70px] text-slate-700 dark:text-slate-200"></div>
-            </div>
-          </div>
-
-          <!-- Theme toggle -->
-          <button id="themeToggle" class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800" aria-label="Toggle theme">
-            <!-- Moon -->
-            <svg id="theme-icon-dark" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-              <path fill-rule="evenodd" d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 004.463-.948a.75.75 0 01.97.97 10.503 10.503 0 01-4.401 4.402A10.5 10.5 0 013 10.5a10.5 10.5 0 014.402-8.332.75.75 0 011.126.55z" clip-rule="evenodd"/>
-            </svg>
-            <!-- Sun -->
-            <svg id="theme-icon-light" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.106a.75.75 0 010 1.06l-1.591 1.59a.75.75 0 11-1.06-1.06l1.59-1.59a.75.75 0 011.06 0zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.894 17.894a.75.75 0 011.06 0l1.59 1.591a.75.75 0 11-1.06 1.06l-1.59-1.59a.75.75 0 010-1.06zM12 18.75a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0v-2.25a.75.75 0 01.75-.75zM5.106 17.894a.75.75 0 010-1.06l1.59-1.59a.75.75 0 111.06 1.06l-1.59 1.59a.75.75 0 01-1.06 0zM2.25 12a.75.75 0 01.75-.75h2.25a.75.75 0 010 1.5H3a.75.75 0 01-.75-.75zM6.106 5.106a.75.75 0 011.06 0l1.591 1.59a.75.75 0 01-1.06 1.06l-1.59-1.59a.75.75 0 010-1.06z"/>
-            </svg>
-          </button>
-        </div>
       </div>
     </div>
   </header>
 
-  <!-- MAIN -->
+  <!-- ========== MAIN ========== -->
   <main class="relative py-8 sm:py-12">
-    <div aria-hidden="true" class="absolute inset-0 pointer-events-none">
-      <div class="absolute -top-32 left-1/2 -translate-x-1/2 w-[80vw] max-w-4xl h-[500px] rounded-full bg-accent/10 blur-3xl"></div>
-    </div>
-
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid gap-6 md:gap-8 md:grid-cols-5 relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid gap-6 md:grid-cols-5">
       
-      <!-- Form Pesanan -->
-      <div class="md:col-span-3 bg-white/70 dark:bg-slate-800/70 ring-1 ring-slate-200 dark:ring-slate-800 rounded-2xl p-6 sm:p-8 shadow">
-        <h2 class="text-lg sm:text-xl font-semibold mb-4">Buat Pesanan</h2>
-        <form id="orderForm" class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium mb-1">Email PayPal</label>
-            <input type="email" name="paypalEmail" class="w-full rounded-lg border p-2 bg-white dark:bg-slate-900" required />
+      <!-- FORM -->
+      <div class="md:col-span-3 bg-white dark:bg-slate-800 shadow rounded-2xl p-6 sm:p-8">
+        <h2 class="text-2xl font-bold mb-1">Buat Pesanan Baru</h2>
+        <p class="text-slate-500 dark:text-slate-400 text-sm mb-6">Detail akan tersimpan otomatis di database Supabase.</p>
+
+        <!-- Form -->
+        <form id="orderForm" class="space-y-4" novalidate>
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label for="name" class="block text-sm font-medium mb-1.5">Nama Lengkap</label>
+              <input id="name" type="text" required class="form-input w-full p-2 rounded border" placeholder="Nama Anda" />
+            </div>
+            <div>
+              <label for="paypalEmail" class="block text-sm font-medium mb-1.5">Email PayPal</label>
+              <input id="paypalEmail" type="email" required class="form-input w-full p-2 rounded border" placeholder="email@paypal.com" />
+            </div>
           </div>
-          <div>
-            <label class="block text-sm font-medium mb-1">Jumlah (USD)</label>
-            <input type="number" name="amount" class="w-full rounded-lg border p-2 bg-white dark:bg-slate-900" required />
+
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label for="type" class="block text-sm font-medium mb-1.5">Jenis Transaksi</label>
+              <select id="type" required class="form-input w-full p-2 rounded border">
+                <option value="convert">Convert (PayPal → Bank/E-Wallet)</option>
+                <option value="topup">Topup (Bank/E-Wallet → PayPal)</option>
+              </select>
+            </div>
+            <div>
+              <label for="targetType" class="block text-sm font-medium mb-1.5">Jenis Tujuan</label>
+              <select id="targetType" required class="form-input w-full p-2 rounded border">
+                <option value="bank">Bank</option>
+                <option value="ewallet">E-Wallet</option>
+              </select>
+            </div>
           </div>
-          <div>
-            <label class="block text-sm font-medium mb-1">Tipe Transaksi</label>
-            <select name="type" class="w-full rounded-lg border p-2 bg-white dark:bg-slate-900">
-              <option value="convert">Convert</option>
-              <option value="topup">Topup</option>
-            </select>
+
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label for="provider" class="block text-sm font-medium mb-1.5">Provider</label>
+              <input id="provider" type="text" required class="form-input w-full p-2 rounded border" placeholder="BCA / Dana / OVO" />
+            </div>
+            <div>
+              <label for="account" class="block text-sm font-medium mb-1.5">No. Rekening / Akun</label>
+              <input id="account" type="text" required class="form-input w-full p-2 rounded border" placeholder="1234567890" />
+            </div>
           </div>
-          <button type="submit" class="w-full bg-accent hover:bg-accent-hover text-white font-semibold py-2 px-4 rounded-lg">Kirim Pesanan</button>
+
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label for="usd" class="block text-sm font-medium mb-1.5">Nominal (USD)</label>
+              <input id="usd" type="number" step="0.01" min="0.01" required class="form-input w-full p-2 rounded border" placeholder="0.00" />
+            </div>
+            <div>
+              <label for="rate" class="block text-sm font-medium mb-1.5">Rate</label>
+              <input id="rate" type="number" step="1" min="0" required class="form-input w-full p-2 rounded border" placeholder="15000" />
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between rounded-lg bg-slate-100 dark:bg-slate-700/50 p-3">
+            <span class="text-sm text-slate-500">Estimasi diterima (IDR):</span>
+            <span id="idr" class="font-semibold text-lg">Rp 0</span>
+          </div>
+
+          <button id="submitBtn" type="submit" class="w-full h-12 flex items-center justify-center rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold">
+            Kirim Order
+          </button>
         </form>
       </div>
 
-      <!-- Sidebar -->
-      <aside class="md:col-span-2 space-y-6 md:space-y-8">
-        <!-- Kurs -->
-        <div class="bg-white/70 dark:bg-slate-800/70 rounded-2xl p-6 ring-1 ring-slate-200 dark:ring-slate-800 shadow">
-          <h2 class="text-lg font-semibold mb-3">Kurs</h2>
-          <p class="text-sm text-slate-500">Convert: <span id="rateConvert"></span></p>
-          <p class="text-sm text-slate-500">Topup: <span id="rateTopup"></span></p>
-          <p class="text-sm text-slate-500">Live: <span id="rateLiveSidebar"></span></p>
-        </div>
-
-        <!-- Riwayat -->
-        <div class="bg-white/70 dark:bg-slate-800/70 rounded-2xl p-6 ring-1 ring-slate-200 dark:ring-slate-800 shadow">
-          <h2 class="text-lg font-semibold mb-3">Riwayat Transaksi</h2>
-          <div class="overflow-x-auto">
-            <table class="min-w-full text-sm">
-              <thead>
-                <tr class="text-left text-slate-600 dark:text-slate-400">
-                  <th class="px-2 py-1">Email</th>
-                  <th class="px-2 py-1">Jumlah</th>
-                  <th class="px-2 py-1">Tipe</th>
+      <!-- RIWAYAT -->
+      <aside class="md:col-span-2 space-y-6">
+        <div class="bg-white dark:bg-slate-800 shadow rounded-2xl p-6">
+          <h3 class="text-lg font-bold mb-3">Riwayat Transaksi</h3>
+          <div class="overflow-x-auto rounded-lg ring-1 ring-slate-200 dark:ring-slate-700">
+            <table class="min-w-full text-sm text-left">
+              <thead class="bg-slate-200/60 dark:bg-slate-800/60 text-slate-600 dark:text-slate-300">
+                <tr>
+                  <th class="p-2">Tanggal</th>
+                  <th class="p-2">Nama</th>
+                  <th class="p-2">Email</th>
+                  <th class="p-2">USD</th>
+                  <th class="p-2">Rate</th>
+                  <th class="p-2">IDR</th>
+                  <th class="p-2">Tipe</th>
                 </tr>
               </thead>
-              <tbody id="transactionHistory" class="divide-y divide-slate-200 dark:divide-slate-700">
-                <!-- isi dari database -->
-              </tbody>
+              <tbody id="transactionHistory" class="divide-y divide-slate-200 dark:divide-slate-700"></tbody>
             </table>
           </div>
         </div>
@@ -137,34 +123,94 @@
     </div>
   </main>
 
-  <!-- FOOTER -->
-  <footer class="bg-white/70 dark:bg-slate-900/70 ring-1 ring-slate-200 dark:ring-slate-800">
+  <!-- ========== FOOTER ========== -->
+  <footer class="bg-white/80 dark:bg-slate-900/80 ring-1 ring-slate-200 dark:ring-slate-800">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      <p class="text-center text-sm text-slate-500 dark:text-slate-400">© 2025 Xkay Store. All rights reserved.</p>
+      <p class="text-center text-sm text-slate-500 dark:text-slate-400">© 2025 Xkay Store</p>
     </div>
   </footer>
 
-  <!-- Script untuk Theme Toggle -->
+  <!-- ========== SUPABASE SCRIPT ========== -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    const themeToggle = document.getElementById("themeToggle");
-    const darkIcon = document.getElementById("theme-icon-dark");
-    const lightIcon = document.getElementById("theme-icon-light");
+    const supabaseUrl = "https://rhujpinlutjiztyonmas.supabase.co";
+    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJodWpwaW5sdXRqaXp0eW9ubWFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczMDQyOTIsImV4cCI6MjA3Mjg4MDI5Mn0.zcfDUOHTeBYydFFscwmy3U9yryHiItTVJPLRurUlBvY";
+    const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
-    function applyTheme(theme) {
-      document.documentElement.classList.toggle("dark", theme === "dark");
-      darkIcon.classList.toggle("hidden", theme === "light");
-      lightIcon.classList.toggle("hidden", theme === "dark");
-      localStorage.setItem("theme", theme);
+    const form = document.getElementById("orderForm");
+    const historyTable = document.getElementById("transactionHistory");
+    const usdInput = document.getElementById("usd");
+    const rateInput = document.getElementById("rate");
+    const idrOutput = document.getElementById("idr");
+
+    // Hitung otomatis IDR
+    function updateIDR() {
+      const usd = parseFloat(usdInput.value) || 0;
+      const rate = parseFloat(rateInput.value) || 0;
+      idrOutput.textContent = "Rp " + (usd * rate).toLocaleString("id-ID");
+    }
+    usdInput.addEventListener("input", updateIDR);
+    rateInput.addEventListener("input", updateIDR);
+
+    // Load Riwayat
+    async function loadHistory() {
+      const { data, error } = await supabaseClient
+        .from("transactions")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(10);
+
+      if (error) {
+        console.error(error);
+        return;
+      }
+
+      historyTable.innerHTML = "";
+      data.forEach((row) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="p-2 whitespace-nowrap">${new Date(row.created_at).toLocaleString("id-ID")}</td>
+          <td class="p-2 whitespace-nowrap">${row.name}</td>
+          <td class="p-2 whitespace-nowrap">${row.paypal_email}</td>
+          <td class="p-2 whitespace-nowrap">${row.usd}</td>
+          <td class="p-2 whitespace-nowrap">${row.rate}</td>
+          <td class="p-2 whitespace-nowrap">Rp ${row.receive_idr.toLocaleString("id-ID")}</td>
+          <td class="p-2 whitespace-nowrap">${row.type}</td>
+        `;
+        historyTable.appendChild(tr);
+      });
     }
 
-    themeToggle.addEventListener("click", () => {
-      const current = localStorage.getItem("theme") || "dark";
-      applyTheme(current === "dark" ? "light" : "dark");
+    // Submit ke Supabase
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const data = {
+        name: document.getElementById("name").value,
+        paypal_email: document.getElementById("paypalEmail").value,
+        usd: parseFloat(usdInput.value),
+        rate: parseFloat(rateInput.value),
+        receive_idr: parseFloat(usdInput.value) * parseFloat(rateInput.value),
+        type: document.getElementById("type").value,
+        provider: document.getElementById("provider").value,
+        account: document.getElementById("account").value,
+        target_type: document.getElementById("targetType").value,
+      };
+
+      const { error } = await supabaseClient.from("transactions").insert([data]);
+
+      if (error) {
+        alert("❌ Gagal menyimpan transaksi!");
+        console.error(error);
+      } else {
+        alert("✅ Transaksi berhasil disimpan!");
+        form.reset();
+        updateIDR();
+        loadHistory();
+      }
     });
 
-    // set awal
-    applyTheme(localStorage.getItem("theme") || "dark");
+    // Load awal
+    loadHistory();
   </script>
-
 </body>
 </html>
