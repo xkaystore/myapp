@@ -1,287 +1,322 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Xkay Store • Convert & Topup PayPal</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Xkay Store - Halaman Utama</title>
+  <link rel="stylesheet" href="style.css">
+<style type="text/css" id="dcoder_stylesheet">/* Sidebar, Navbar, Dark mode dll sebelumnya tetap sama */
 
-  <!-- Google Fonts: Inter -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+/* Controls di atas tabel */
+.table-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  gap: 10px;
+}
 
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-          },
-          colors: {
-            accent: { DEFAULT: '#2563EB', hover: '#1D4ED8' },
-          },
-        },
-      },
-    };
-  </script>
+.table-controls input {
+  flex: 1;
+}
 
-  <!-- Supabase -->
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+.table-controls select {
+  padding: 6px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
 
-  <meta name="theme-color" content="#2563EB" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0' x2='1' y1='0' y2='1'><stop offset='0%' stop-color='%232563EB'/><stop offset='100%' stop-color='%231D4ED8'/></linearGradient></defs><rect width='100' height='100' rx='22' fill='url(%23g)'/><text x='50%' y='57%' font-size='56' text-anchor='middle' fill='white' font-family='Inter, Arial, sans-serif' font-weight='600'>X</text></svg>"/>
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 15px;
+  gap: 6px;
+}
 
-  <style>
-    body { font-family: 'Inter', sans-serif; }
-    .card-glass { backdrop-filter: blur(16px) saturate(180%); -webkit-backdrop-filter: blur(16px) saturate(180%); }
-    ::-webkit-scrollbar { width: 8px; height: 8px; }
-    ::-webkit-scrollbar-thumb { @apply bg-slate-300 dark:bg-slate-700 rounded-full; }
-    .table-container thead th { position: sticky; top: 0; z-index: 1; }
-    .btn, .opt-btn, input, select { transition: transform 0.1s ease, box-shadow 0.2s ease, background-color 0.2s ease; }
-    .btn:active, .opt-btn:active { transform: translateY(1px) scale(0.98); }
-    input:focus, select:focus, button:focus-visible { outline: none; box-shadow: 0 0 0 3px theme('colors.accent.DEFAULT / 40%'); }
-    .skeleton::after {
-        content: ''; position: absolute; top: 0; left: -150%; width: 150%; height: 100%;
-        background: linear-gradient(90deg, transparent, theme('colors.slate.200 / 50%'), transparent);
-        animation: shimmer 1.5s infinite;
-    }
-    html.dark .skeleton::after { background: linear-gradient(90deg, transparent, theme('colors.slate.700 / 50%'), transparent); }
-    @keyframes shimmer { 100% { left: 150%; } }
-  </style>
-</head>
+.pagination button {
+  padding: 6px 12px;
+  border: 1px solid #2563eb;
+  background: white;
+  color: #2563eb;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s;
+}
 
-<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 min-h-screen antialiased selection:bg-accent/20">
-  
-  <header class="card-glass sticky top-0 z-40 bg-white/70 dark:bg-slate-900/70 ring-1 ring-slate-200 dark:ring-slate-800">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between py-4">
-        <div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-accent grid place-items-center"><span class="text-xl font-semibold text-white">X</span></div><div><h1 class="text-lg sm:text-xl font-bold tracking-tight">Xkay Store</h1><p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">Convert & Topup PayPal</p></div></div>
-        <div class="flex items-center gap-2 sm:gap-4"><div class="hidden sm:flex items-center gap-4 text-sm font-medium"><div class="text-center"><div class="text-slate-500 dark:text-slate-400">Convert</div><div id="rateFixedConvert" class="text-slate-700 dark:text-slate-200"></div></div><div class="text-center"><div class="text-slate-500 dark:text-slate-400">Topup</div><div id="rateFixedTopup" class="text-slate-700 dark:text-slate-200"></div></div><div class="text-center"><div class="text-slate-500 dark:text-slate-400">Live</div><div id="rateLive" class="min-w-[70px] text-slate-700 dark:text-slate-200"></div></div></div>
-        <button id="themeToggle" class="btn p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800" aria-label="Toggle theme">
-          <!-- Moon Icon -->
-          <svg id="theme-icon-dark" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 004.463-.948a.75.75 0 01.97.97 10.503 10.503 0 01-4.401 4.402A10.5 10.5 0 013 10.5a10.5 10.5 0 014.402-8.332.75.75 0 011.126.55z" clip-rule="evenodd" /></svg>
-          <!-- Sun Icon (Fixed) -->
-          <svg id="theme-icon-light" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.106a.75.75 0 010 1.06l-1.591 1.59a.75.75 0 11-1.06-1.06l1.59-1.59a.75.75 0 011.06 0zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.894 17.894a.75.75 0 011.06 0l1.59 1.591a.75.75 0 11-1.06 1.06l-1.59-1.59a.75.75 0 010-1.06zM12 18.75a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0v-2.25a.75.75 0 01.75-.75zM5.106 17.894a.75.75 0 010-1.06l1.59-1.59a.75.75 0 111.06 1.06l-1.59 1.59a.75.75 0 01-1.06 0zM2.25 12a.75.75 0 01.75-.75h2.25a.75.75 0 010 1.5H3a.75.75 0 01-.75-.75zM6.106 5.106a.75.75 0 011.06 0l1.591 1.59a.75.75 0 01-1.06 1.06l-1.59-1.59a.75.75 0 010-1.06z"/></svg>
-        </button></div>
+.pagination button.active {
+  background: #2563eb;
+  color: white;
+}
+
+.pagination button:hover {
+  background: #2563eb;
+  color: white;
+}
+
+/* Dark mode pagination */
+body.dark .pagination button {
+  background: #1f2937;
+  color: white;
+  border-color: #374151;
+}
+
+body.dark .pagination button.active {
+  background: #2563eb;
+}
+</style></head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-left">
+      <button id="sidebarToggle" class="icon-btn">☰</button>
+      <div class="logo">🌐</div>
+      <span class="title">Xkay Store</span>
+    </div>
+    <div class="navbar-right">
+      <button id="darkModeToggle" class="icon-btn">🌙</button>
+    </div>
+  </nav>
+
+  <!-- Sidebar -->
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-header">
+      <h2>Menu</h2>
+      <div class="sidebar-actions">
+        <button id="collapseSidebar" class="icon-btn">⬅️</button>
+        <button id="closeSidebar" class="icon-btn">❌</button>
       </div>
     </div>
+    <ul>
+      <li><a href="#"><span class="icon">🏠</span><span class="text">Home</span><span class="tooltip">Home</span></a></li>
+      <li><a href="#"><span class="icon">🛒</span><span class="text">Order</span><span class="tooltip">Order</span></a></li>
+      <li><a href="#"><span class="icon">💳</span><span class="text">Topup</span><span class="tooltip">Topup</span></a></li>
+      <li><a href="#"><span class="icon">ℹ️</span><span class="text">Tentang Kami</span><span class="tooltip">Tentang Kami</span></a></li>
+      <li><a href="#"><span class="icon">📞</span><span class="text">Kontak</span><span class="tooltip">Kontak</span></a></li>
+    </ul>
+  </aside>
+
+  <!-- Overlay -->
+  <div id="overlay" class="overlay"></div>
+
+  <!-- Header -->
+  <header class="header">
+    <h1>Selamat Datang di Xkay Store</h1>
+    <p>Layanan convert &amp; topup saldo PayPal terpercaya</p>
   </header>
 
-  <main class="relative py-8 sm:py-12">
-    <div aria-hidden="true" class="absolute inset-0 pointer-events-none"><div class="absolute -top-32 left-1/2 -translate-x-1/2 w-[80vw] max-w-4xl h-[500px] rounded-full bg-accent/10 blur-3xl"></div></div>
-    
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid gap-6 md:gap-8 md:grid-cols-5 relative">
-      <div class="md:col-span-3 card-glass bg-white/70 dark:bg-slate-800/70 ring-1 ring-slate-200 dark:ring-slate-800 rounded-2xl p-6 sm:p-8">
-        <h2 class="text-2xl font-bold mb-1">Buat Pesanan Baru</h2><p class="text-slate-500 dark:text-slate-400 text-sm mb-6">Detail akan dikirim ke WhatsApp Admin.</p>
-        <form id="orderForm" class="space-y-4" novalidate>
-          <div class="grid sm:grid-cols-2 gap-4"><div><label for="name" class="block text-sm font-medium mb-1.5 text-slate-600 dark:text-slate-300">Nama Lengkap</label><input id="name" type="text" autocomplete="name" required class="form-input" placeholder="Nama Anda" /></div><div><label for="paypal_email" class="block text-sm font-medium mb-1.5 text-slate-600 dark:text-slate-300">Email PayPal</label><input id="paypal_email" type="email" autocomplete="email" required class="form-input" placeholder="email@paypal.com" /></div></div>
-          <div class="grid sm:grid-cols-2 gap-4"><div><label for="type" class="block text-sm font-medium mb-1.5 text-slate-600 dark:text-slate-300">Jenis Transaksi</label><select id="type" required class="form-input"><option value="convert">Convert (PayPal → Tujuan)</option><option value="topup">Topup (Tujuan → PayPal)</option></select></div><div><label for="providerBtn" class="block text-sm font-medium mb-1.5 text-slate-600 dark:text-slate-300">Tujuan Penerimaan</label><button type="button" id="providerBtn" class="btn w-full h-10 rounded-lg px-3 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 ring-1 ring-slate-300 dark:ring-slate-600">Pilih Bank / E-Wallet</button><p id="selectedProvider" class="text-xs text-slate-500 dark:text-slate-400 mt-1.5">Belum dipilih</p></div></div>
-          <div class="grid sm:grid-cols-2 gap-4"><div><label for="account" class="block text-sm font-medium mb-1.5 text-slate-600 dark:text-slate-300">No. Rekening / Akun</label><input id="account" type="text" required class="form-input" placeholder="Contoh: 1234567890" /></div><div><label for="usd" class="block text-sm font-medium mb-1.5 text-slate-600 dark:text-slate-300">Nominal (USD)</label><input id="usd" type="number" step="0.01" min="0.01" required class="form-input" placeholder="0.00" /></div></div>
-          <div class="flex items-center justify-between rounded-lg bg-slate-100 dark:bg-slate-700/50 p-3"><span class="text-sm text-slate-500 dark:text-slate-400">Estimasi diterima (IDR):</span><span id="idr" class="font-semibold text-lg">Rp 0</span></div>
-          <button id="submitBtn" type="submit" class="btn w-full h-12 flex items-center justify-center rounded-lg bg-accent hover:bg-accent-hover text-white font-semibold"><span>Kirim Order via WhatsApp</span><svg class="w-5 h-5 ml-2 hidden animate-spin" id="submit-spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></button>
-        </form>
-      </div>
+  <!-- Body -->
+  <main class="content">
+    <section class="intro">
+      <h2>Kenapa memilih kami?</h2>
+      <p>
+        Xkay Store menyediakan layanan <strong>Convert</strong> saldo PayPal dengan kurs tetap Rp12.000/USD 
+        dan <strong>Topup</strong> saldo PayPal dengan kurs tetap Rp17.000/USD, serta opsi kurs real-time sesuai pasar.
+      </p>
+      <p>Kami berkomitmen memberikan layanan cepat, aman, dan terpercaya 🚀</p>
+    </section>
 
-      <aside class="md:col-span-2 space-y-6 md:space-y-8">
-        <div class="card-glass bg-white/70 dark:bg-slate-800/70 ring-1 ring-slate-200 dark:ring-slate-800 rounded-2xl p-6">
-          <h3 class="text-lg font-bold mb-4">Informasi Kurs</h3>
-          <div class="space-y-3">
-            <div class="p-4 rounded-lg bg-slate-100 dark:bg-slate-800"><div class="text-slate-500 dark:text-slate-400 text-sm">Convert (tetap)</div><div id="fixedConvertBig" class="mt-1 text-2xl font-bold"></div></div>
-            <div class="p-4 rounded-lg bg-slate-100 dark:bg-slate-800"><div class="text-slate-500 dark:text-slate-400 text-sm">Topup (tetap)</div><div id="fixedTopupBig" class="mt-1 text-2xl font-bold"></div></div>
-            <div class="p-4 rounded-lg bg-slate-100 dark:bg-slate-800"><div class="flex items-center justify-between"><span class="text-sm text-slate-500 dark:text-slate-400">Kurs Real-Time (Info)</span><button id="refreshRate" class="btn text-xs px-2 py-1 rounded-md bg-accent/80 hover:bg-accent text-white">Refresh</button></div><div class="mt-1"><div id="liveRateBig" class="text-2xl font-bold min-h-[32px]"></div><div id="liveMeta" class="text-[11px] text-slate-500 dark:text-slate-400 mt-1"></div></div></div>
-          </div>
-        </div>
-        
-        <div class="card-glass bg-white/70 dark:bg-slate-800/70 ring-1 ring-slate-200 dark:ring-slate-800 rounded-2xl p-6">
-          <div class="flex items-center justify-between gap-4 mb-4"><h3 class="text-lg font-bold">Riwayat Transaksi</h3><button id="reloadHistory" class="btn text-xs px-2 py-1 rounded-md bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 ring-1 ring-slate-300 dark:ring-slate-600">Reload</button></div>
-          <div class="rounded-lg ring-1 ring-slate-200 dark:ring-slate-700 bg-slate-100 dark:bg-slate-900/50 overflow-hidden">
-            <div class="table-container max-h-[420px] overflow-y-auto overflow-x-auto">
-              <table class="min-w-full text-left text-sm"><thead class="bg-slate-200/60 dark:bg-slate-800/60 card-glass text-slate-500 dark:text-slate-400"><tr><th class="p-3 whitespace-nowrap">Tanggal</th><th class="p-3 whitespace-nowrap">Tipe</th><th class="p-3 whitespace-nowrap">Provider</th><th class="p-3 whitespace-nowrap">Nama</th><th class="p-3 whitespace-nowrap">USD</th><th class="p-3 whitespace-nowrap">IDR</th></tr></thead><tbody id="history" class="divide-y divide-slate-200 dark:divide-slate-700"></tbody></table>
-            </div>
-          </div>
-          <p id="historyState" class="hidden text-center text-slate-500 dark:text-slate-400 text-sm mt-4"></p>
-        </div>
-      </aside>
-    </div>
+    <!-- Tabel riwayat transaksi -->
+    <section class="history">
+      <h2>Riwayat Transaksi</h2>
+      <div class="table-controls">
+        <input type="text" id="searchInput" placeholder="Cari transaksi... (nama, USD, IDR)">
+        <label for="rowsPerPage">Tampilkan:</label>
+        <select id="rowsPerPage">
+          <option value="5">5</option>
+          <option value="10" selected>10</option>
+          <option value="20">20</option>
+          <option value="all">Semua</option>
+        </select>
+      </div>
+      <table id="transactionTable">
+        <thead>
+          <tr>
+            <th data-col="0">Waktu ⬍</th>
+            <th data-col="1">Nama Lengkap ⬍</th>
+            <th data-col="2">Jumlah (USD) ⬍</th>
+            <th data-col="3">Jumlah (IDR) ⬍</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>2025-09-08 21:00</td><td>Budi Santoso</td><td>50</td><td>Rp 600.000</td></tr>
+          <tr><td>2025-09-08 20:30</td><td>Ani Lestari</td><td>100</td><td>Rp 1.200.000</td></tr>
+          <tr><td>2025-09-08 20:00</td><td>Rizky Pratama</td><td>25</td><td>Rp 300.000</td></tr>
+          <tr><td>2025-09-08 19:30</td><td>Siti Aminah</td><td>75</td><td>Rp 900.000</td></tr>
+          <tr><td>2025-09-08 19:00</td><td>Dewi Anggraini</td><td>150</td><td>Rp 1.800.000</td></tr>
+          <tr><td>2025-09-08 18:30</td><td>Andi Wijaya</td><td>200</td><td>Rp 2.400.000</td></tr>
+          <tr><td>2025-09-08 18:00</td><td>Maya Putri</td><td>120</td><td>Rp 1.440.000</td></tr>
+          <tr><td>2025-09-08 17:30</td><td>Yoga Saputra</td><td>80</td><td>Rp 960.000</td></tr>
+          <tr><td>2025-09-08 17:00</td><td>Hendra Gunawan</td><td>60</td><td>Rp 720.000</td></tr>
+          <tr><td>2025-09-08 16:30</td><td>Fitri Rahma</td><td>90</td><td>Rp 1.080.000</td></tr>
+        </tbody>
+      </table>
+      <div id="pagination" class="pagination"></div>
+    </section>
   </main>
 
-  <div id="providerModal" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="providerTitle">
-    <div id="providerOverlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm" aria-hidden="true"></div><div class="relative mx-auto mt-20 w-[92%] max-w-md"><div class="rounded-2xl bg-white text-slate-800 shadow-2xl ring-1 ring-black/10 p-5"><div class="flex items-center justify-between"><h3 id="providerTitle" class="text-lg font-semibold">Pilih Bank / E-Wallet</h3><button id="closeProvider" class="btn rounded-lg px-2 py-1 text-sm bg-slate-100 hover:bg-slate-200">Tutup</button></div><p class="mt-4 mb-2 text-sm font-semibold text-slate-500">Bank Lokal</p><div class="grid grid-cols-2 gap-3"><button data-category="Bank Lokal" data-provider="BCA" class="opt-btn">BCA</button><button data-category="Bank Lokal" data-provider="BRI" class="opt-btn">BRI</button><button data-category="Bank Lokal" data-provider="BNI" class="opt-btn">BNI</button><button data-category="Bank Lokal" data-provider="Mandiri" class="opt-btn">Mandiri</button></div><p class="mt-4 mb-2 text-sm font-semibold text-slate-500">E-Wallet</p><div class="grid grid-cols-2 gap-3"><button data-category="E-Wallet" data-provider="OVO" class="opt-btn">OVO</button><button data-category="E-Wallet" data-provider="Dana" class="opt-btn">Dana</button><button data-category="E-Wallet" data-provider="GoPay" class="opt-btn">GoPay</button><button data-category="E-Wallet" data-provider="ShopeePay" class="opt-btn">ShopeePay</button></div></div></div>
-  </div>
+  <!-- Footer -->
+  <footer class="footer">
+    © 2025 Xkay Store. All Rights Reserved.
+  </footer>
 
-  <div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 flex items-center gap-3 px-4 py-2 rounded-lg text-sm font-semibold shadow-2xl transition-transform duration-300 translate-y-20 opacity-0" role="alert"><span id="toast-icon"></span><span id="toast-msg"></span></div>
+  <script src="script.js"></script>
 
-  <script type="module">
-    // ====== CONFIGURATION ======
-    const CONFIG = {
-        SUPABASE_URL: "https://rhujpinlutjiztyonmas.supabase.co",
-        SUPABASE_ANON: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJodWpwaW5sdXRqaXp0eW9ubWFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczMDQyOTIsImV4cCI6MjA3Mjg4MDI5Mn0.zcfDUOHTeBYydFFscwmy3U9yryHiItTVJPLRurUlBvY",
-        WA_ADMIN: "6285846005280",
-        RATES: { CONVERT: 12000, TOPUP: 17000 }, FETCH_TIMEOUT: 8000, ID_LOCALE: "id-ID",
-    };
+<script type="text/javascript" id="dcoder_script">const sidebar = document.getElementById('sidebar');
+const sidebarToggle = document.getElementById('sidebarToggle');
+const closeSidebar = document.getElementById('closeSidebar');
+const collapseSidebar = document.getElementById('collapseSidebar');
+const darkModeToggle = document.getElementById('darkModeToggle');
+const overlay = document.getElementById('overlay');
+const sidebarLinks = document.querySelectorAll('.sidebar ul li a');
+const searchInput = document.getElementById('searchInput');
+const table = document.getElementById('transactionTable');
+const tbody = table.getElementsByTagName('tbody')[0];
+const pagination = document.getElementById('pagination');
+const rowsPerPageSelect = document.getElementById('rowsPerPage');
 
-    const DOMElements = { qs: (sel) => document.querySelector(sel) };
-    const AppState = { liveRate: CONFIG.RATES.CONVERT, selectedProvider: {}, isSubmitting: false, toastTimeout: null };
+function isDesktop() {
+  return window.innerWidth >= 1024;
+}
 
-    const Utils = {
-        formatCurrency: (n) => new Intl.NumberFormat(CONFIG.ID_LOCALE, { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(n),
-        formatNumber: (n) => new Intl.NumberFormat(CONFIG.ID_LOCALE, { maximumFractionDigits: 2 }).format(n),
-        showToast(message, type = 'success') {
-            const toast = DOMElements.qs("#toast"), icon = DOMElements.qs("#toast-icon");
-            DOMElements.qs("#toast-msg").textContent = message;
-            const styles = {
-                success: { bg: 'bg-emerald-500', icon: '✅' },
-                error: { bg: 'bg-red-500', icon: '❌' },
-                info: { bg: 'bg-blue-500', icon: 'ℹ️' },
-            };
-            toast.className = `fixed bottom-5 left-1/2 -translate-x-1/2 flex items-center gap-3 px-4 py-2 rounded-lg text-sm font-semibold shadow-2xl transition-transform duration-300 text-white ${styles[type].bg}`;
-            icon.textContent = styles[type].icon;
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            clearTimeout(AppState.toastTimeout);
-            AppState.toastTimeout = setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 2500);
-        },
-    };
+function animateButton(btn) {
+  btn.style.transform = "scale(1.3) rotate(15deg)";
+  setTimeout(() => btn.style.transform = "scale(1) rotate(0)", 250);
+}
 
-    const ThemeManager = {
-        init() {
-            this.applyTheme(localStorage.getItem("xkay_theme") || "dark");
-            DOMElements.qs("#themeToggle").addEventListener("click", () => this.toggleTheme());
-        },
-        applyTheme(theme) {
-            document.documentElement.classList.toggle("dark", theme === "dark");
-            DOMElements.qs("#theme-icon-dark").classList.toggle("hidden", theme === "light");
-            DOMElements.qs("#theme-icon-light").classList.toggle("hidden", theme === "dark");
-            localStorage.setItem("xkay_theme", theme);
-        },
-        toggleTheme() { this.applyTheme(localStorage.getItem("xkay_theme") === "dark" ? "light" : "dark"); },
-    };
+/* --- Sidebar --- */
+sidebarToggle.addEventListener('click', () => {
+  if (!isDesktop()) {
+    sidebar.classList.add('active');
+    overlay.classList.add('active');
+  }
+  animateButton(sidebarToggle);
+});
 
-    const ApiService = {
-        supabase: null,
-        init() { this.supabase = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON); },
-        async fetchWithTimeout(url) {
-            const controller = new AbortController();
-            const timeout = setTimeout(() => controller.abort(), CONFIG.FETCH_TIMEOUT);
-            try { return await (await fetch(url, { signal: controller.signal })).json(); } 
-            finally { clearTimeout(timeout); }
-        },
-        async getLiveRate() {
-            const sources = [
-                async () => ({ rate: Math.round((await this.fetchWithTimeout("https://api.exchangerate.host/latest?base=USD&symbols=IDR"))?.rates?.IDR), src: "exchangerate.host" }),
-                async () => ({ rate: Math.round((await this.fetchWithTimeout("https://open.er-api.com/v6/latest/USD"))?.rates?.IDR), src: "open.er-api.com" }),
-                async () => ({ rate: Math.round((await this.fetchWithTimeout("https://api.frankfurter.app/latest?from=USD&to=IDR"))?.rates?.IDR), src: "frankfurter.app" }),
-            ];
-            try { const result = await Promise.any(sources.map(s => s())); if (!result?.rate) throw new Error("Invalid data"); return result; } 
-            catch (e) { console.warn("Live rate fetch failed:", e); return null; }
-        },
-        getHistory() { return this.supabase.from("orders").select("*").order("created_at", { ascending: false }).limit(100); },
-        saveOrder(orderData) { return this.supabase.from("orders").insert([orderData]); },
-    };
+function closeSidebarMenu() {
+  if (!isDesktop()) {
+    sidebar.classList.remove('active');
+    overlay.classList.remove('active');
+  }
+}
 
-    const UIController = {
-        init() { this.setFixedRateUI(); this.setupEventListeners(); this.applyStyles(); },
-        setFixedRateUI() {
-            const { CONVERT, TOPUP } = CONFIG.RATES;
-            DOMElements.qs("#rateFixedConvert").textContent = Utils.formatCurrency(CONVERT);
-            DOMElements.qs("#rateFixedTopup").textContent = Utils.formatCurrency(TOPUP);
-            DOMElements.qs("#fixedConvertBig").textContent = Utils.formatCurrency(CONVERT);
-            DOMElements.qs("#fixedTopupBig").textContent = Utils.formatCurrency(TOPUP);
-        },
-        updateLiveRateUI(result) {
-            const rate = result?.rate || AppState.liveRate; const formatted = Utils.formatCurrency(rate);
-            DOMElements.qs("#rateLive").textContent = formatted; DOMElements.qs("#liveRateBig").textContent = formatted;
-            DOMElements.qs("#liveMeta").textContent = result ? `Sumber: ${result.src} • ${new Date().toLocaleTimeString(CONFIG.ID_LOCALE)}` : "Gagal memuat, pakai fallback.";
-        },
-        renderHistory(data) {
-            const tbody = DOMElements.qs("#history"), stateEl = DOMElements.qs("#historyState");
-            tbody.innerHTML = ""; stateEl.classList.add("hidden");
-            if (!data || data.length === 0) { stateEl.textContent = "Belum ada transaksi."; stateEl.classList.remove("hidden"); return; }
-            tbody.innerHTML = data.map(row => `<tr><td class="p-3 whitespace-nowrap">${new Date(row.created_at).toLocaleDateString(CONFIG.ID_LOCALE)}</td><td class="p-3 capitalize">${row.type??"-"}</td><td class="p-3">${row.provider??"-"}</td><td class="p-3">${row.name??"-"}</td><td class="p-3">${Utils.formatNumber(row.usd??0)}</td><td class="p-3 font-semibold whitespace-nowrap">${Utils.formatCurrency(row.receive_idr??0)}</td></tr>`).join('');
-        },
-        showHistoryLoading() {
-            DOMElements.qs("#historyState").classList.add("hidden");
-            DOMElements.qs("#history").innerHTML = Array(5).fill('<tr>' + Array(6).fill('<td class="p-3"><div class="skeleton h-4 w-full rounded relative overflow-hidden bg-slate-200 dark:bg-slate-700"></div></td>').join('') + '</tr>').join('');
-        },
-        showHistoryError() {
-            DOMElements.qs("#history").innerHTML = ""; const stateEl = DOMElements.qs("#historyState");
-            stateEl.textContent = "Gagal memuat riwayat. Coba Reload."; stateEl.classList.remove("hidden");
-        },
-        updateComputedIDR() {
-            const rate = DOMElements.qs("#type").value === "convert" ? CONFIG.RATES.CONVERT : CONFIG.RATES.TOPUP;
-            const usd = parseFloat(DOMElements.qs("#usd").value) || 0;
-            DOMElements.qs("#idr").textContent = Utils.formatCurrency(Math.round(usd * rate));
-        },
-        setupEventListeners() {
-            DOMElements.qs("#orderForm").addEventListener("submit", (e) => MainController.handleFormSubmit(e));
-            DOMElements.qs("#orderForm").addEventListener("input", (e) => { if (['usd', 'type'].includes(e.target.id)) this.updateComputedIDR(); });
-            DOMElements.qs("#refreshRate").addEventListener("click", () => MainController.loadLiveRate());
-            DOMElements.qs("#reloadHistory").addEventListener("click", () => MainController.loadHistory());
-            this.setupModal();
-        },
-        setupModal() {
-            const modal = DOMElements.qs("#providerModal"), openBtn = DOMElements.qs("#providerBtn");
-            let opener;
-            const open = () => { opener = document.activeElement; modal.classList.remove("hidden"); document.addEventListener("keydown", onEsc); };
-            const close = () => { modal.classList.add("hidden"); document.removeEventListener("keydown", onEsc); opener?.focus(); };
-            const onEsc = (e) => { if (e.key === "Escape") close(); };
-            openBtn.addEventListener("click", open);
-            DOMElements.qs("#closeProvider").addEventListener("click", close);
-            DOMElements.qs("#providerOverlay").addEventListener("click", close);
-            modal.addEventListener("click", (e) => {
-                const btn = e.target.closest(".opt-btn"); if (!btn) return;
-                AppState.selectedProvider = { category: btn.dataset.category, provider: btn.dataset.provider };
-                DOMElements.qs("#selectedProvider").textContent = `${btn.dataset.category} — ${btn.dataset.provider}`;
-                openBtn.textContent = btn.dataset.provider;
-                Utils.showToast(`Metode dipilih: ${btn.dataset.provider}`, 'info'); close();
-            });
-        },
-        applyStyles() {
-            document.querySelectorAll('.form-input').forEach(el => el.className = "form-input w-full rounded-lg px-3 py-2 bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-200 ring-1 ring-slate-300 dark:ring-slate-600 focus:ring-accent placeholder:text-slate-400 dark:placeholder:text-slate-500");
-            document.querySelectorAll('.opt-btn').forEach(el => el.className = "opt-btn h-12 rounded-lg bg-slate-100 hover:bg-slate-200 ring-1 ring-slate-200 text-sm font-semibold");
-        },
-        toggleSubmitSpinner(show) {
-            const btn = DOMElements.qs("#submitBtn"), spinner = DOMElements.qs("#submit-spinner");
-            btn.disabled = show;
-            btn.querySelector("span").style.opacity = show ? 0 : 1;
-            spinner.classList.toggle("hidden", !show);
-        },
-        resetForm() { DOMElements.qs("#orderForm").reset(); AppState.selectedProvider = {}; DOMElements.qs("#selectedProvider").textContent = "Belum dipilih"; DOMElements.qs("#providerBtn").textContent = "Pilih Bank / E-Wallet"; this.updateComputedIDR(); }
-    };
+if (closeSidebar) closeSidebar.addEventListener('click', () => {
+  closeSidebarMenu();
+  animateButton(closeSidebar);
+});
 
-    const Validation = { isEmail: (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v), isName: (v) => v?.trim().length >= 3, isAcct: (v) => /^[a-zA-Z0-9.\-_ ]{5,}$/.test(v.trim()) };
+if (overlay) overlay.addEventListener('click', closeSidebarMenu);
 
-    const MainController = {
-        async init() { ThemeManager.init(); ApiService.init(); UIController.init(); this.loadLiveRate(); this.loadHistory(); setInterval(() => this.loadLiveRate(), 10 * 60 * 1000); },
-        async loadLiveRate() { UIController.updateLiveRateUI(null); const result = await ApiService.getLiveRate(); if (result) AppState.liveRate = result.rate; UIController.updateLiveRateUI(result); },
-        async loadHistory() {
-            UIController.showHistoryLoading(); const { data, error } = await ApiService.getHistory();
-            if (error) { console.error("[DB] History Error:", error); UIController.showHistoryError(); } 
-            else { UIController.renderHistory(data); }
-        },
-        async handleFormSubmit(e) {
-            e.preventDefault(); if (AppState.isSubmitting) return; AppState.isSubmitting = true; UIController.toggleSubmitSpinner(true);
-            const data = { name: DOMElements.qs("#name").value, email: DOMElements.qs("#paypal_email").value, type: DOMElements.qs("#type").value, account: DOMElements.qs("#account").value, usd: parseFloat(DOMElements.qs("#usd").value) || 0 };
-            const end = () => { AppState.isSubmitting = false; UIController.toggleSubmitSpinner(false); return; };
-            if (!AppState.selectedProvider.provider) { Utils.showToast("Pilih tujuan penerimaan dulu.", 'error'); return end(); }
-            if (!Validation.isName(data.name)) { Utils.showToast("Nama lengkap minimal 3 karakter.", 'error'); return end(); }
-            if (!Validation.isEmail(data.email)) { Utils.showToast("Format email tidak valid.", 'error'); return end(); }
-            if (!Validation.isAcct(data.account)) { Utils.showToast("Nomor rekening/akun tidak valid.", 'error'); return end(); }
-            if (!(data.usd > 0.99)) { Utils.showToast("Nominal USD minimal $1.00", 'error'); return end(); }
-            const rate = DOMElements.qs("#type").value === "convert" ? CONFIG.RATES.CONVERT : CONFIG.RATES.TOPUP;
-            const orderData = { ...data, name: data.name.trim(), account: data.account.trim(), rate, receive_idr: Math.round(data.usd * rate), target_type: AppState.selectedProvider.category, provider: AppState.selectedProvider.provider };
-            const { error } = await ApiService.saveOrder(orderData);
-            if (error) { console.error("[DB] Save Error:", error); Utils.showToast("Gagal simpan, tetap membuka WA.", 'error'); } 
-            else { Utils.showToast("Pesanan tersimpan, membuka WhatsApp...", 'success'); }
-            const waMsg = `Halo Admin, saya ingin ${data.type}:\n\nNama: ${data.name.trim()}\nEmail PayPal: ${data.email}\nTujuan: ${AppState.selectedProvider.provider} (${AppState.selectedProvider.category})\nNo. Akun: ${data.account.trim()}\nNominal: ${Utils.formatNumber(data.usd)} USD = ${Utils.formatCurrency(orderData.receive_idr)}`;
-            window.open(`https://wa.me/${CONFIG.WA_ADMIN}?text=${encodeURIComponent(waMsg)}`, "_blank", "noopener,noreferrer");
-            UIController.resetForm(); await this.loadHistory(); end();
-        },
-    };
+if (collapseSidebar) {
+  collapseSidebar.addEventListener('click', () => {
+    if (isDesktop()) {
+      sidebar.classList.toggle('collapsed');
+      document.body.classList.toggle('sidebar-collapsed');
+      document.querySelector('.navbar').classList.toggle('sidebar-collapsed');
 
-    document.addEventListener("DOMContentLoaded", () => MainController.init());
-  </script>
-</body>
-</html>
+      collapseSidebar.textContent = sidebar.classList.contains('collapsed') ? '➡️' : '⬅️';
+      animateButton(collapseSidebar);
+    }
+  });
+}
+
+sidebarLinks.forEach(link => {
+  link.addEventListener('click', () => {
+    sidebarLinks.forEach(l => l.classList.remove('active'));
+    link.classList.add('active');
+    closeSidebarMenu();
+  });
+});
+
+darkModeToggle.addEventListener('click', () => {
+  document.body.classList.toggle('dark');
+  animateButton(darkModeToggle);
+});
+
+/* --- Table Search + Pagination --- */
+let currentPage = 1;
+let rowsPerPage = parseInt(rowsPerPageSelect.value) || 10;
+
+/* Sorting */
+let sortDirections = {};
+
+function sortTable(colIndex) {
+  const rows = Array.from(tbody.querySelectorAll("tr"));
+  const isNumeric = colIndex >= 2;
+  const direction = sortDirections[colIndex] === "asc" ? "desc" : "asc";
+
+  rows.sort((a, b) => {
+    const aText = a.children[colIndex].innerText.trim();
+    const bText = b.children[colIndex].innerText.trim();
+
+    let aVal = isNumeric ? parseFloat(aText.replace(/[^0-9.-]+/g, "")) : aText.toLowerCase();
+    let bVal = isNumeric ? parseFloat(bText.replace(/[^0-9.-]+/g, "")) : bText.toLowerCase();
+
+    if (aVal < bVal) return direction === "asc" ? -1 : 1;
+    if (aVal > bVal) return direction === "asc" ? 1 : -1;
+    return 0;
+  });
+
+  rows.forEach(row => tbody.appendChild(row));
+  sortDirections[colIndex] = direction;
+  renderTable();
+}
+
+table.querySelectorAll("th").forEach((th, index) => {
+  th.addEventListener("click", () => sortTable(index));
+});
+
+function renderTable() {
+  const rows = Array.from(tbody.querySelectorAll("tr"));
+  const filter = searchInput.value.toLowerCase();
+  let filteredRows = rows.filter(row => {
+    const cells = Array.from(row.getElementsByTagName("td"));
+    return cells.some(cell => cell.textContent.toLowerCase().includes(filter));
+  });
+
+  let totalPages = rowsPerPage === "all" ? 1 : Math.ceil(filteredRows.length / rowsPerPage);
+  if (currentPage > totalPages) currentPage = totalPages || 1;
+
+  filteredRows.forEach((row, i) => {
+    if (rowsPerPage === "all") {
+      row.style.display = "";
+    } else {
+      row.style.display = (i >= (currentPage - 1) * rowsPerPage && i < currentPage * rowsPerPage) ? "" : "none";
+    }
+  });
+
+  renderPagination(totalPages);
+}
+
+function renderPagination(totalPages) {
+  pagination.innerHTML = "";
+  if (totalPages <= 1) return;
+
+  for (let i = 1; i <= totalPages; i++) {
+    const btn = document.createElement("button");
+    btn.textContent = i;
+    if (i === currentPage) btn.classList.add("active");
+    btn.addEventListener("click", () => {
+      currentPage = i;
+      renderTable();
+    });
+    pagination.appendChild(btn);
+  }
+}
+
+function filterTable() {
+  currentPage = 1;
+  renderTable();
+}
+
+searchInput.addEventListener('keyup', filterTable);
+
+rowsPerPageSelect.addEventListener('change', () => {
+  rowsPerPage = rowsPerPageSelect.value === "all" ? "all" : parseInt(rowsPerPageSelect.value);
+  currentPage = 1;
+  renderTable();
+});
+
+// Initial render
+renderTable();
+</script></body></html>
