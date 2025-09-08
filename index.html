@@ -65,7 +65,7 @@
           </div>
           <button id="themeToggle" class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800">
             <svg id="theme-icon-dark" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" /></svg>
-            <svg id="theme-icon-light" class="h-5 w-5 hidden" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 0 018 0z" clip-rule="evenodd" /></svg>
+            <svg id="theme-icon-light" class="h-5 w-5 hidden" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 018 0z" clip-rule="evenodd" /></svg>
           </button>
         </div>
       </div>
@@ -210,7 +210,189 @@
 
   <!-- SCRIPT -->
   <script type="module">
-    // ... (script sama persis seperti versi sebelumnya, hanya tampilan yg dioptimasi mobile)
+    // === KONFIG SUPABASE ===
+    const SUPABASE_URL = "https://rhujpinlutjiztyonmas.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJodWpwaW5sdXRqaXp0eW9ubWFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczMDQyOTIsImV4cCI6MjA3Mjg4MDI5Mn0.zcfDUOHTeBYydFFscwmy3U9yryHiItTVJPLRurUlBvY";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // === ELEMENTS ===
+    const form = document.getElementById("orderForm");
+    const usdInput = document.getElementById("usd");
+    const typeInput = document.getElementById("type");
+    const idrOutput = document.getElementById("idr");
+    const submitBtn = document.getElementById("submitBtn");
+    const spinner = document.getElementById("submit-spinner");
+    const historyBody = document.getElementById("history");
+    const historyState = document.getElementById("historyState");
+    const reloadHistoryBtn = document.getElementById("reloadHistory");
+
+    const toastEl = document.getElementById("toast");
+
+    // fixed kurs
+    const FIXED_CONVERT = 12000;
+    const FIXED_TOPUP = 17000;
+
+    // === FUNGSI TOAST ===
+    function showToast(msg, color="bg-accent") {
+      toastEl.textContent = msg;
+      toastEl.className = `fixed bottom-5 left-1/2 -translate-x-1/2 px-3 py-2 text-xs sm:text-sm rounded-lg text-white ${color}`;
+      toastEl.style.opacity = "1";
+      toastEl.style.transform = "translate(-50%,0)";
+      setTimeout(() => {
+        toastEl.style.opacity = "0";
+        toastEl.style.transform = "translate(-50%,80px)";
+      }, 3000);
+    }
+
+    // === HITUNG KONVERSI ===
+    function updateIDR() {
+      const usd = parseFloat(usdInput.value) || 0;
+      const type = typeInput.value;
+      let rate = type === "convert" ? FIXED_CONVERT : FIXED_TOPUP;
+      const idr = usd * rate;
+      idrOutput.textContent = "Rp " + idr.toLocaleString("id-ID");
+    }
+
+    usdInput.addEventListener("input", updateIDR);
+    typeInput.addEventListener("change", updateIDR);
+
+    // === PROVIDER MODAL ===
+    const modal = document.getElementById("providerModal");
+    const providerBtn = document.getElementById("providerBtn");
+    const closeProvider = document.getElementById("closeProvider");
+    const overlay = document.getElementById("providerOverlay");
+    const selectedProvider = document.getElementById("selectedProvider");
+    let chosenProvider = null;
+
+    providerBtn.addEventListener("click", () => { modal.classList.remove("hidden"); });
+    closeProvider.addEventListener("click", () => { modal.classList.add("hidden"); });
+    overlay.addEventListener("click", () => { modal.classList.add("hidden"); });
+    document.querySelectorAll(".opt-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        chosenProvider = btn.dataset.provider;
+        selectedProvider.textContent = chosenProvider;
+        modal.classList.add("hidden");
+        updateIDR();
+      });
+    });
+
+    // === SUBMIT ===
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      spinner.classList.remove("hidden");
+      submitBtn.disabled = true;
+
+      const name = document.getElementById("name").value;
+      const email = document.getElementById("paypal_email").value;
+      const type = typeInput.value;
+      const usd = parseFloat(usdInput.value);
+      const account = document.getElementById("account").value;
+      const idr = usd * (type === "convert" ? FIXED_CONVERT : FIXED_TOPUP);
+
+      // simpan DB
+      const { error } = await supabase.from("orders").insert([{ 
+        name, paypal_email: email, type, provider: chosenProvider, account, usd, idr 
+      }]);
+
+      if (error) {
+        showToast("Gagal simpan data", "bg-red-600");
+      } else {
+        showToast("Order berhasil!");
+        loadHistory();
+        // kirim WA
+        const msg = `Halo Admin, saya ingin ${type}.\nNama: ${name}\nEmail PayPal: ${email}\nProvider: ${chosenProvider}\nAkun: ${account}\nUSD: ${usd}\nIDR: Rp ${idr.toLocaleString("id-ID")}`;
+        const url = `https://wa.me/6281234567890?text=${encodeURIComponent(msg)}`;
+        window.open(url, "_blank");
+        form.reset();
+        selectedProvider.textContent = "Belum dipilih";
+      }
+      spinner.classList.add("hidden");
+      submitBtn.disabled = false;
+    });
+
+    // === LOAD HISTORY ===
+    async function loadHistory() {
+      historyBody.innerHTML = "";
+      historyState.classList.add("hidden");
+      const { data, error } = await supabase.from("orders").select("*").order("created_at", { ascending: false }).limit(20);
+      if (error) {
+        historyState.textContent = "Gagal memuat data";
+        historyState.classList.remove("hidden");
+        return;
+      }
+      if (!data.length) {
+        historyState.textContent = "Belum ada transaksi";
+        historyState.classList.remove("hidden");
+        return;
+      }
+      data.forEach(row => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="p-2 sm:p-3">${new Date(row.created_at).toLocaleDateString("id-ID")}</td>
+          <td class="p-2 sm:p-3">${row.type}</td>
+          <td class="p-2 sm:p-3">${row.provider || "-"}</td>
+          <td class="p-2 sm:p-3">${row.name}</td>
+          <td class="p-2 sm:p-3">${row.usd}</td>
+          <td class="p-2 sm:p-3">Rp ${row.idr.toLocaleString("id-ID")}</td>
+        `;
+        historyBody.appendChild(tr);
+      });
+    }
+
+    reloadHistoryBtn.addEventListener("click", loadHistory);
+    loadHistory();
+
+    // === TEMA ===
+    const themeToggle = document.getElementById("themeToggle");
+    const iconDark = document.getElementById("theme-icon-dark");
+    const iconLight = document.getElementById("theme-icon-light");
+
+    function applyTheme(theme) {
+      if (theme === "dark") {
+        document.documentElement.classList.add("dark");
+        iconDark.classList.add("hidden");
+        iconLight.classList.remove("hidden");
+      } else {
+        document.documentElement.classList.remove("dark");
+        iconDark.classList.remove("hidden");
+        iconLight.classList.add("hidden");
+      }
+    }
+
+    themeToggle.addEventListener("click", () => {
+      const current = localStorage.theme === "dark" ? "dark" : "light";
+      const next = current === "dark" ? "light" : "dark";
+      localStorage.theme = next;
+      applyTheme(next);
+    });
+    applyTheme(localStorage.theme || "light");
+
+    // === FIXED & LIVE RATE ===
+    function renderFixed() {
+      document.getElementById("rateFixedConvert").textContent = "Rp " + FIXED_CONVERT.toLocaleString("id-ID");
+      document.getElementById("rateFixedTopup").textContent = "Rp " + FIXED_TOPUP.toLocaleString("id-ID");
+      document.getElementById("fixedConvertBig").textContent = "Rp " + FIXED_CONVERT.toLocaleString("id-ID");
+      document.getElementById("fixedTopupBig").textContent = "Rp " + FIXED_TOPUP.toLocaleString("id-ID");
+    }
+    renderFixed();
+
+    async function fetchLive() {
+      try {
+        const res = await fetch("https://open.er-api.com/v6/latest/USD");
+        const json = await res.json();
+        const rate = json.rates.IDR;
+        document.getElementById("rateLive").textContent = "Rp " + Math.round(rate).toLocaleString("id-ID");
+        document.getElementById("liveRateBig").textContent = "Rp " + Math.round(rate).toLocaleString("id-ID");
+        document.getElementById("liveMeta").textContent = "Sumber: open.er-api.com";
+      } catch (e) {
+        document.getElementById("rateLive").textContent = "-";
+        document.getElementById("liveRateBig").textContent = "-";
+        document.getElementById("liveMeta").textContent = "Gagal memuat kurs live";
+      }
+    }
+    fetchLive();
+    document.getElementById("refreshRate").addEventListener("click", fetchLive);
+
   </script>
 </body>
 </html>
