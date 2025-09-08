@@ -1,546 +1,723 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="dark">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Xkay Store • Convert & Topup PayPal</title>
 
-  <!-- Tailwind -->
-  <script>
-    window.tailwind = { config: { darkMode: 'class' } };
-  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Supabase -->
+  <script>
+    window.tailwind = {
+      config: {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+            },
+            colors: {
+              // Dark Theme
+              dark: {
+                bg: '#0D1117',
+                'bg-secondary': '#161B22',
+                card: '#1A2029',
+                border: '#30363D',
+                text: '#E6EDF3',
+                'text-muted': '#8B949E',
+              },
+              // Light Theme
+              light: {
+                bg: '#F3F4F6',
+                'bg-secondary': '#FFFFFF',
+                card: '#FFFFFF',
+                border: '#D1D5DB',
+                text: '#1F2937',
+                'text-muted': '#6B7280',
+              },
+              accent: {
+                DEFAULT: '#2563EB',
+                hover: '#1D4ED8',
+              },
+            },
+          },
+        },
+      }
+    };
+  </script>
+
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
-  <meta name="theme-color" content="#0d47a1" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0' x2='1' y1='0' y2='1'><stop offset='0%' stop-color='%23133a7c'/><stop offset='100%' stop-color='%230d47a1'/></linearGradient></defs><rect width='100' height='100' rx='18' fill='url(%23g)'/><text x='50%' y='57%' font-size='56' text-anchor='middle' fill='white' font-family='Arial, sans-serif'>X</text></svg>"/>
+  <meta name="theme-color" content="#1D4ED8" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0' x2='1' y1='0' y2='1'><stop offset='0%' stop-color='%232563EB'/><stop offset='100%' stop-color='%231D4ED8'/></linearGradient></defs><rect width='100' height='100' rx='22' fill='url(%23g)'/><text x='50%' y='57%' font-size='56' text-anchor='middle' fill='white' font-family='Inter, Arial, sans-serif' font-weight='600'>X</text></svg>"/>
 
   <style>
+    /* Base Styles */
+    body {
+      font-family: 'Inter', sans-serif;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    .card-glass {
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+    }
     /* Scrollbar */
-    ::-webkit-scrollbar{width:8px;height:8px}
-    ::-webkit-scrollbar-thumb{background:#2b3f83;border-radius:999px}
-    ::-webkit-scrollbar-track{background:transparent}
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-thumb { background: #30363D; border-radius: 999px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    html.light ::-webkit-scrollbar-thumb { background: #D1D5DB; }
 
-    /* Sticky thead for scrollable table */
-    thead.sticky th { position: sticky; top: 0; z-index: 2; }
-
-    /* Light theme tokens (toggle via .theme-light on body) */
-    body.theme-light { color:#0f172a; background: radial-gradient(90% 90% at 50% 10%, #e9f1ff 0%, #e3ebff 40%, #eef3ff 100%) fixed; }
-    body.theme-light .glass { background: rgba(255,255,255,0.75) !important; color:#0f172a !important; border-color: rgba(0,0,0,0.08) !important; }
-    body.theme-light .glass-strong { background: rgba(255,255,255,0.92) !important; }
-    body.theme-light .muted { color:#334155 !important; }
-
-    .btn { transition: transform .06s ease, opacity .2s ease; }
-    .btn:active { transform: translateY(1px) scale(.99); }
-
-    /* Prevent layout shift on mobile when toast shows */
-    body { min-height: 100dvh; }
+    /* Sticky Header for Table */
+    .table-container thead th { position: sticky; top: 0; z-index: 1; }
+    
+    /* Transitions */
+    .btn, .opt-btn, input, select {
+        transition: transform 0.1s ease, box-shadow 0.2s ease, background-color 0.2s ease, opacity 0.2s ease;
+    }
+    .btn:active, .opt-btn:active {
+        transform: translateY(1px) scale(0.98);
+    }
+    
+    /* Focus Ring */
+    input:focus, select:focus, button:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.4);
+    }
+    
+    /* Skeleton Loader */
+    .skeleton {
+        position: relative;
+        overflow: hidden;
+        background-color: rgba(128, 128, 128, 0.2);
+    }
+    .skeleton::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -150%;
+        width: 150%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+        animation: shimmer 1.5s infinite;
+    }
+    @keyframes shimmer {
+        0% { left: -150%; }
+        100% { left: 150%; }
+    }
   </style>
 </head>
 
-<body class="min-h-screen text-white bg-gradient-to-br from-[#0f172a] via-[#0b2454] to-[#0a1a3a] selection:bg-white/20 selection:text-white">
-  <!-- Header -->
-  <header class="glass-strong sticky top-0 z-40 backdrop-blur-md bg-white/10 ring-1 ring-white/15">
-    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-2xl bg-white/10 ring-1 ring-white/15 grid place-items-center">
-          <span class="text-xl font-bold">X</span>
-        </div>
-        <div>
-          <h1 class="text-lg sm:text-xl font-bold tracking-tight">Xkay Store</h1>
-          <p class="text-xs sm:text-sm text-white/70 muted">Convert & Topup PayPal • cepat & aman</p>
-        </div>
-      </div>
+<body class="bg-dark-bg text-dark-text min-h-screen antialiased selection:bg-accent/30">
+  
+  <header class="card-glass sticky top-0 z-40 bg-dark-card/75 ring-1 ring-dark-border">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between py-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-accent grid place-items-center">
+                    <span class="text-xl font-semibold text-white">X</span>
+                </div>
+                <div>
+                    <h1 class="text-lg sm:text-xl font-bold tracking-tight text-dark-text">Xkay Store</h1>
+                    <p class="text-xs sm:text-sm text-dark-text-muted">Convert & Topup PayPal • Cepat & Aman</p>
+                </div>
+            </div>
 
-      <div class="flex items-center gap-2 sm:gap-3">
-        <button id="themeToggle" class="btn px-3 py-2 rounded-xl bg-white/10 ring-1 ring-white/15 hover:bg-white/20">🌙/☀️</button>
-        <div class="hidden sm:flex items-center gap-3 text-sm">
-          <div class="glass px-3 py-2 rounded-xl bg-white/10 ring-1 ring-white/10">
-            <div class="text-white/60 muted">Convert (tetap)</div>
-            <div id="rateFixedConvert" class="font-semibold">Rp 12.000</div>
-          </div>
-          <div class="glass px-3 py-2 rounded-xl bg-white/10 ring-1 ring-white/10">
-            <div class="text-white/60 muted">Topup (tetap)</div>
-            <div id="rateFixedTopup" class="font-semibold">Rp 17.000</div>
-          </div>
-          <div class="glass px-3 py-2 rounded-xl bg-white/10 ring-1 ring-white/10">
-            <div class="text-white/60 muted">Kurs real-time</div>
-            <div id="rateLive" class="font-semibold">Memuat…</div>
-          </div>
+            <div class="flex items-center gap-2 sm:gap-3">
+                <div class="hidden sm:flex items-center gap-3 text-sm">
+                    <div class="text-center"><div class="text-dark-text-muted">Convert</div><div id="rateFixedConvert" class="font-semibold"></div></div>
+                    <div class="text-center"><div class="text-dark-text-muted">Topup</div><div id="rateFixedTopup" class="font-semibold"></div></div>
+                    <div class="text-center"><div class="text-dark-text-muted">Live</div><div id="rateLive" class="font-semibold min-w-[70px]"></div></div>
+                </div>
+                <button id="themeToggle" class="btn p-2 rounded-full hover:bg-dark-border/50" aria-label="Toggle theme">
+                    <svg id="theme-icon-dark" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+                    <svg id="theme-icon-light" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                </button>
+            </div>
         </div>
-      </div>
     </div>
   </header>
 
-  <!-- Hero / Form + Info -->
-  <main class="relative">
-    <div class="absolute inset-0 pointer-events-none">
-      <div class="absolute -top-24 left-1/2 -translate-x-1/2 w-[900px] h-[900px] rounded-full bg-blue-500/20 blur-3xl"></div>
+  <main class="relative py-8 sm:py-12">
+    <div aria-hidden="true" class="absolute inset-0 pointer-events-none">
+        <div class="absolute -top-32 left-1/2 -translate-x-1/2 w-[80vw] max-w-4xl h-[500px] rounded-full bg-accent/10 blur-3xl"></div>
     </div>
+    
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid gap-8 lg:grid-cols-5 relative">
+        <div class="lg:col-span-3 card-glass bg-dark-card/75 ring-1 ring-dark-border rounded-2xl p-6 sm:p-8">
+            <h2 class="text-2xl font-bold mb-1 text-dark-text">Buat Pesanan Baru</h2>
+            <p class="text-dark-text-muted text-sm mb-6">Detail akan dikirim ke WhatsApp Admin dan tersimpan di riwayat.</p>
 
-    <section class="max-w-6xl mx-auto px-4 pt-6 pb-4 grid gap-6 md:grid-cols-2">
-      <!-- Card: Order -->
-      <div class="glass rounded-2xl bg-white/10 ring-1 ring-white/15 shadow-2xl p-5 sm:p-6">
-        <div class="flex items-center justify-between mb-1">
-          <h2 class="text-xl font-semibold">Buat Order</h2>
-          <button id="themeToggleSm" class="btn sm:hidden px-3 py-2 rounded-xl bg-white/10 ring-1 ring-white/15 hover:bg-white/20">Tema</button>
-        </div>
-        <p class="text-white/70 text-sm mb-5 muted">Tanpa login. Detail dikirim ke WhatsApp Admin & tersimpan di riwayat.</p>
+            <form id="orderForm" class="space-y-4" novalidate>
+                <div class="grid sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="name" class="block text-sm font-medium mb-1.5 text-dark-text-muted">Nama Lengkap</label>
+                        <input id="name" type="text" autocomplete="name" required class="form-input" placeholder="Nama Anda" />
+                    </div>
+                    <div>
+                        <label for="paypal_email" class="block text-sm font-medium mb-1.5 text-dark-text-muted">Email PayPal</label>
+                        <input id="paypal_email" type="email" autocomplete="email" required class="form-input" placeholder="email@paypal.com" />
+                    </div>
+                </div>
 
-        <form id="orderForm" class="space-y-4" novalidate>
-          <div class="grid sm:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm mb-1 text-white/80 muted">Nama Lengkap</label>
-              <input id="name" type="text" autocomplete="name" required
-                class="w-full rounded-xl px-3 py-2 text-black focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Nama Anda" />
-            </div>
-            <div>
-              <label class="block text-sm mb-1 text-white/80 muted">Email PayPal</label>
-              <input id="paypal_email" type="email" autocomplete="email" required
-                class="w-full rounded-xl px-3 py-2 text-black focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="email@paypal.com" />
-            </div>
-          </div>
+                <div class="grid sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="type" class="block text-sm font-medium mb-1.5 text-dark-text-muted">Jenis Transaksi</label>
+                        <select id="type" required class="form-input">
+                            <option value="convert">Convert (PayPal → Tujuan)</option>
+                            <option value="topup">Topup (Tujuan → PayPal)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="providerBtn" class="block text-sm font-medium mb-1.5 text-dark-text-muted">Tujuan Penerimaan</label>
+                        <button type="button" id="providerBtn" class="btn w-full h-10 rounded-lg px-3 bg-dark-bg-secondary hover:bg-dark-border/50 ring-1 ring-dark-border">
+                            Pilih Bank / E-Wallet
+                        </button>
+                        <p id="selectedProvider" class="text-xs text-dark-text-muted mt-1.5">Belum dipilih</p>
+                    </div>
+                </div>
 
-          <div class="grid sm:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm mb-1 text-white/80 muted">Jenis Transaksi</label>
-              <select id="type" required
-                class="w-full rounded-xl px-3 py-2 text-black focus:outline-none focus:ring-2 focus:ring-blue-400">
-                <option value="convert">Convert (PayPal → Bank/E-Wallet)</option>
-                <option value="topup">Topup (Bank/E-Wallet → PayPal)</option>
-              </select>
-            </div>
+                <div class="grid sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="account" class="block text-sm font-medium mb-1.5 text-dark-text-muted">No. Rekening / Akun</label>
+                        <input id="account" type="text" required class="form-input" placeholder="Contoh: 1234567890" />
+                    </div>
+                    <div>
+                        <label for="usd" class="block text-sm font-medium mb-1.5 text-dark-text-muted">Nominal (USD)</label>
+                        <input id="usd" type="number" step="0.01" min="0.01" required class="form-input" placeholder="0.00" />
+                    </div>
+                </div>
 
-            <div>
-              <label class="block text-sm mb-1 text-white/80 muted">Tujuan Penerimaan</label>
-              <button type="button" id="providerBtn"
-                class="btn w-full rounded-xl px-3 py-2 bg-blue-600 hover:bg-blue-500 transition focus:outline-none focus:ring-2 focus:ring-blue-300">
-                Pilih Bank / E-Wallet
-              </button>
-              <p id="selectedProvider" class="text-xs text-white/70 mt-1 muted">Belum dipilih</p>
-            </div>
-          </div>
+                <div class="flex items-center justify-between rounded-lg bg-dark-bg-secondary p-3">
+                    <span class="text-sm text-dark-text-muted">Estimasi diterima (IDR):</span>
+                    <span id="idr" class="font-semibold text-lg text-dark-text">Rp 0</span>
+                </div>
 
-          <div class="grid sm:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm mb-1 text-white/80 muted">No Rekening / Akun</label>
-              <input id="account" type="text" required
-                class="w-full rounded-xl px-3 py-2 text-black focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Contoh: 1234567890 (BCA)" />
-            </div>
-            <div>
-              <label class="block text-sm mb-1 text-white/80 muted">Nominal (USD)</label>
-              <input id="usd" type="number" step="0.01" min="0.01" required
-                class="w-full rounded-xl px-3 py-2 text-black focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="0.00" />
-              <p class="text-xs text-white/70 mt-1 muted">Dihitung pakai kurs tetap per jenis transaksi.</p>
-            </div>
-          </div>
-
-          <div class="flex items-center justify-between rounded-xl bg-white/5 ring-1 ring-white/10 px-3 py-2 glass">
-            <span class="text-sm text-white/80 muted">Setara (IDR, kurs tetap):</span>
-            <span id="idr" class="font-semibold">Rp 0</span>
-          </div>
-
-          <button id="submitBtn" type="submit"
-            class="btn w-full rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-semibold py-3 transition focus:outline-none focus:ring-2 focus:ring-emerald-300">
-            Kirim Order via WhatsApp
-          </button>
-          <p class="text-[11px] text-white/60 muted">Dengan mengirim, Anda setuju data disimpan untuk riwayat transaksi.</p>
-        </form>
-      </div>
-
-      <!-- Card: Kurs & Info -->
-      <aside class="glass rounded-2xl bg-white/10 ring-1 ring-white/10 p-5 sm:p-6">
-        <h3 class="text-lg font-semibold mb-2">Informasi Kurs</h3>
-        <ul class="space-y-2 text-sm text-white/80 muted">
-          <li>• <b>Kurs tetap</b> dipakai untuk hitungan IDR (Convert & Topup berbeda).</li>
-          <li>• <b>Kurs real-time</b> hanya info pasar (tidak memengaruhi perhitungan).</li>
-          <li>• Hubungi Admin WhatsApp untuk konfirmasi final.</li>
-        </ul>
-
-        <div class="mt-4 grid gap-3">
-          <div class="glass rounded-xl bg-white/10 ring-1 ring-white/10 p-3">
-            <div class="text-white/60 muted text-sm">Convert (tetap)</div>
-            <div id="fixedConvertBig" class="mt-1 text-2xl font-bold">Rp 12.000</div>
-          </div>
-          <div class="glass rounded-xl bg-white/10 ring-1 ring-white/10 p-3">
-            <div class="text-white/60 muted text-sm">Topup (tetap)</div>
-            <div id="fixedTopupBig" class="mt-1 text-2xl font-bold">Rp 17.000</div>
-          </div>
-          <div class="glass rounded-xl bg-white/10 ring-1 ring-white/10 p-3">
-            <div class="flex items-center justify-between">
-              <span class="text-sm text-white/70 muted">Kurs Real-Time</span>
-              <button id="refreshRate" class="btn text-xs px-2 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-300">Refresh</button>
-            </div>
-            <div class="mt-1">
-              <div id="liveRateBig" class="text-2xl font-bold">Memuat…</div>
-              <div id="liveMeta" class="text-[11px] text-white/60 mt-1 muted">Sumber: —</div>
-            </div>
-          </div>
-        </div>
-      </aside>
-    </section>
-
-    <!-- Riwayat -->
-    <section class="max-w-6xl mx-auto px-4 pt-2 pb-10">
-      <div class="glass rounded-2xl bg-white/10 ring-1 ring-white/10 p-5 sm:p-6">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
-          <h2 class="text-xl font-semibold">Riwayat Transaksi</h2>
-          <div class="flex items-center gap-2">
-            <button id="reloadHistory" class="btn px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-500">Reload</button>
-            <button id="exportBtn" class="btn px-3 py-2 rounded-lg bg-yellow-400 text-black font-semibold">Export CSV</button>
-          </div>
+                <button id="submitBtn" type="submit" class="btn w-full rounded-lg bg-accent hover:bg-accent-hover text-white font-semibold py-3">
+                    <span>Kirim Order via WhatsApp</span>
+                    <svg class="w-5 h-5 ml-2 hidden" id="submit-spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                </button>
+                <p class="text-[11px] text-center text-dark-text-muted">Dengan mengirim, Anda setuju data disimpan untuk riwayat transaksi.</p>
+            </form>
         </div>
 
-        <div class="rounded-xl ring-1 ring-white/10 glass-strong overflow-hidden">
-          <!-- SCROLLABLE WRAPPER -->
-          <div class="max-h-[420px] overflow-y-auto">
-            <table class="min-w-full text-left text-sm">
-              <thead class="sticky bg-white/10 text-white/80">
-                <tr>
-                  <th class="px-3 py-2">Tanggal</th>
-                  <th class="px-3 py-2">Tipe</th>
-                  <th class="px-3 py-2">Kategori</th>
-                  <th class="px-3 py-2">Provider</th>
-                  <th class="px-3 py-2">Nama</th>
-                  <th class="px-3 py-2">USD</th>
-                  <th class="px-3 py-2">IDR</th>
-                </tr>
-              </thead>
-              <tbody id="history" class="divide-y divide-white/10">
-                <tr class="animate-pulse"><td class="px-3 py-2" colspan="7">Memuat data…</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <p id="historyEmpty" class="hidden text-center text-white/60 text-sm mt-3 muted">Belum ada transaksi.</p>
-      </div>
-    </section>
+        <aside class="lg:col-span-2 space-y-8">
+            <div class="card-glass bg-dark-card/75 ring-1 ring-dark-border rounded-2xl p-6">
+                <h3 class="text-lg font-bold mb-4 text-dark-text">Informasi Kurs</h3>
+                <div class="space-y-3">
+                    <div class="p-4 rounded-lg bg-dark-bg-secondary">
+                        <div class="text-dark-text-muted text-sm">Convert (tetap)</div>
+                        <div id="fixedConvertBig" class="mt-1 text-2xl font-bold text-dark-text"></div>
+                    </div>
+                    <div class="p-4 rounded-lg bg-dark-bg-secondary">
+                        <div class="text-dark-text-muted text-sm">Topup (tetap)</div>
+                        <div id="fixedTopupBig" class="mt-1 text-2xl font-bold text-dark-text"></div>
+                    </div>
+                    <div class="p-4 rounded-lg bg-dark-bg-secondary">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-dark-text-muted">Kurs Real-Time (Info)</span>
+                            <button id="refreshRate" class="btn text-xs px-2 py-1 rounded-md bg-accent/80 hover:bg-accent text-white">Refresh</button>
+                        </div>
+                        <div class="mt-1">
+                            <div id="liveRateBig" class="text-2xl font-bold text-dark-text min-h-[32px]"></div>
+                            <div id="liveMeta" class="text-[11px] text-dark-text-muted mt-1"></div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+            
+            <div class="card-glass bg-dark-card/75 ring-1 ring-dark-border rounded-2xl p-6">
+                <div class="flex items-center justify-between gap-4 mb-4">
+                    <h3 class="text-lg font-bold text-dark-text">Riwayat Transaksi</h3>
+                    <button id="reloadHistory" class="btn text-xs px-2 py-1 rounded-md bg-dark-bg-secondary hover:bg-dark-border/50 ring-1 ring-dark-border">Reload</button>
+                </div>
+                <div class="rounded-lg ring-1 ring-dark-border bg-dark-bg-secondary overflow-hidden">
+                    <div class="table-container max-h-[420px] overflow-y-auto">
+                        <table class="min-w-full text-left text-sm">
+                            <thead class="bg-dark-card/80 card-glass text-dark-text-muted">
+                                <tr>
+                                    <th class="p-3">Tanggal</th><th class="p-3">Tipe</th><th class="p-3">Provider</th>
+                                    <th class="p-3">Nama</th><th class="p-3">USD</th><th class="p-3">IDR</th>
+                                </tr>
+                            </thead>
+                            <tbody id="history" class="divide-y divide-dark-border">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+                <p id="historyState" class="hidden text-center text-dark-text-muted text-sm mt-4"></p>
+            </div>
+        </aside>
+    </div>
   </main>
 
-  <!-- Modal Provider -->
   <div id="providerModal" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="providerTitle">
-    <div id="providerOverlay" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
-    <div class="relative mx-auto mt-20 w-[92%] max-w-md rounded-2xl bg-white text-black shadow-2xl ring-1 ring-black/10">
-      <div class="p-5">
-        <div class="flex items-center justify-between">
-          <h3 id="providerTitle" class="text-lg font-semibold">Pilih Bank / E-Wallet</h3>
-          <button id="closeProvider" class="rounded-lg px-2 py-1 text-sm bg-black/5 hover:bg-black/10">Tutup (Esc)</button>
-        </div>
-
-        <p class="mt-3 mb-1 text-sm font-semibold text-black/70">Bank Lokal</p>
-        <div class="grid grid-cols-2 gap-3">
-          <button data-category="Bank Lokal" data-provider="BCA" class="opt-btn">BCA</button>
-          <button data-category="Bank Lokal" data-provider="BRI" class="opt-btn">BRI</button>
-          <button data-category="Bank Lokal" data-provider="BNI" class="opt-btn">BNI</button>
-          <button data-category="Bank Lokal" data-provider="Mandiri" class="opt-btn">Mandiri</button>
-        </div>
-
-        <p class="mt-4 mb-1 text-sm font-semibold text-black/70">E-Wallet</p>
-        <div class="grid grid-cols-2 gap-3">
-          <button data-category="E-Wallet" data-provider="OVO" class="opt-btn">OVO</button>
-          <button data-category="E-Wallet" data-provider="Dana" class="opt-btn">Dana</button>
-          <button data-category="E-Wallet" data-provider="GoPay" class="opt-btn">GoPay</button>
-          <button data-category="E-Wallet" data-provider="ShopeePay" class="opt-btn">ShopeePay</button>
-        </div>
+    <div id="providerOverlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm" aria-hidden="true"></div>
+    <div class="relative mx-auto mt-20 w-[92%] max-w-md">
+      <div class="rounded-2xl bg-light-bg-secondary text-light-text shadow-2xl ring-1 ring-black/10 p-5">
+          <div class="flex items-center justify-between">
+              <h3 id="providerTitle" class="text-lg font-semibold">Pilih Bank / E-Wallet</h3>
+              <button id="closeProvider" class="btn rounded-lg px-2 py-1 text-sm bg-black/5 hover:bg-black/10">Tutup</button>
+          </div>
+          <p class="mt-4 mb-2 text-sm font-semibold text-light-text-muted">Bank Lokal</p>
+          <div class="grid grid-cols-2 gap-3">
+              <button data-category="Bank Lokal" data-provider="BCA" class="opt-btn">BCA</button>
+              <button data-category="Bank Lokal" data-provider="BRI" class="opt-btn">BRI</button>
+              <button data-category="Bank Lokal" data-provider="BNI" class="opt-btn">BNI</button>
+              <button data-category="Bank Lokal" data-provider="Mandiri" class="opt-btn">Mandiri</button>
+          </div>
+          <p class="mt-4 mb-2 text-sm font-semibold text-light-text-muted">E-Wallet</p>
+          <div class="grid grid-cols-2 gap-3">
+              <button data-category="E-Wallet" data-provider="OVO" class="opt-btn">OVO</button>
+              <button data-category="E-Wallet" data-provider="Dana" class="opt-btn">Dana</button>
+              <button data-category="E-Wallet" data-provider="GoPay" class="opt-btn">GoPay</button>
+              <button data-category="E-Wallet" data-provider="ShopeePay" class="opt-btn">ShopeePay</button>
+          </div>
       </div>
     </div>
   </div>
 
-  <!-- Toast -->
-  <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 hidden px-4 py-2 rounded-xl bg-white text-black text-sm shadow-xl"></div>
+  <div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 flex items-center gap-3 px-4 py-2 rounded-lg text-sm font-semibold shadow-2xl transition-transform duration-300 translate-y-20 opacity-0" role="alert">
+      <span id="toast-icon"></span>
+      <span id="toast-msg"></span>
+  </div>
 
   <script type="module">
-    // ====== KONFIG (ubah jika perlu) ======
-    const SUPABASE_URL  = "https://rhujpinlutjiztyonmas.supabase.co";
-    const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJodWpwaW5sdXRqaXp0eW9ubWFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczMDQyOTIsImV4cCI6MjA3Mjg4MDI5Mn0.zcfDUOHTeBYydFFscwmy3U9yryHiItTVJPLRurUlBvY";
-    const WA_ADMIN      = "6285846005280";
+    // ====== CONFIGURATION ======
+    const CONFIG = {
+        SUPABASE_URL: "https://rhujpinlutjiztyonmas.supabase.co",
+        SUPABASE_ANON: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJodWpwaW5sdXRqaXp0eW9ubWFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczMDQyOTIsImV4cCI6MjA3Mjg4MDI5Mn0.zcfDUOHTeBYydFFscwmy3U9yryHiItTVJPLRurUlBvY",
+        WA_ADMIN: "6285846005280",
+        RATES: {
+            CONVERT: 12000,
+            TOPUP: 17000,
+        },
+        FETCH_TIMEOUT: 8000,
+        ID_LOCALE: "id-ID",
+    };
 
-    // Kurs tetap (terpisah & non-editable via UI)
-    const FIXED_RATE_CONVERT = 12000;
-    const FIXED_RATE_TOPUP   = 17000;
+    // ====== DOM ELEMENTS ======
+    const DOMElements = {
+        qs: (sel) => document.querySelector(sel),
+        qsa: (sel) => Array.from(document.querySelectorAll(sel)),
+        get body() { return document.body; },
+        // ... (getters for other elements)
+    };
+    
+    // ====== STATE MANAGEMENT ======
+    const AppState = {
+        liveRate: CONFIG.RATES.CONVERT,
+        selectedProvider: { category: null, provider: null },
+        isSubmitting: false,
+        toastTimeout: null,
+    };
 
-    // ====== STATE ======
-    const idLocale = "id-ID";
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-    let LIVE_RATE  = FIXED_RATE_CONVERT;
-    let selected   = { category: null, provider: null };
-    let modalOpener = null;
-    let submitting = false;
+    // ====== UTILITIES ======
+    const Utils = {
+        formatCurrency: (n) => new Intl.NumberFormat(CONFIG.ID_LOCALE, { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(n),
+        formatNumber: (n) => new Intl.NumberFormat(CONFIG.ID_LOCALE, { maximumFractionDigits: 2 }).format(n),
+        
+        showToast(message, type = 'success') {
+            const toast = DOMElements.qs("#toast");
+            const icon = DOMElements.qs("#toast-icon");
+            DOMElements.qs("#toast-msg").textContent = message;
 
-    // ====== HELPERS ======
-    const qs  = (sel) => document.querySelector(sel);
-    const qsa = (sel) => Array.from(document.querySelectorAll(sel));
-    const rp  = (n) => new Intl.NumberFormat(idLocale, { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(n);
-    const fmt = (n) => new Intl.NumberFormat(idLocale, { maximumFractionDigits: 2 }).format(n);
+            const styles = {
+                success: { bg: 'bg-emerald-500', icon: '✅' },
+                error: { bg: 'bg-red-500', icon: '❌' },
+                info: { bg: 'bg-blue-500', icon: 'ℹ️' },
+            };
+            
+            toast.className = `fixed bottom-5 left-1/2 -translate-x-1/2 flex items-center gap-3 px-4 py-2 rounded-lg text-sm font-semibold shadow-2xl transition-transform duration-300 text-white ${styles[type].bg}`;
+            icon.textContent = styles[type].icon;
 
-    function toast(msg, ok=true){
-      const el = qs("#toast"); el.textContent = msg;
-      el.className = "fixed bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-xl text-sm shadow-xl " + (ok ? "bg-emerald-400 text-black" : "bg-red-400 text-black");
-      el.style.display = "block"; setTimeout(()=>{ el.style.display="none"; }, 2200);
-    }
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            clearTimeout(AppState.toastTimeout);
+            AppState.toastTimeout = setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 2500);
+        },
+    };
 
-    function currentFixedRate(){
-      return qs("#type").value === "convert" ? FIXED_RATE_CONVERT : FIXED_RATE_TOPUP;
-    }
-    function updateComputedIDR(){
-      const usd = parseFloat(qs("#usd").value) || 0;
-      qs("#idr").textContent = rp(Math.round(usd * currentFixedRate()));
-    }
-    function setFixedRateUI(){
-      qs("#rateFixedConvert").textContent = rp(FIXED_RATE_CONVERT);
-      qs("#rateFixedTopup").textContent   = rp(FIXED_RATE_TOPUP);
-      qs("#fixedConvertBig").textContent  = rp(FIXED_RATE_CONVERT);
-      qs("#fixedTopupBig").textContent    = rp(FIXED_RATE_TOPUP);
-      updateComputedIDR();
-    }
+    // ====== THEME MANAGER ======
+    const ThemeManager = {
+        init() {
+            this.applyTheme(localStorage.getItem("xkay_theme") || "dark");
+            DOMElements.qs("#themeToggle").addEventListener("click", () => this.toggleTheme());
+        },
+        applyTheme(theme) {
+            const html = document.documentElement;
+            html.classList.toggle("dark", theme === "dark");
+            html.classList.toggle("light", theme === "light");
+            DOMElements.qs("#theme-icon-dark").classList.toggle("hidden", theme === "light");
+            DOMElements.qs("#theme-icon-light").classList.toggle("hidden", theme === "dark");
+            localStorage.setItem("xkay_theme", theme);
+        },
+        toggleTheme() {
+            const currentTheme = localStorage.getItem("xkay_theme") || "dark";
+            this.applyTheme(currentTheme === "dark" ? "light" : "dark");
+        },
+    };
 
-    // ====== THEME ======
-    const THEME_KEY = "xkay_theme";
-    function applyTheme(t){
-      const body = document.body;
-      if(t === "light"){ body.classList.add("theme-light"); document.documentElement.classList.remove("dark"); }
-      else { body.classList.remove("theme-light"); document.documentElement.classList.add("dark"); }
-      localStorage.setItem(THEME_KEY, t);
-    }
-    function toggleTheme(){
-      applyTheme((localStorage.getItem(THEME_KEY) || "dark") === "dark" ? "light" : "dark");
-    }
+    // ====== API & DATA SERVICE ======
+    const ApiService = {
+        supabase: supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON),
 
-    // ====== LIVE RATE (3 sumber + timeout + fallback) ======
-    const FETCH_TIMEOUT = 8000;
-    function fetchTimeout(url, ms=FETCH_TIMEOUT){
-      return Promise.race([
-        fetch(url),
-        new Promise((_,rej)=>setTimeout(()=>rej(new Error("timeout")), ms))
-      ]);
-    }
-    async function src_exchangerate_host(){
-      const r = await fetchTimeout("https://api.exchangerate.host/latest?base=USD&symbols=IDR");
-      const j = await r.json(); const v = Number(j?.rates?.IDR); if(!v) throw new Error("invalid data"); return { rate: Math.round(v), src: "exchangerate.host" };
-    }
-    async function src_open_er_api(){
-      const r = await fetchTimeout("https://open.er-api.com/v6/latest/USD");
-      const j = await r.json(); const v = Number(j?.rates?.IDR); if(!v) throw new Error("invalid data"); return { rate: Math.round(v), src: "open.er-api.com" };
-    }
-    async function src_frankfurter(){
-      const r = await fetchTimeout("https://api.frankfurter.app/latest?from=USD&to=IDR");
-      const j = await r.json(); const v = Number(j?.rates?.IDR); if(!v) throw new Error("invalid data"); return { rate: Math.round(v), src: "frankfurter.app" };
-    }
-    async function loadLiveRate(){
-      const small = qs("#rateLive");
-      const big   = qs("#liveRateBig");
-      const meta  = qs("#liveMeta");
-      small.textContent = big.textContent = "Memuat…";
-      try{
-        const sources = [src_exchangerate_host(), src_open_er_api(), src_frankfurter()];
-        let result;
-        if (Promise.any) {
-          result = await Promise.any(sources);
-        } else {
-          // simple first-success polyfill
-          result = await new Promise((resolve, reject)=>{
-            let fails = 0;
-            sources.forEach(p => p.then(resolve).catch(()=>{ if(++fails === sources.length) reject(new Error("all failed")); }));
-          });
+        async fetchWithTimeout(url, ms = CONFIG.FETCH_TIMEOUT) {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), ms);
+            try {
+                const response = await fetch(url, { signal: controller.signal });
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                return await response.json();
+            } catch (error) {
+                clearTimeout(timeout);
+                throw error;
+            }
+        },
+
+        async getLiveRate() {
+            const sources = [
+                async () => {
+                    const data = await this.fetchWithTimeout("https://api.exchangerate.host/latest?base=USD&symbols=IDR");
+                    return { rate: Math.round(data?.rates?.IDR), src: "exchangerate.host" };
+                },
+                async () => {
+                    const data = await this.fetchWithTimeout("https://open.er-api.com/v6/latest/USD");
+                    return { rate: Math.round(data?.rates?.IDR), src: "open.er-api.com" };
+                },
+                async () => {
+                    const data = await this.fetchWithTimeout("https://api.frankfurter.app/latest?from=USD&to=IDR");
+                    return { rate: Math.round(data?.rates?.IDR), src: "frankfurter.app" };
+                },
+            ];
+
+            try {
+                const result = await Promise.any(sources.map(s => s()));
+                if (!result || !result.rate) throw new Error("Invalid data from all sources");
+                return result;
+            } catch (e) {
+                console.warn("Live rate fetch failed:", e);
+                return null;
+            }
+        },
+        
+        async getHistory() {
+            const { data, error } = await this.supabase
+                .from("orders")
+                .select("*")
+                .order("created_at", { ascending: false })
+                .limit(100);
+            if (error) throw error;
+            return data;
+        },
+
+        async saveOrder(orderData) {
+            const { error } = await this.supabase.from("orders").insert([orderData]);
+            if (error) throw error;
         }
-        LIVE_RATE = result.rate;
-        small.textContent = rp(LIVE_RATE);
-        big.textContent   = rp(LIVE_RATE);
-        meta.textContent  = `Sumber: ${result.src} • ${new Date().toLocaleString(idLocale)}`;
-      }catch(e){
-        console.warn("live rate failed:", e);
-        LIVE_RATE = currentFixedRate(); // fallback
-        small.textContent = rp(LIVE_RATE);
-        big.textContent   = rp(LIVE_RATE);
-        meta.textContent  = "Gagal muat kurs real-time (pakai fallback).";
-      }
-    }
+    };
 
-    // ====== PROVIDER MODAL ======
-    const modal = qs("#providerModal");
-    const overlay = qs("#providerOverlay");
-    const providerBtn = qs("#providerBtn");
-    const closeProvider = qs("#closeProvider");
-    const baseOptBtn = "opt-btn px-3 py-2 rounded-xl bg-black/5 hover:bg-black/10 ring-1 ring-black/10 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm";
-    qsa(".opt-btn").forEach(b=> b.className = baseOptBtn);
+    // ====== UI CONTROLLER ======
+    const UIController = {
+        init() {
+            this.setFixedRateUI();
+            this.setupEventListeners();
+            this.updateComputedIDR();
+            this.applyInputStyles();
+        },
 
-    function openModal(){
-      modalOpener = document.activeElement;
-      modal.classList.remove("hidden");
-      modal.setAttribute("aria-hidden","false");
-      const first = modal.querySelector(".opt-btn"); first && first.focus();
-      document.addEventListener("keydown", onEscClose);
-    }
-    function closeModal(){
-      modal.classList.add("hidden");
-      modal.setAttribute("aria-hidden","true");
-      document.removeEventListener("keydown", onEscClose);
-      if(modalOpener) modalOpener.focus();
-    }
-    function onEscClose(e){ if(e.key === "Escape") closeModal(); }
+        setFixedRateUI() {
+            const { CONVERT, TOPUP } = CONFIG.RATES;
+            DOMElements.qs("#rateFixedConvert").textContent = Utils.formatCurrency(CONVERT);
+            DOMElements.qs("#rateFixedTopup").textContent = Utils.formatCurrency(TOPUP);
+            DOMElements.qs("#fixedConvertBig").textContent = Utils.formatCurrency(CONVERT);
+            DOMElements.qs("#fixedTopupBig").textContent = Utils.formatCurrency(TOPUP);
+        },
 
-    providerBtn.addEventListener("click", openModal, { passive:true });
-    closeProvider.addEventListener("click", closeModal, { passive:true });
-    overlay.addEventListener("click", closeModal, { passive:true });
+        updateLiveRateUI(result) {
+            const rate = result?.rate || AppState.liveRate;
+            const formattedRate = Utils.formatCurrency(rate);
+            
+            DOMElements.qs("#rateLive").textContent = formattedRate;
+            DOMElements.qs("#liveRateBig").textContent = formattedRate;
+            
+            if (result) {
+                DOMElements.qs("#liveMeta").textContent = `Sumber: ${result.src} • ${new Date().toLocaleTimeString(CONFIG.ID_LOCALE)}`;
+            } else {
+                DOMElements.qs("#liveMeta").textContent = "Gagal memuat, menggunakan fallback.";
+            }
+        },
+        
+        renderHistory(data) {
+            const tbody = DOMElements.qs("#history");
+            const stateEl = DOMElements.qs("#historyState");
+            tbody.innerHTML = "";
+            stateEl.classList.add("hidden");
 
-    modal.addEventListener("click", (e)=>{
-      const btn = e.target.closest(".opt-btn");
-      if(!btn) return;
-      selected.category = btn.dataset.category;
-      selected.provider = btn.dataset.provider;
-      qs("#selectedProvider").textContent = `${selected.category} — ${selected.provider}`;
-      toast("Metode dipilih: " + selected.provider);
-      closeModal();
-    });
+            if (!data || data.length === 0) {
+                stateEl.textContent = "Belum ada transaksi.";
+                stateEl.classList.remove("hidden");
+                return;
+            }
+            
+            const fragment = document.createDocumentFragment();
+            for (const row of data) {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td class="p-3">${new Date(row.created_at).toLocaleDateString(CONFIG.ID_LOCALE)}</td>
+                    <td class="p-3 capitalize">${row.type ?? "-"}</td>
+                    <td class="p-3">${row.provider ?? "-"}</td>
+                    <td class="p-3">${row.name ?? "-"}</td>
+                    <td class="p-3">${Utils.formatNumber(row.usd ?? 0)}</td>
+                    <td class="p-3 font-semibold">${Utils.formatCurrency(row.receive_idr ?? 0)}</td>
+                `;
+                fragment.appendChild(tr);
+            }
+            tbody.appendChild(fragment);
+        },
 
-    // ====== VALIDASI ======
-    const isEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-    const isName  = (v) => v && v.trim().length >= 3;
-    const isAcct  = (v) => /^[a-zA-Z0-9.\-_ ]{5,}$/.test(v.trim());
+        showHistoryLoading() {
+            const tbody = DOMElements.qs("#history");
+            const stateEl = DOMElements.qs("#historyState");
+            stateEl.classList.add("hidden");
+            tbody.innerHTML = Array(5).fill(0).map(() => `
+                <tr>
+                    ${Array(6).fill(0).map(() => `<td class="p-3"><div class="skeleton h-4 w-full rounded"></div></td>`).join('')}
+                </tr>
+            `).join('');
+        },
 
-    // ====== FORM ======
-    const orderForm = qs("#orderForm");
-    const submitBtn = qs("#submitBtn");
-    ["input","change"].forEach(evt=>{
-      qs("#usd").addEventListener(evt, updateComputedIDR, { passive:true });
-      qs("#type").addEventListener(evt, updateComputedIDR, { passive:true });
-    });
+        showHistoryError() {
+            DOMElements.qs("#history").innerHTML = "";
+            const stateEl = DOMElements.qs("#historyState");
+            stateEl.textContent = "Gagal memuat riwayat. Coba Reload.";
+            stateEl.classList.remove("hidden");
+        },
 
-    orderForm.addEventListener("submit", async (e)=>{
-      e.preventDefault();
-      if(submitting) return;
-      submitting = true; submitBtn.disabled = true; submitBtn.textContent = "Memproses…";
+        getCurrentFixedRate() {
+            return DOMElements.qs("#type").value === "convert" ? CONFIG.RATES.CONVERT : CONFIG.RATES.TOPUP;
+        },
 
-      const name = qs("#name").value.trim();
-      const email = qs("#paypal_email").value.trim();
-      const type = qs("#type").value;
-      const account = qs("#account").value.trim();
-      const usd = Math.max(0, parseFloat(qs("#usd").value) || 0);
-      const rate = currentFixedRate();
-      const idr = Math.round(usd * rate);
+        updateComputedIDR() {
+            const usd = parseFloat(DOMElements.qs("#usd").value) || 0;
+            const idr = Math.round(usd * this.getCurrentFixedRate());
+            DOMElements.qs("#idr").textContent = Utils.formatCurrency(idr);
+        },
 
-      if(!selected.provider){ toast("Pilih Bank / E-Wallet dulu.", false); return endSubmit(); }
-      if(!isName(name)){ toast("Nama minimal 3 karakter.", false); return endSubmit(); }
-      if(!isEmail(email)){ toast("Email tidak valid.", false); return endSubmit(); }
-      if(!isAcct(account)){ toast("Akun/Rekening minimal 5 karakter (huruf/angka .-_ spasi).", false); return endSubmit(); }
-      if(!(usd > 0)){ toast("Nominal USD harus lebih dari 0.", false); return endSubmit(); }
+        setupEventListeners() {
+            const form = DOMElements.qs("#orderForm");
+            form.addEventListener("submit", (e) => MainController.handleFormSubmit(e));
+            form.addEventListener("input", (e) => {
+                if (e.target.id === 'usd' || e.target.id === 'type') {
+                    this.updateComputedIDR();
+                }
+            });
 
-      // Simpan ke DB (best-effort)
-      try{
-        const { error } = await supabaseClient.from("orders").insert([{
-          type, name, paypal_email: email,
-          usd, rate, receive_idr: idr,
-          target_type: selected.category, provider: selected.provider, account
-        }]);
-        if(error) throw error;
-        toast("Order tersimpan. Membuka WhatsApp…", true);
-      }catch(err){
-        console.error("[DB] insert gagal:", err);
-        toast("Gagal simpan DB—tetap membuka WhatsApp.", false);
-      }
+            DOMElements.qs("#refreshRate").addEventListener("click", () => MainController.loadLiveRate());
+            DOMElements.qs("#reloadHistory").addEventListener("click", () => MainController.loadHistory());
 
-      // Kirim ke WhatsApp
-      const waMsg = [
-        `Halo Admin Xkay Store, saya ingin ${type}:`,
-        ``,
-        `Nama: ${name}`,
-        `Email PayPal: ${email}`,
-        `Kategori: ${selected.category}`,
-        `Provider: ${selected.provider}`,
-        `Akun: ${account}`,
-        `Nominal: ${fmt(usd)} USD = ${rp(idr)} (kurs tetap ${rp(rate)})`,
-        `Kurs real-time saat ini: ${rp(LIVE_RATE)}`
-      ].join("\n");
-      window.open(`https://wa.me/${encodeURIComponent(WA_ADMIN)}?text=${encodeURIComponent(waMsg)}`, "_blank", "noopener");
+            this.setupModalListeners();
+        },
+        
+        setupModalListeners() {
+            const modal = DOMElements.qs("#providerModal");
+            const openBtn = DOMElements.qs("#providerBtn");
+            const closeBtn = DOMElements.qs("#closeProvider");
+            const overlay = DOMElements.qs("#providerOverlay");
+            let modalOpener;
 
-      orderForm.reset();
-      selected = { category:null, provider:null };
-      qs("#selectedProvider").textContent = "Belum dipilih";
-      updateComputedIDR();
-      await loadHistory();
-      endSubmit();
-    });
+            const openModal = () => {
+                modalOpener = document.activeElement;
+                modal.classList.remove("hidden");
+                DOMElements.qsa(".opt-btn")[0]?.focus();
+                document.addEventListener("keydown", onEsc);
+            };
 
-    function endSubmit(){
-      submitting = false; submitBtn.disabled = false; submitBtn.textContent = "Kirim Order via WhatsApp";
-    }
+            const closeModal = () => {
+                modal.classList.add("hidden");
+                document.removeEventListener("keydown", onEsc);
+                modalOpener?.focus();
+            };
 
-    // ====== RIWAYAT ======
-    async function loadHistory(){
-      const tbody = qs("#history");
-      const empty = qs("#historyEmpty");
-      tbody.innerHTML = `<tr class="animate-pulse"><td class="px-3 py-2" colspan="7">Memuat data…</td></tr>`;
-      empty.classList.add("hidden");
-      try{
-        const { data, error } = await supabaseClient.from("orders").select("*").order("created_at", { ascending:false }).limit(200);
-        if(error) throw error;
-        tbody.innerHTML = "";
-        if(!data || !data.length){ empty.classList.remove("hidden"); return; }
-        for(const row of data){
-          const tr = document.createElement("tr");
-          const cells = [
-            new Date(row.created_at).toLocaleString(idLocale),
-            row.type ?? "-",
-            row.target_type ?? "-",
-            row.provider ?? "-",
-            row.name ?? "-",
-            (row.usd ?? 0).toLocaleString(idLocale, { maximumFractionDigits: 2 }),
-            rp(row.receive_idr ?? 0)
-          ];
-          for(const c of cells){
-            const td = document.createElement("td");
-            td.className = "px-3 py-2";
-            td.textContent = c;
-            tr.appendChild(td);
-          }
-          tbody.appendChild(tr);
+            const onEsc = (e) => { if (e.key === "Escape") closeModal(); };
+
+            openBtn.addEventListener("click", openModal);
+            closeBtn.addEventListener("click", closeModal);
+            overlay.addEventListener("click", closeModal);
+            
+            modal.addEventListener("click", (e) => {
+                const btn = e.target.closest(".opt-btn");
+                if (!btn) return;
+
+                AppState.selectedProvider.category = btn.dataset.category;
+                AppState.selectedProvider.provider = btn.dataset.provider;
+                
+                DOMElements.qs("#selectedProvider").textContent = `${btn.dataset.category} — ${btn.dataset.provider}`;
+                openBtn.textContent = btn.dataset.provider;
+                
+                Utils.showToast(`Metode dipilih: ${btn.dataset.provider}`, 'info');
+                closeModal();
+            });
+        },
+        
+        applyInputStyles() {
+            const baseInputClass = "w-full rounded-lg px-3 py-2 bg-dark-bg-secondary text-dark-text ring-1 ring-dark-border focus:ring-accent";
+            const baseOptBtnClass = "opt-btn h-12 rounded-lg bg-black/5 hover:bg-black/10 ring-1 ring-black/10 text-sm font-semibold";
+            DOMElements.qsa('.form-input').forEach(el => el.className = baseInputClass);
+            DOMElements.qsa('.opt-btn').forEach(el => el.className = baseOptBtnClass);
+        },
+
+        toggleSubmitSpinner(show) {
+            const btn = DOMElements.qs("#submitBtn");
+            const spinner = DOMElements.qs("#submit-spinner");
+            const text = btn.querySelector("span");
+            if (show) {
+                btn.disabled = true;
+                text.classList.add("opacity-0");
+                spinner.classList.remove("hidden");
+                spinner.classList.add("absolute", "animate-spin");
+            } else {
+                btn.disabled = false;
+                text.classList.remove("opacity-0");
+                spinner.classList.add("hidden");
+                spinner.classList.remove("absolute", "animate-spin");
+            }
+        },
+
+        resetForm() {
+            DOMElements.qs("#orderForm").reset();
+            AppState.selectedProvider = { category: null, provider: null };
+            DOMElements.qs("#selectedProvider").textContent = "Belum dipilih";
+            DOMElements.qs("#providerBtn").textContent = "Pilih Bank / E-Wallet";
+            this.updateComputedIDR();
         }
-      }catch(e){
-        console.error("[DB] load history gagal:", e);
-        tbody.innerHTML = "";
-        empty.classList.remove("hidden");
-        empty.textContent = "Gagal memuat riwayat. Coba Reload.";
-      }
-    }
+    };
+    
+    // ====== VALIDATION ======
+    const Validation = {
+        isEmail: (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v),
+        isName: (v) => v && v.trim().length >= 3,
+        isAcct: (v) => /^[a-zA-Z0-9.\-_ ]{5,}$/.test(v.trim()),
+    };
 
-    async function exportCSV(){
-      try{
-        const { data, error } = await supabaseClient.from("orders").select("*").order("created_at",{ascending:false});
-        if(error) throw error;
-        const head = ["Tanggal","Tipe","Kategori","Provider","Nama","USD","IDR"];
-        const rows = (data||[]).map(r => [
-          r.created_at, r.type||"", r.target_type||"", r.provider||"", r.name||"", r.usd||0, r.receive_idr||0
-        ]);
-        const csv = [head, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n");
-        const blob = new Blob([csv], { type:"text/csv;charset=utf-8" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a"); a.href = url; a.download = "riwayat_xkay_store.csv"; a.click();
-        URL.revokeObjectURL(url);
-        toast("CSV terunduh");
-      }catch(e){
-        console.error("[CSV] export gagal:", e);
-        toast("Gagal export CSV.", false);
-      }
-    }
+    // ====== MAIN CONTROLLER ======
+    const MainController = {
+        async init() {
+            ThemeManager.init();
+            UIController.init();
+            
+            this.loadLiveRate();
+            this.loadHistory();
+            setInterval(() => this.loadLiveRate(), 10 * 60 * 1000); // Refresh every 10 mins
+        },
 
-    // ====== BINDINGS ======
-    qs("#refreshRate").addEventListener("click", loadLiveRate, { passive:true });
-    qs("#reloadHistory").addEventListener("click", loadHistory, { passive:true });
-    qs("#exportBtn").addEventListener("click", exportCSV, { passive:true });
-    qs("#themeToggle").addEventListener("click", toggleTheme, { passive:true });
-    qs("#themeToggleSm").addEventListener("click", toggleTheme, { passive:true });
+        async loadLiveRate() {
+            UIController.updateLiveRateUI(null); // Show loading state
+            const result = await ApiService.getLiveRate();
+            if (result) {
+                AppState.liveRate = result.rate;
+            }
+            UIController.updateLiveRateUI(result);
+        },
 
-    // ====== INIT ======
-    (async function init(){
-      applyTheme(localStorage.getItem(THEME_KEY) || "dark");
-      qsa(".opt-btn").forEach(b=> b.className = "opt-btn px-3 py-2 rounded-xl bg-black/5 hover:bg-black/10 ring-1 ring-black/10 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm");
-      setFixedRateUI();
-      await loadLiveRate();
-      setInterval(loadLiveRate, 10 * 60 * 1000); // refresh tiap 10 menit
-      await loadHistory();
-      updateComputedIDR();
-    })();
+        async loadHistory() {
+            UIController.showHistoryLoading();
+            try {
+                const data = await ApiService.getHistory();
+                UIController.renderHistory(data);
+            } catch (error) {
+                console.error("[DB] Load history failed:", error);
+                UIController.showHistoryError();
+            }
+        },
+        
+        async handleFormSubmit(e) {
+            e.preventDefault();
+            if (AppState.isSubmitting) return;
+
+            AppState.isSubmitting = true;
+            UIController.toggleSubmitSpinner(true);
+
+            const formData = {
+                name: DOMElements.qs("#name").value.trim(),
+                email: DOMElements.qs("#paypal_email").value.trim(),
+                type: DOMElements.qs("#type").value,
+                account: DOMElements.qs("#account").value.trim(),
+                usd: parseFloat(DOMElements.qs("#usd").value) || 0,
+            };
+
+            // Validation
+            if (!AppState.selectedProvider.provider) {
+                Utils.showToast("Pilih Bank / E-Wallet dulu.", 'error');
+                return this.endSubmit();
+            }
+            if (!Validation.isName(formData.name)) {
+                Utils.showToast("Nama lengkap minimal 3 karakter.", 'error');
+                return this.endSubmit();
+            }
+            if (!Validation.isEmail(formData.email)) {
+                Utils.showToast("Format email tidak valid.", 'error');
+                return this.endSubmit();
+            }
+            if (!Validation.isAcct(formData.account)) {
+                Utils.showToast("Nomor rekening/akun tidak valid.", 'error');
+                return this.endSubmit();
+            }
+            if (!(formData.usd > 0)) {
+                Utils.showToast("Nominal USD harus lebih dari 0.", 'error');
+                return this.endSubmit();
+            }
+
+            const rate = UIController.getCurrentFixedRate();
+            const idr = Math.round(formData.usd * rate);
+
+            // Save to DB (best-effort)
+            try {
+                await ApiService.saveOrder({
+                    ...formData,
+                    rate,
+                    receive_idr: idr,
+                    target_type: AppState.selectedProvider.category,
+                    provider: AppState.selectedProvider.provider,
+                });
+                Utils.showToast("Pesanan tersimpan, membuka WhatsApp...", 'success');
+            } catch (err) {
+                console.error("[DB] Insert failed:", err);
+                Utils.showToast("Gagal menyimpan, tetap membuka WhatsApp.", 'error');
+            }
+
+            // Open WhatsApp
+            const waMsg = [
+                `Halo Admin Xkay Store, saya ingin ${formData.type}:`, ``,
+                `Nama: ${formData.name}`,
+                `Email PayPal: ${formData.email}`,
+                `Kategori: ${AppState.selectedProvider.category}`,
+                `Tujuan: ${AppState.selectedProvider.provider}`,
+                `No. Akun: ${formData.account}`,
+                `Nominal: ${Utils.formatNumber(formData.usd)} USD = ${Utils.formatCurrency(idr)} (kurs ${Utils.formatCurrency(rate)})`,
+                `Kurs live saat ini: ${Utils.formatCurrency(AppState.liveRate)}`
+            ].join("\n");
+            
+            const waUrl = `https://wa.me/${CONFIG.WA_ADMIN}?text=${encodeURIComponent(waMsg)}`;
+            window.open(waUrl, "_blank", "noopener,noreferrer");
+
+            UIController.resetForm();
+            await this.loadHistory();
+            this.endSubmit();
+        },
+
+        endSubmit() {
+            AppState.isSubmitting = false;
+            UIController.toggleSubmitSpinner(false);
+        }
+    };
+
+    // ====== INITIALIZE APP ======
+    document.addEventListener("DOMContentLoaded", () => MainController.init());
+
   </script>
 </body>
 </html>
