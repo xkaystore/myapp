@@ -1,15 +1,729 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <title>Aplikasiku</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Xkay Store — Convert & Topup PayPal</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+    <style>
+        :root {
+            --bg: #e0e7ff; /* Light background */
+            --text: #1a202c; /* Darker text */
+            --muted: #4a5568; /* Muted text */
+            --card: #ffffff; /* White card background */
+            --border: #e2e8f0; /* Light border */
+            --primary: #4f46e5; /* Purple primary */
+            --primary-strong: #4338ca; /* Darker purple */
+            --accent: #22d3ee; /* Cyan accent */
+            --stripe1: #f7fafc;
+            --stripe2: #edf2f7;
+            --shadow: 0 10px 25px rgba(0, 0, 0, 0.1); /* Softer shadow */
+        }
+        [data-theme="dark"] {
+            --bg: #1a202c; /* Dark background */
+            --text: #e2e8f0; /* Light text */
+            --muted: #a0aec0; /* Lighter muted text */
+            --card: #2d3748; /* Dark card background */
+            --border: #4a5568; /* Darker border */
+            --primary: #818cf8; /* Lighter purple */
+            --primary-strong: #6366f1; /* Primary purple */
+            --accent: #67e8f9; /* Lighter cyan */
+            --stripe1: #2c3545;
+            --stripe2: #1f2937;
+            --shadow: 0 12px 30px rgba(0, 0, 0, 0.4); /* Darker shadow */
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+        a { color: inherit; text-decoration: none; }
+
+        /* Header */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: var(--card);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.8rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            box-shadow: var(--shadow); /* Added shadow to header */
+            transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .brand {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            letter-spacing: .5px;
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+        .icon-btn {
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 1.5rem; /* Larger icon */
+            color: var(--muted);
+            padding: .6rem .8rem;
+            border-radius: .8rem;
+            transition: all 0.2s ease;
+        }
+        .icon-btn:hover {
+            background: rgba(var(--primary), 0.1);
+            color: var(--primary);
+        }
+
+        /* Hero */
+        .hero {
+            padding: 3rem 1.5rem;
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary-strong), #1a202c); /* Darker, more intense gradient */
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero h2 {
+            margin: 0 0 0.8rem;
+            font-size: 2.5rem; /* Larger hero title */
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+        }
+        .hero div {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+        .cta-group {
+            display: flex;
+            gap: 1rem; /* More space */
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+        .btn {
+            background: var(--accent); /* Accent color for buttons */
+            color: #1a202c; /* Dark text for accent buttons */
+            border: none;
+            padding: .8rem 1.8rem; /* Larger padding */
+            border-radius: .8rem; /* Softer corners */
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(var(--accent), 0.3);
+        }
+        .btn:hover {
+            background: var(--primary); /* Hover with primary color */
+            color: #fff;
+            box-shadow: 0 6px 20px rgba(var(--primary), 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* Cards */
+        .container { padding: 1.5rem; max-width: 1200px; margin: 0 auto; }
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 1.2rem; /* More rounded */
+            box-shadow: var(--shadow);
+            padding: 1.5rem; /* More padding */
+            margin: 0 auto 1.5rem;
+            max-width: 960px;
+            transition: all 0.3s ease;
+        }
+        .card h3 {
+            margin: .2rem 0 1.2rem;
+            color: var(--primary);
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 1.3rem;
+        }
+
+        /* Kurs */
+        .rate-line {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem; /* More space */
+            align-items: center;
+            justify-content: flex-start;
+        }
+        .pill {
+            background: var(--stripe1);
+            border: 1px solid var(--border);
+            padding: .6rem 1rem; /* More padding */
+            border-radius: .8rem; /* More rounded */
+            white-space: nowrap;
+            font-weight: 600;
+            color: var(--text);
+            transition: all 0.2s ease;
+        }
+        .pill b { color: var(--primary-strong); }
+        .pill:hover {
+            border-color: var(--primary);
+            box-shadow: 0 2px 8px rgba(var(--primary), 0.1);
+        }
+        .refresh {
+            display: inline-flex;
+            align-items: center;
+            gap: .6rem;
+        }
+        .refresh .icon-btn {
+            font-size: 1.3rem;
+            padding: .3rem;
+            border-radius: 50%; /* Circular button */
+        }
+        .spin { animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .small { font-size: .9rem; color: var(--muted); margin-top: .8rem; } /* Slightly larger small text */
+
+        /* Table */
+        .table-wrap { overflow-x: auto; border-radius: 1rem; border: 1px solid var(--border); }
+        table { border-collapse: collapse; width: 100%; min-width: 768px; /* Slightly wider min-width */ background: var(--card); }
+        thead th {
+            position: sticky;
+            top: 0;
+            background: var(--primary); /* Primary color for table header */
+            color: #fff;
+            text-align: left;
+            padding: .9rem 1rem; /* More padding */
+            font-weight: 700;
+        }
+        tbody td {
+            padding: .8rem 1rem; /* More padding */
+            border-top: 1px solid var(--border);
+            vertical-align: top;
+            word-break: break-word;
+            font-size: .95rem;
+        }
+        tbody tr:nth-child(odd) { background: var(--stripe1); }
+        tbody tr:nth-child(even) { background: var(--stripe2); }
+
+        /* Modal (Base) */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.65); /* Darker overlay */
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            z-index: 1200;
+            backdrop-filter: blur(5px); /* Blurred background */
+        }
+        .modal.show { display: flex; }
+        .modal-content {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 1.2rem;
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 580px; /* Wider modal */
+            max-height: 90vh; /* Taller modal */
+            overflow: auto;
+            animation: fadeInScale 0.3s ease-out;
+        }
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .modal-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.2rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .modal-title {
+            margin: 0;
+            color: var(--primary);
+            font-size: 1.2rem;
+            font-weight: 800;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .modal-body { padding: 1.2rem; }
+        .close {
+            background: transparent;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--muted);
+            transition: color 0.2s ease;
+        }
+        .close:hover { color: var(--primary-strong); }
+
+        /* Form */
+        .form-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; } /* More gap */
+        label { font-weight: 700; font-size: 1rem; color: var(--text); margin-bottom: .3rem; display: block;}
+        input, select {
+            width: 100%;
+            padding: .8rem 1rem; /* More padding */
+            border: 1px solid var(--border);
+            border-radius: .8rem;
+            background: var(--stripe1); /* Lighter background for inputs */
+            color: var(--text);
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(var(--primary), 0.2);
+            background: var(--card);
+        }
+        input[readonly] { cursor: pointer; }
+        .hint { font-size: .85rem; color: var(--muted); margin-top: .4rem; }
+        .error { font-size: .85rem; color: #ef4444; margin-top: .4rem; display: none; }
+        .field.invalid input { border-color: #ef4444; background: #fee2e2; } /* Redder background for error */
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        @media (max-width: 640px) { .two-col { grid-template-columns: 1fr; } }
+
+        /* Bank Selector Modal */
+        .seg { display: flex; gap: .6rem; background: var(--stripe1); border: 1px solid var(--border); padding: .4rem; border-radius: .8rem; }
+        .seg button {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: .7rem;
+            border-radius: .7rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 1rem;
+            color: var(--muted);
+            transition: all 0.2s ease;
+        }
+        .seg button.active { background: var(--primary); color: #fff; box-shadow: 0 2px 10px rgba(var(--primary), 0.2); }
+        .grid-bank {
+            display: grid;
+            grid-template-columns: repeat(auto-fit,minmax(140px,1fr)); /* Larger bank items */
+            gap: .8rem;
+            margin-top: 1rem;
+        }
+        .bank-item {
+            border: 1px solid var(--border);
+            background: var(--stripe1);
+            border-radius: .9rem;
+            padding: .9rem; /* More padding */
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text);
+            transition: all 0.2s ease;
+        }
+        .bank-item:hover {
+            outline: 2px solid var(--primary);
+            background: var(--primary-strong);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(var(--primary), 0.2);
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            min-width: 280px; /* Wider toast */
+            max-width: 400px;
+            padding: 1rem 1.2rem;
+            border-radius: 1rem;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: .8rem;
+            box-shadow: 0 16px 36px rgba(0,0,0,.35); /* Stronger shadow */
+            opacity: 0;
+            transform: translateY(20px);
+            pointer-events: none;
+            transition: all .4s ease-out; /* Slower transition */
+            font-size: 1rem;
+        }
+        .toast.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+        .toast.success { background: linear-gradient(135deg, var(--primary), var(--primary-strong)); }
+        .toast.error { background: linear-gradient(135deg,#ef4444,#b91c1c); }
+        .toast .bx { font-size: 1.5rem; } /* Boxicon size */
+
+        /* Footer */
+        footer {
+            padding: 1.5rem;
+            text-align: center;
+            color: var(--muted);
+            font-size: .9rem;
+            margin-top: 2rem;
+        }
+    </style>
 </head>
 <body>
-  <h1>Halo Dunia 👋</h1>
-  <p>Ini aplikasi web pertamaku pakai HP!</p>
-  <button onclick="sapa()">Klik Aku</button>
 
-  <script src="script.js"></script>
+    <header>
+        <div class="brand">Xkay Store</div>
+        <button id="themeBtn" class="icon-btn" aria-label="Toggle tema">
+            <i class='bx bx-moon'></i>
+        </button>
+    </header>
+
+    <section class="hero">
+        <h2>Convert & Topup Saldo PayPal</h2>
+        <div>Proses cepat, aman, kurs tetap & real-time tersedia.</div>
+        <div class="cta-group">
+            <button class="btn" onclick="openForm('convert')"><i class='bx bx-transfer'></i> Convert</button>
+            <button class="btn" onclick="openForm('topup')"><i class='bx bx-bolt-circle'></i> Topup</button>
+        </div>
+    </section>
+
+    <div class="container">
+        <div class="card" aria-live="polite">
+            <h3>Kurs</h3>
+            <div class="rate-line">
+                <span class="pill"><b>Kurs Tetap Convert:</b> 1 USD = Rp <span id="rateFixedConvert">12.000</span></span>
+                <span class="pill"><b>Kurs Tetap Topup:</b> 1 USD = Rp <span id="rateFixedTopup">17.000</span></span>
+                <span class="pill refresh">
+                    <b>Kurs Real-Time:</b> <span id="rateRealtime">Memuat…</span>
+                    <button id="refreshBtn" class="icon-btn" title="Muat ulang" onclick="refreshRealtime()"><i class='bx bx-sync'></i></button>
+                </span>
+            </div>
+            <div class="small" id="rateStamp"></div>
+        </div>
+
+        <div class="card">
+            <h3>Riwayat Transaksi</h3>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Waktu</th>
+                            <th>Nama</th>
+                            <th>Email</th>
+                            <th>Bank / E-Wallet</th>
+                            <th>USD</th>
+                            <th>IDR</th>
+                            <th>Jenis</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyBody"></tbody>
+                </table>
+            </div>
+            <div class="small">Data tersimpan di perangkat Anda (LocalStorage).</div>
+        </div>
+    </div>
+
+    <div id="formModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="formTitle">
+        <div class="modal-content">
+            <div class="modal-head">
+                <h4 id="formTitle" class="modal-title">Form</h4>
+                <button class="close" aria-label="Tutup" onclick="closeForm()"><i class='bx bx-x'></i></button>
+            </div>
+            <div class="modal-body">
+                <form id="trxForm" novalidate>
+                    <div class="form-grid">
+                        <div class="field" id="f-nama">
+                            <label for="nama">Nama Lengkap</label>
+                            <input id="nama" autocomplete="name" placeholder="Nama Anda" />
+                            <div class="error">Nama minimal 3 karakter.</div>
+                        </div>
+                        <div class="field" id="f-email">
+                            <label for="email">Email PayPal</label>
+                            <input id="email" type="email" autocomplete="email" placeholder="email@paypal.com" />
+                            <div class="error">Masukkan email valid.</div>
+                        </div>
+                        <div class="two-col">
+                            <div class="field" id="f-bank">
+                                <label for="bankInput">Bank / E-Wallet</label>
+                                <input id="bankInput" readonly placeholder="Pilih bank / e-wallet" onclick="openBankPicker()" />
+                                <div class="error">Pilih salah satu bank / e-wallet.</div>
+                            </div>
+                            <div class="field" id="f-norek">
+                                <label for="norek">No Rekening / Akun</label>
+                                <input id="norek" inputmode="numeric" placeholder="Nomor rekening / akun" />
+                                <div class="error">Nomor tidak boleh kosong.</div>
+                            </div>
+                        </div>
+                        <div class="two-col">
+                            <div class="field" id="f-usd">
+                                <label for="usd">Nominal (USD)</label>
+                                <input id="usd" type="number" min="1" step="0.01" placeholder="Contoh: 25" oninput="updateEstimate()" />
+                                <div class="error">Masukkan nominal USD ≥ 1.</div>
+                            </div>
+                            <div class="field">
+                                <label for="idr">Estimasi (IDR)</label>
+                                <input id="idr" readonly />
+                                <div class="hint">Menggunakan kurs tetap sesuai jenis transaksi.</div>
+                            </div>
+                        </div>
+                        <button class="btn" type="submit"><i class='bx bxl-whatsapp'></i> Kirim via WhatsApp</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="bankModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="bankTitle">
+        <div class="modal-content">
+            <div class="modal-head">
+                <h4 id="bankTitle" class="modal-title">Pilih Bank / E-Wallet</h4>
+                <button class="close" aria-label="Tutup" onclick="closeBankPicker()"><i class='bx bx-x'></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="seg" role="tablist">
+                    <button id="tab-bank" class="active" role="tab" aria-selected="true" onclick="switchBankTab('bank')"><i class='bx bx-building-house'></i> Bank</button>
+                    <button id="tab-ewallet" role="tab" aria-selected="false" onclick="switchBankTab('ewallet')"><i class='bx bx-wallet'></i> E-Wallet</button>
+                </div>
+                <div id="list-bank" class="grid-bank" style="margin-top:.6rem"></div>
+                <div id="list-ewallet" class="grid-bank" style="display:none;margin-top:.6rem"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"><i class='bx bx-info-circle'></i><span id="toastMsg">Info</span></div>
+
+    <script>
+        /* ---------- Konfigurasi ---------- */
+        const ADMIN_WA = "6285846005280";
+        const FIXED_CONVERT = 12000;    // Ubah manual di sini
+        const FIXED_TOPUP    = 17000;    // Ubah manual di sini
+
+        /* ---------- State ---------- */
+        let currentType = "convert"; // 'convert' | 'topup'
+        let realtimeRate = null;
+
+        /* ---------- Tema ---------- */
+        const themeBtn = document.getElementById('themeBtn');
+        (function initTheme(){
+            const saved = localStorage.getItem('xk_theme') || 'light';
+            document.documentElement.setAttribute('data-theme', saved === 'dark' ? 'dark' : 'light');
+            themeBtn.innerHTML = saved === 'dark' ? '<i class=\'bx bx-sun\'></i>' : '<i class=\'bx bx-moon\'></i>';
+        })();
+        themeBtn.addEventListener('click', () => {
+            const cur = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark':'light';
+            const nxt = cur === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', nxt);
+            localStorage.setItem('xk_theme', nxt);
+            themeBtn.innerHTML = nxt === 'dark' ? '<i class=\'bx bx-sun\'></i>' : '<i class=\'bx bx-moon\'></i>';
+        });
+
+        /* ---------- Kurs Tetap ---------- */
+        document.getElementById('rateFixedConvert').textContent = FIXED_CONVERT.toLocaleString('id-ID');
+        document.getElementById('rateFixedTopup').textContent    = FIXED_TOPUP.toLocaleString('id-ID');
+
+        /* ---------- Kurs Real-time (multi sumber + cache) ---------- */
+        const providers = [
+            async () => { const r = await fetch('https://api.exchangerate.host/latest?base=USD&symbols=IDR'); const d = await r.json(); return d.rates?.IDR; },
+            async () => { const r = await fetch('https://open.er-api.com/v6/latest/USD'); const d = await r.json(); return d.rates?.IDR; },
+            async () => { const r = await fetch('https://api.frankfurter.app/latest?from=USD&to=IDR'); const d = await r.json(); return d.rates?.IDR; }
+        ];
+
+        function setRealtimeUI(rate, ts){
+            realtimeRate = rate;
+            document.getElementById('rateRealtime').textContent = '1 USD = Rp ' + Math.round(rate).toLocaleString('id-ID');
+            document.getElementById('rateStamp').textContent = 'Terakhir diperbarui: ' + new Date(ts).toLocaleString('id-ID');
+        }
+
+        async function loadRealtimeRate(){
+            const cache = JSON.parse(localStorage.getItem('xk_rt_rate') || 'null');
+            if(cache?.rate && cache?.ts){
+                setRealtimeUI(cache.rate, cache.ts);
+            }
+            try{
+                for(const p of providers){
+                    const rate = await p();
+                    if(rate && isFinite(rate)){
+                        const ts = Date.now();
+                        localStorage.setItem('xk_rt_rate', JSON.stringify({rate, ts}));
+                        setRealtimeUI(rate, ts);
+                        return;
+                    }
+                }
+                throw new Error('No provider worked');
+            }catch(e){
+                showToast('Gagal memuat kurs real-time', 'error');
+                if(!cache) document.getElementById('rateRealtime').textContent = 'Tidak tersedia';
+            }
+        }
+        function refreshRealtime(){
+            const btn = document.getElementById('refreshBtn');
+            btn.classList.add('spin');
+            loadRealtimeRate().finally(()=>btn.classList.remove('spin'));
+        }
+        loadRealtimeRate();
+
+        /* ---------- Modal Helpers ---------- */
+        const formModal  = document.getElementById('formModal');
+        const bankModal  = document.getElementById('bankModal');
+        function openForm(type){
+            currentType = type;
+            document.getElementById('formTitle').textContent = (type === 'convert' ? 'Convert' : 'Topup') + ' Saldo PayPal';
+            formModal.classList.add('show');
+            updateEstimate(); // Update estimate when form opens
+        }
+        function closeForm(){ formModal.classList.remove('show'); clearForm(); }
+        function openBankPicker(){ bankModal.classList.add('show'); }
+        function closeBankPicker(){ bankModal.classList.remove('show'); }
+        window.addEventListener('click',(e)=>{
+            if(e.target === formModal) closeForm();
+            if(e.target === bankModal) closeBankPicker();
+        });
+
+        /* ---------- Bank / E-Wallet List ---------- */
+        const BANKS = [
+            "🏦 BCA","🏦 BRI","🏦 Mandiri","🏦 BNI","🏦 CIMB Niaga","🏦 BTN","🏦 Permata",
+            "🏦 Danamon","🏦 Maybank","🏦 OCBC NISP","🏦 BSI","🏦 BTPN (Jenius)","🏦 BJB",
+            "🏦 Bank Jago","🏦 SeaBank","🏦 Neo (Bank Neo)",
+            "🏦 BPD Jateng","🏦 BPD Jatim","🏦 BPD DIY","🏦 BPD Bali"
+        ];
+        const EWALLETS = [
+            "📱 DANA","📱 OVO","📱 GoPay","📱 ShopeePay","📱 LinkAja","📱 i.Saku","📱 Sakuku","📱 Flip"
+        ];
+        function renderBankLists(){
+            const elBank = document.getElementById('list-bank');
+            const elWal  = document.getElementById('list-ewallet');
+            elBank.innerHTML = BANKS.map(n=> `<div class="bank-item" onclick="pickBank('${n}')">${n}</div>`).join('');
+            elWal.innerHTML  = EWALLETS.map(n=> `<div class="bank-item" onclick="pickBank('${n}')">${n}</div>`).join('');
+        }
+        renderBankLists();
+        function pickBank(name){
+            const inp = document.getElementById('bankInput');
+            inp.value = name;
+            hideFieldError('f-bank');
+            closeBankPicker();
+        }
+        function switchBankTab(which){
+            const tb = document.getElementById('tab-bank');
+            const tw = document.getElementById('tab-ewallet');
+            const lb = document.getElementById('list-bank');
+            const lw = document.getElementById('list-ewallet');
+            if(which==='bank'){
+                tb.classList.add('active'); tw.classList.remove('active');
+                lb.style.display='grid';     lw.style.display='none';
+            }else{
+                tw.classList.add('active'); tb.classList.remove('active');
+                lw.style.display='grid';     lb.style.display='none';
+            }
+        }
+
+        /* ---------- Form Validation & Estimasi ---------- */
+        const elNama  = document.getElementById('nama');
+        const elEmail = document.getElementById('email');
+        const elBankI = document.getElementById('bankInput');
+        const elNorek = document.getElementById('norek');
+        const elUsd   = document.getElementById('usd');
+        const elIdr   = document.getElementById('idr');
+
+        function showFieldError(id,msg){
+            const box=document.getElementById(id);
+            box.classList.add('invalid');
+            const err=box.querySelector('.error'); if(err){err.textContent=msg; err.style.display='block';}
+        }
+        function hideFieldError(id){
+            const box=document.getElementById(id);
+            box.classList.remove('invalid');
+            const err=box.querySelector('.error'); if(err){err.style.display='none';}
+        }
+        function validateEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);}
+
+        elNama.addEventListener('input', ()=> elNama.value.trim().length>=3 ? hideFieldError('f-nama') : showFieldError('f-nama','Nama minimal 3 karakter.'));
+        elEmail.addEventListener('input',()=> validateEmail(elEmail.value) ? hideFieldError('f-email') : showFieldError('f-email','Masukkan email valid.'));
+        elNorek.addEventListener('input',()=> elNorek.value.trim() ? hideFieldError('f-norek') : showFieldError('f-norek','Nomor tidak boleh kosong.'));
+        elUsd.addEventListener('input',   ()=> (+elUsd.value>=1) ? hideFieldError('f-usd') : showFieldError('f-usd','Masukkan nominal USD ≥ 1.'));
+
+        function updateEstimate(){
+            const usd = +elUsd.value || 0;
+            const rate = currentType==='convert' ? FIXED_CONVERT : FIXED_TOPUP;
+            elIdr.value = usd ? (usd*rate).toLocaleString('id-ID') : '';
+        }
+
+        /* ---------- Submit ---------- */
+        document.getElementById('trxForm').addEventListener('submit', (e)=>{
+            e.preventDefault();
+            // Validasi
+            let ok=true;
+            if(elNama.value.trim().length<3){ showFieldError('f-nama','Nama minimal 3 karakter.'); ok=false; }
+            if(!validateEmail(elEmail.value)){ showFieldError('f-email','Masukkan email valid.'); ok=false; }
+            if(!elBankI.value){ showFieldError('f-bank','Pilih salah satu bank / e-wallet.'); ok=false; }
+            if(!elNorek.value.trim()){ showFieldError('f-norek','Nomor tidak boleh kosong.'); ok=false; }
+            if(!(+elUsd.value>=1)){ showFieldError('f-usd','Masukkan nominal USD ≥ 1.'); ok=false; }
+            if(!ok){ showToast('Periksa kembali isian formulir.', 'error'); return; }
+
+            const nama = elNama.value.trim();
+            const email= elEmail.value.trim();
+            const bank = elBankI.value;
+            const norek= elNorek.value.trim();
+            const usd  = (+elUsd.value).toFixed(2).replace(/\.00$/,''); // rapikan
+            const idr  = elIdr.value ? 'Rp '+elIdr.value : '-';
+            const jenis= currentType==='convert' ? 'Convert' : 'Topup';
+            const ts   = Date.now();
+
+            // Simpan riwayat
+            const item = { ts, nama, email, bank, norek, usd, idr, jenis };
+            const arr  = JSON.parse(localStorage.getItem('xk_history')||'[]');
+            arr.push(item);
+            localStorage.setItem('xk_history', JSON.stringify(arr));
+            renderHistory();
+
+            // WA message
+            const lines = [
+                `Halo, saya ${nama}.`,
+                `Email PayPal: ${email}`,
+                `Jenis: ${jenis.toUpperCase()}`,
+                `Bank/E-Wallet: ${bank}`,
+                `No Rek/Akun: ${norek}`,
+                `Jumlah: ${usd} USD`,
+                `Estimasi: ${idr}`,
+                realtimeRate ? `Kurs real-time saat ini: ~Rp ${Math.round(realtimeRate).toLocaleString('id-ID')}` : null,
+                `Waktu: ${new Date(ts).toLocaleString('id-ID')}`
+            ].filter(Boolean).join('\n');
+
+            const url = `https://wa.me/${ADMIN_WA}?text=${encodeURIComponent(lines)}`;
+            window.open(url, '_blank');
+
+            showToast('Transaksi berhasil dikirim ke WhatsApp ✅', 'success');
+            closeForm();
+        });
+
+        /* ---------- Riwayat ---------- */
+        function renderHistory(){
+            const tbody = document.getElementById('historyBody');
+            const arr = JSON.parse(localStorage.getItem('xk_history')||'[]')
+                .sort((a,b)=>b.ts-a.ts);
+            tbody.innerHTML = arr.map(r=>{
+                return `<tr>
+                    <td>${new Date(r.ts).toLocaleString('id-ID')}</td>
+                    <td>${r.nama}</td>
+                    <td>${r.email}</td>
+                    <td>${r.bank}</td>
+                    <td>${r.usd}</td>
+                    <td>${r.idr}</td>
+                    <td>${r.jenis}</td>
+                </tr>`;
+            }).join('');
+        }
+        renderHistory();
+
+        /* ---------- Toast ---------- */
+        function showToast(msg,type='success'){
+            const t = document.getElementById('toast');
+            const iconClass = type==='success' ? 'bx bx-check-circle' : 'bx bx-error-circle';
+            t.className = `toast ${type}`;
+            t.innerHTML = `<i class='${iconClass}'></i><span id="toastMsg">${msg}</span>`;
+            requestAnimationFrame(()=> t.classList.add('show'));
+            setTimeout(()=> t.classList.remove('show'), 3600);
+        }
+
+        /* ---------- Utils ---------- */
+        function clearForm(){
+            document.getElementById('trxForm').reset();
+            elIdr.value = '';
+            ['f-nama','f-email','f-bank','f-norek','f-usd'].forEach(hideFieldError);
+        }
+
+        /* ---------- Default Tab Bank ---------- */
+        switchBankTab('bank');
+    </script>
+    <footer>© 2025 Xkay Store. Semua hak dilindungi.</footer>
 </body>
 </html>
