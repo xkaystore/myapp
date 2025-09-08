@@ -5,12 +5,10 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Xkay Store • Convert & Topup PayPal</title>
 
-  <!-- Google Fonts: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -28,7 +26,6 @@
     };
   </script>
 
-  <!-- Supabase -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
   <meta name="theme-color" content="#2563EB" />
@@ -39,7 +36,19 @@
     .card-glass { backdrop-filter: blur(16px) saturate(180%); -webkit-backdrop-filter: blur(16px) saturate(180%); }
     ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-thumb { @apply bg-slate-300 dark:bg-slate-700 rounded-full; }
-    .table-container thead th { position: sticky; top: 0; z-index: 1; }
+    .table-container { 
+      /* Ensures horizontal scroll for table content */
+      overflow-x: auto; 
+      -webkit-overflow-scrolling: touch; /* For smoother scrolling on iOS */
+    }
+    .table-container thead th { 
+      position: sticky; 
+      top: 0; 
+      z-index: 1; 
+      /* Ensure sticky header background is visible */
+      background-color: inherit; 
+      @apply bg-slate-200/60 dark:bg-slate-800/60; /* Reapply background for sticky header */
+    }
     .btn, .opt-btn, input, select { transition: transform 0.1s ease, box-shadow 0.2s ease, background-color 0.2s ease; }
     .btn:active, .opt-btn:active { transform: translateY(1px) scale(0.98); }
     input:focus, select:focus, button:focus-visible { outline: none; box-shadow: 0 0 0 3px theme('colors.accent.DEFAULT / 40%'); }
@@ -58,14 +67,35 @@
   <header class="card-glass sticky top-0 z-40 bg-white/70 dark:bg-slate-900/70 ring-1 ring-slate-200 dark:ring-slate-800">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between py-4">
-        <div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-accent grid place-items-center"><span class="text-xl font-semibold text-white">X</span></div><div><h1 class="text-lg sm:text-xl font-bold tracking-tight">Xkay Store</h1><p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">Convert & Topup PayPal</p></div></div>
-        <div class="flex items-center gap-2 sm:gap-4"><div class="hidden sm:flex items-center gap-4 text-sm font-medium"><div class="text-center"><div class="text-slate-500 dark:text-slate-400">Convert</div><div id="rateFixedConvert" class="text-slate-700 dark:text-slate-200"></div></div><div class="text-center"><div class="text-slate-500 dark:text-slate-400">Topup</div><div id="rateFixedTopup" class="text-slate-700 dark:text-slate-200"></div></div><div class="text-center"><div class="text-slate-500 dark:text-slate-400">Live</div><div id="rateLive" class="min-w-[70px] text-slate-700 dark:text-slate-200"></div></div></div>
-        <button id="themeToggle" class="btn p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800" aria-label="Toggle theme">
-          <!-- Moon Icon -->
-          <svg id="theme-icon-dark" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 004.463-.948a.75.75 0 01.97.97 10.503 10.503 0 01-4.401 4.402A10.5 10.5 0 013 10.5a10.5 10.5 0 014.402-8.332.75.75 0 011.126.55z" clip-rule="evenodd" /></svg>
-          <!-- Sun Icon (Fixed) -->
-          <svg id="theme-icon-light" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.106a.75.75 0 010 1.06l-1.591 1.59a.75.75 0 11-1.06-1.06l1.59-1.59a.75.75 0 011.06 0zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.894 17.894a.75.75 0 011.06 0l1.59 1.591a.75.75 0 11-1.06 1.06l-1.59-1.59a.75.75 0 010-1.06zM12 18.75a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0v-2.25a.75.75 0 01.75-.75zM5.106 17.894a.75.75 0 010-1.06l1.59-1.59a.75.75 0 111.06 1.06l-1.59 1.59a.75.75 0 01-1.06 0zM2.25 12a.75.75 0 01.75-.75h2.25a.75.75 0 010 1.5H3a.75.75 0 01-.75-.75zM6.106 5.106a.75.75 0 011.06 0l1.591 1.59a.75.75 0 01-1.06 1.06l-1.59-1.59a.75.75 0 010-1.06z"/></svg>
-        </button></div>
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-accent grid place-items-center">
+            <span class="text-xl font-semibold text-white">X</span>
+          </div>
+          <div>
+            <h1 class="text-lg sm:text-xl font-bold tracking-tight">Xkay Store</h1>
+            <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">Convert & Topup PayPal</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 sm:gap-4">
+          <div class="hidden sm:flex items-center gap-4 text-sm font-medium">
+            <div class="text-center">
+              <div class="text-slate-500 dark:text-slate-400">Convert</div>
+              <div id="rateFixedConvert" class="text-slate-700 dark:text-slate-200"></div>
+            </div>
+            <div class="text-center">
+              <div class="text-slate-500 dark:text-slate-400">Topup</div>
+              <div id="rateFixedTopup" class="text-slate-700 dark:text-slate-200"></div>
+            </div>
+            <div class="text-center">
+              <div class="text-slate-500 dark:text-slate-400">Live</div>
+              <div id="rateLive" class="min-w-[70px] text-slate-700 dark:text-slate-200"></div>
+            </div>
+          </div>
+          <button id="themeToggle" class="btn p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800" aria-label="Toggle theme">
+            <svg id="theme-icon-dark" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 004.463-.948a.75.75 0 01.97.97 10.503 10.503 0 01-4.401 4.402A10.5 10.5 0 013 10.5a10.5 10.5 0 014.402-8.332.75.75 0 011.126.55z" clip-rule="evenodd" /></svg>
+            <svg id="theme-icon-light" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.106a.75.75 0 010 1.06l-1.591 1.59a.75.75 0 11-1.06-1.06l1.59-1.59a.75.75 0 011.06 0zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.894 17.894a.75.75 0 011.06 0l1.59 1.591a.75.75 0 11-1.06 1.06l-1.59-1.59a.75.75 0 010-1.06zM12 18.75a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0v-2.25a.75.75 0 01.75-.75zM5.106 17.894a.75.75 0 010-1.06l1.59-1.59a.75.75 0 111.06 1.06l-1.59 1.59a.75.75 0 01-1.06 0zM2.25 12a.75.75 0 01.75-.75h2.25a.75.75 0 010 1.5H3a.75.75 0 01-.75-.75zM6.106 5.106a.75.75 0 011.06 0l1.591 1.59a.75.75 0 01-1.06 1.06l-1.59-1.59a.75.75 0 010-1.06z"/></svg>
+          </button>
+        </div>
       </div>
     </div>
   </header>
@@ -77,11 +107,48 @@
       <div class="md:col-span-3 card-glass bg-white/70 dark:bg-slate-800/70 ring-1 ring-slate-200 dark:ring-slate-800 rounded-2xl p-6 sm:p-8">
         <h2 class="text-2xl font-bold mb-1">Buat Pesanan Baru</h2><p class="text-slate-500 dark:text-slate-400 text-sm mb-6">Detail akan dikirim ke WhatsApp Admin.</p>
         <form id="orderForm" class="space-y-4" novalidate>
-          <div class="grid sm:grid-cols-2 gap-4"><div><label for="name" class="block text-sm font-medium mb-1.5 text-slate-600 dark:text-slate-300">Nama Lengkap</label><input id="name" type="text" autocomplete="name" required class="form-input" placeholder="Nama Anda" /></div><div><label for="paypal_email" class="block text-sm font-medium mb-1.5 text-slate-600 dark:text-slate-300">Email PayPal</label><input id="paypal_email" type="email" autocomplete="email" required class="form-input" placeholder="email@paypal.com" /></div></div>
-          <div class="grid sm:grid-cols-2 gap-4"><div><label for="type" class="block text-sm font-medium mb-1.5 text-slate-600 dark:text-slate-300">Jenis Transaksi</label><select id="type" required class="form-input"><option value="convert">Convert (PayPal → Tujuan)</option><option value="topup">Topup (Tujuan → PayPal)</option></select></div><div><label for="providerBtn" class="block text-sm font-medium mb-1.5 text-slate-600 dark:text-slate-300">Tujuan Penerimaan</label><button type="button" id="providerBtn" class="btn w-full h-10 rounded-lg px-3 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 ring-1 ring-slate-300 dark:ring-slate-600">Pilih Bank / E-Wallet</button><p id="selectedProvider" class="text-xs text-slate-500 dark:text-slate-400 mt-1.5">Belum dipilih</p></div></div>
-          <div class="grid sm:grid-cols-2 gap-4"><div><label for="account" class="block text-sm font-medium mb-1.5 text-slate-600 dark:text-slate-300">No. Rekening / Akun</label><input id="account" type="text" required class="form-input" placeholder="Contoh: 1234567890" /></div><div><label for="usd" class="block text-sm font-medium mb-1.5 text-slate-600 dark:text-slate-300">Nominal (USD)</label><input id="usd" type="number" step="0.01" min="0.01" required class="form-input" placeholder="0.00" /></div></div>
-          <div class="flex items-center justify-between rounded-lg bg-slate-100 dark:bg-slate-700/50 p-3"><span class="text-sm text-slate-500 dark:text-slate-400">Estimasi diterima (IDR):</span><span id="idr" class="font-semibold text-lg">Rp 0</span></div>
-          <button id="submitBtn" type="submit" class="btn w-full h-12 flex items-center justify-center rounded-lg bg-accent hover:bg-accent-hover text-white font-semibold"><span>Kirim Order via WhatsApp</span><svg class="w-5 h-5 ml-2 hidden animate-spin" id="submit-spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></button>
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label for="name" class="block text-sm font-medium mb-1.5 text-slate-600 dark:text-slate-300">Nama Lengkap</label>
+              <input id="name" type="text" autocomplete="name" required class="form-input" placeholder="Nama Anda" />
+            </div>
+            <div>
+              <label for="paypal_email" class="block text-sm font-medium mb-1.5 text-slate-600 dark:text-slate-300">Email PayPal</label>
+              <input id="paypal_email" type="email" autocomplete="email" required class="form-input" placeholder="email@paypal.com" />
+            </div>
+          </div>
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label for="type" class="block text-sm font-medium mb-1.5 text-slate-600 dark:text-slate-300">Jenis Transaksi</label>
+              <select id="type" required class="form-input">
+                <option value="convert">Convert (PayPal → Tujuan)</option>
+                <option value="topup">Topup (Tujuan → PayPal)</option>
+              </select>
+            </div>
+            <div>
+              <label for="providerBtn" class="block text-sm font-medium mb-1.5 text-slate-600 dark:text-slate-300">Tujuan Penerimaan</label>
+              <button type="button" id="providerBtn" class="btn w-full h-10 rounded-lg px-3 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 ring-1 ring-slate-300 dark:ring-slate-600">Pilih Bank / E-Wallet</button>
+              <p id="selectedProvider" class="text-xs text-slate-500 dark:text-slate-400 mt-1.5">Belum dipilih</p>
+            </div>
+          </div>
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label for="account" class="block text-sm font-medium mb-1.5 text-slate-600 dark:text-slate-300">No. Rekening / Akun</label>
+              <input id="account" type="text" required class="form-input" placeholder="Contoh: 1234567890" />
+            </div>
+            <div>
+              <label for="usd" class="block text-sm font-medium mb-1.5 text-slate-600 dark:text-slate-300">Nominal (USD)</label>
+              <input id="usd" type="number" step="0.01" min="0.01" required class="form-input" placeholder="0.00" />
+            </div>
+          </div>
+          <div class="flex items-center justify-between rounded-lg bg-slate-100 dark:bg-slate-700/50 p-3">
+            <span class="text-sm text-slate-500 dark:text-slate-400">Estimasi diterima (IDR):</span>
+            <span id="idr" class="font-semibold text-lg">Rp 0</span>
+          </div>
+          <button id="submitBtn" type="submit" class="btn w-full h-12 flex items-center justify-center rounded-lg bg-accent hover:bg-accent-hover text-white font-semibold">
+            <span>Kirim Order via WhatsApp</span>
+            <svg class="w-5 h-5 ml-2 hidden animate-spin" id="submit-spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+          </button>
         </form>
       </div>
 
@@ -98,8 +165,7 @@
         <div class="card-glass bg-white/70 dark:bg-slate-800/70 ring-1 ring-slate-200 dark:ring-slate-800 rounded-2xl p-6">
           <div class="flex items-center justify-between gap-4 mb-4"><h3 class="text-lg font-bold">Riwayat Transaksi</h3><button id="reloadHistory" class="btn text-xs px-2 py-1 rounded-md bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 ring-1 ring-slate-300 dark:ring-slate-600">Reload</button></div>
           <div class="rounded-lg ring-1 ring-slate-200 dark:ring-slate-700 bg-slate-100 dark:bg-slate-900/50 overflow-hidden">
-            <div class="table-container max-h-[420px] overflow-y-auto overflow-x-auto">
-              <table class="min-w-full text-left text-sm"><thead class="bg-slate-200/60 dark:bg-slate-800/60 card-glass text-slate-500 dark:text-slate-400"><tr><th class="p-3 whitespace-nowrap">Tanggal</th><th class="p-3 whitespace-nowrap">Tipe</th><th class="p-3 whitespace-nowrap">Provider</th><th class="p-3 whitespace-nowrap">Nama</th><th class="p-3 whitespace-nowrap">USD</th><th class="p-3 whitespace-nowrap">IDR</th></tr></thead><tbody id="history" class="divide-y divide-slate-200 dark:divide-slate-700"></tbody></table>
+            <div class="table-container max-h-[420px]"> <table class="min-w-full text-left text-sm"><thead class="bg-slate-200/60 dark:bg-slate-800/60 card-glass text-slate-500 dark:text-slate-400"><tr><th class="p-3 whitespace-nowrap">Tanggal</th><th class="p-3 whitespace-nowrap">Tipe</th><th class="p-3 whitespace-nowrap">Provider</th><th class="p-3 whitespace-nowrap">Nama</th><th class="p-3 whitespace-nowrap">USD</th><th class="p-3 whitespace-nowrap">IDR</th></tr></thead><tbody id="history" class="divide-y divide-slate-200 dark:divide-slate-700"></tbody></table>
             </div>
           </div>
           <p id="historyState" class="hidden text-center text-slate-500 dark:text-slate-400 text-sm mt-4"></p>
@@ -109,7 +175,29 @@
   </main>
 
   <div id="providerModal" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="providerTitle">
-    <div id="providerOverlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm" aria-hidden="true"></div><div class="relative mx-auto mt-20 w-[92%] max-w-md"><div class="rounded-2xl bg-white text-slate-800 shadow-2xl ring-1 ring-black/10 p-5"><div class="flex items-center justify-between"><h3 id="providerTitle" class="text-lg font-semibold">Pilih Bank / E-Wallet</h3><button id="closeProvider" class="btn rounded-lg px-2 py-1 text-sm bg-slate-100 hover:bg-slate-200">Tutup</button></div><p class="mt-4 mb-2 text-sm font-semibold text-slate-500">Bank Lokal</p><div class="grid grid-cols-2 gap-3"><button data-category="Bank Lokal" data-provider="BCA" class="opt-btn">BCA</button><button data-category="Bank Lokal" data-provider="BRI" class="opt-btn">BRI</button><button data-category="Bank Lokal" data-provider="BNI" class="opt-btn">BNI</button><button data-category="Bank Lokal" data-provider="Mandiri" class="opt-btn">Mandiri</button></div><p class="mt-4 mb-2 text-sm font-semibold text-slate-500">E-Wallet</p><div class="grid grid-cols-2 gap-3"><button data-category="E-Wallet" data-provider="OVO" class="opt-btn">OVO</button><button data-category="E-Wallet" data-provider="Dana" class="opt-btn">Dana</button><button data-category="E-Wallet" data-provider="GoPay" class="opt-btn">GoPay</button><button data-category="E-Wallet" data-provider="ShopeePay" class="opt-btn">ShopeePay</button></div></div></div>
+    <div id="providerOverlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm" aria-hidden="true"></div>
+    <div class="relative mx-auto mt-20 w-[92%] max-w-md">
+      <div class="rounded-2xl bg-white text-slate-800 shadow-2xl ring-1 ring-black/10 p-5">
+        <div class="flex items-center justify-between">
+          <h3 id="providerTitle" class="text-lg font-semibold">Pilih Bank / E-Wallet</h3>
+          <button id="closeProvider" class="btn rounded-lg px-2 py-1 text-sm bg-slate-100 hover:bg-slate-200">Tutup</button>
+        </div>
+        <p class="mt-4 mb-2 text-sm font-semibold text-slate-500">Bank Lokal</p>
+        <div class="grid grid-cols-2 gap-3">
+          <button data-category="Bank Lokal" data-provider="BCA" class="opt-btn">BCA</button>
+          <button data-category="Bank Lokal" data-provider="BRI" class="opt-btn">BRI</button>
+          <button data-category="Bank Lokal" data-provider="BNI" class="opt-btn">BNI</button>
+          <button data-category="Bank Lokal" data-provider="Mandiri" class="opt-btn">Mandiri</button>
+        </div>
+        <p class="mt-4 mb-2 text-sm font-semibold text-slate-500">E-Wallet</p>
+        <div class="grid grid-cols-2 gap-3">
+          <button data-category="E-Wallet" data-provider="OVO" class="opt-btn">OVO</button>
+          <button data-category="E-Wallet" data-provider="Dana" class="opt-btn">Dana</button>
+          <button data-category="E-Wallet" data-provider="GoPay" class="opt-btn">GoPay</button>
+          <button data-category="E-Wallet" data-provider="ShopeePay" class="opt-btn">ShopeePay</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 flex items-center gap-3 px-4 py-2 rounded-lg text-sm font-semibold shadow-2xl transition-transform duration-300 translate-y-20 opacity-0" role="alert"><span id="toast-icon"></span><span id="toast-msg"></span></div>
@@ -152,6 +240,7 @@
         },
         applyTheme(theme) {
             document.documentElement.classList.toggle("dark", theme === "dark");
+            // Ensure both icons are handled explicitly
             DOMElements.qs("#theme-icon-dark").classList.toggle("hidden", theme === "light");
             DOMElements.qs("#theme-icon-light").classList.toggle("hidden", theme === "dark");
             localStorage.setItem("xkay_theme", theme);
