@@ -1,11 +1,14 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Xkay Store • Convert & Topup PayPal</title>
 
-  <!-- Tailwind CDN -->
+  <!-- Tailwind (enable dark mode via class) -->
+  <script>
+    window.tailwind = { config: { darkMode: 'class' } };
+  </script>
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Supabase -->
   <script src="https://unpkg.com/@supabase/supabase-js"></script>
@@ -21,36 +24,65 @@
     </svg>
   "/>
   <meta name="theme-color" content="#0d47a1" />
+
   <style>
+    /* Scrollbar halus */
     ::-webkit-scrollbar{height:8px;width:8px}
     ::-webkit-scrollbar-thumb{background:#2b3f83;border-radius:999px}
     ::-webkit-scrollbar-track{background:transparent}
+
+    /* THEME OVERRIDES (light) — pakai class .theme-light pada body */
+    body.theme-light {
+      color: #0f172a;
+      background: radial-gradient(80% 80% at 50% 20%, #e6eefc 0%, #dfe7fb 40%, #eaf0ff 100%) fixed;
+    }
+    body.theme-light .themed {
+      background: rgba(255,255,255,0.75) !important;
+      color: #0f172a !important;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-color: rgba(0,0,0,0.08) !important;
+    }
+    body.theme-light .themed-strong {
+      background: rgba(255,255,255,0.9) !important;
+      border-color: rgba(0,0,0,0.08) !important;
+    }
+    body.theme-light .txt-dim { color:#334155 !important; }
+    body.theme-light .btn-primary { background:#0d47a1 !important; color:#fff !important; }
+    body.theme-light .btn-primary:hover { background:#1155c1 !important; }
+    body.theme-light .ring-dim { border-color: rgba(0,0,0,0.08) !important; }
+    /* Sticky thead for vertical scroll table */
+    .sticky-head th { position: sticky; top: 0; z-index: 1; }
   </style>
 </head>
+
 <body class="min-h-screen text-white bg-gradient-to-br from-[#0f172a] via-[#0b2454] to-[#0a1a3a] selection:bg-white/20 selection:text-white">
   <!-- Top Nav -->
-  <header class="sticky top-0 z-40 backdrop-blur-md bg-blue-900/40 border-b border-white/10">
+  <header class="themed-strong sticky top-0 z-40 backdrop-blur-md bg-blue-900/40 border-b border-white/10">
     <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-2xl bg-white/10 ring-1 ring-white/15 grid place-items-center">
+        <div class="w-10 h-10 rounded-2xl bg-white/10 ring-1 ring-white/15 grid place-items-center themed">
           <span class="text-xl font-bold">X</span>
         </div>
         <div>
           <h1 class="text-lg sm:text-xl font-bold tracking-tight">Xkay Store</h1>
-          <p class="text-xs sm:text-sm text-white/70">Convert & Topup PayPal • cepat & aman</p>
+          <p class="text-xs sm:text-sm text-white/70 txt-dim">Convert & Topup PayPal • cepat & aman</p>
         </div>
       </div>
 
-      <!-- Rates -->
-      <div class="hidden sm:flex items-center gap-5 text-sm">
-        <div class="px-3 py-2 rounded-xl bg-white/5 ring-1 ring-white/10">
-          <div class="text-white/60">Kurs Tetap</div>
+      <!-- Right: Rates + Theme toggle -->
+      <div class="flex items-center gap-3 sm:gap-5 text-sm">
+        <div class="px-3 py-2 rounded-xl bg-white/5 ring-1 ring-white/10 themed">
+          <div class="text-white/60 txt-dim">Kurs Tetap</div>
           <div id="fixedRate" class="font-semibold">Rp 12.000</div>
         </div>
-        <div class="px-3 py-2 rounded-xl bg-white/5 ring-1 ring-white/10">
-          <div class="text-white/60">Kurs Real-Time</div>
+        <div class="px-3 py-2 rounded-xl bg-white/5 ring-1 ring-white/10 themed">
+          <div class="text-white/60 txt-dim">Kurs Real-Time</div>
           <div id="liveRate" class="font-semibold">Loading…</div>
         </div>
+        <button id="themeToggle" class="hidden sm:inline-flex px-3 py-2 rounded-xl bg-white/10 ring-1 ring-white/15 hover:bg-white/20 themed btn-primary">
+          Toggle Theme
+        </button>
       </div>
     </div>
   </header>
@@ -60,22 +92,27 @@
     <div class="absolute inset-0 pointer-events-none">
       <div class="absolute -top-10 left-1/2 -translate-x-1/2 w-[800px] h-[800px] rounded-full bg-blue-500/20 blur-3xl"></div>
     </div>
-    <div class="max-w-6xl mx-auto px-4 pt-8 pb-2">
+    <div class="max-w-6xl mx-auto px-4 pt-6 pb-2">
       <div class="grid md:grid-cols-2 gap-6">
         <!-- Order Card -->
-        <div class="rounded-2xl bg-white/10 backdrop-blur-md ring-1 ring-white/15 shadow-2xl p-5 sm:p-6">
-          <h2 class="text-xl font-semibold mb-1">Buat Order</h2>
-          <p class="text-white/70 text-sm mb-5">Tanpa login. Detail dikirim ke WhatsApp Admin, tersimpan di riwayat.</p>
+        <div class="themed rounded-2xl bg-white/10 backdrop-blur-md ring-1 ring-white/15 shadow-2xl p-5 sm:p-6">
+          <div class="flex items-center justify-between mb-1">
+            <h2 class="text-xl font-semibold">Buat Order</h2>
+            <button id="themeToggleSm" class="sm:hidden px-3 py-2 rounded-xl bg-white/10 ring-1 ring-white/15 hover:bg-white/20 themed btn-primary">
+              Theme
+            </button>
+          </div>
+          <p class="text-white/70 text-sm mb-5 txt-dim">Tanpa login. Detail dikirim ke WhatsApp Admin, tersimpan di riwayat.</p>
 
           <form id="orderForm" class="space-y-4" novalidate>
             <div class="grid sm:grid-cols-2 gap-4">
               <div>
-                <label class="block text-sm mb-1 text-white/80">Nama Lengkap</label>
+                <label class="block text-sm mb-1 text-white/80 txt-dim">Nama Lengkap</label>
                 <input id="name" type="text" autocomplete="name" required
                   class="w-full rounded-xl px-3 py-2 text-black focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Nama Anda" />
               </div>
               <div>
-                <label class="block text-sm mb-1 text-white/80">Email PayPal</label>
+                <label class="block text-sm mb-1 text-white/80 txt-dim">Email PayPal</label>
                 <input id="paypal_email" type="email" autocomplete="email" required
                   class="w-full rounded-xl px-3 py-2 text-black focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="email@paypal.com" />
               </div>
@@ -83,7 +120,7 @@
 
             <div class="grid sm:grid-cols-2 gap-4">
               <div>
-                <label class="block text-sm mb-1 text-white/80">Jenis Transaksi</label>
+                <label class="block text-sm mb-1 text-white/80 txt-dim">Jenis Transaksi</label>
                 <select id="type" required
                   class="w-full rounded-xl px-3 py-2 text-black focus:outline-none focus:ring-2 focus:ring-blue-400">
                   <option value="convert">Convert (PayPal → Bank/E-Wallet)</option>
@@ -92,31 +129,31 @@
               </div>
 
               <div>
-                <label class="block text-sm mb-1 text-white/80">Tujuan Penerimaan</label>
+                <label class="block text-sm mb-1 text-white/80 txt-dim">Tujuan Penerimaan</label>
                 <button type="button" id="providerBtn"
-                  class="w-full rounded-xl px-3 py-2 bg-blue-600 hover:bg-blue-500 transition focus:outline-none focus:ring-2 focus:ring-blue-300">
+                  class="w-full rounded-xl px-3 py-2 bg-blue-600 hover:bg-blue-500 transition focus:outline-none focus:ring-2 focus:ring-blue-300 btn-primary">
                   Pilih Bank / E-Wallet
                 </button>
-                <p id="selectedProvider" class="text-xs text-white/70 mt-1">Belum dipilih</p>
+                <p id="selectedProvider" class="text-xs text-white/70 mt-1 txt-dim">Belum dipilih</p>
               </div>
             </div>
 
             <div class="grid sm:grid-cols-2 gap-4">
               <div>
-                <label class="block text-sm mb-1 text-white/80">No Rekening / Akun</label>
+                <label class="block text-sm mb-1 text-white/80 txt-dim">No Rekening / Akun</label>
                 <input id="account" type="text" required
                   class="w-full rounded-xl px-3 py-2 text-black focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Contoh: 1234567890 (BCA)" />
               </div>
               <div>
-                <label class="block text-sm mb-1 text-white/80">Nominal (USD)</label>
+                <label class="block text-sm mb-1 text-white/80 txt-dim">Nominal (USD)</label>
                 <input id="usd" type="number" step="0.01" min="0.01" required
                   class="w-full rounded-xl px-3 py-2 text-black focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="0.00" />
-                <p class="text-xs text-white/70 mt-1">Dihitung dengan <span class="underline decoration-dotted">kurs tetap</span>.</p>
+                <p class="text-xs text-white/70 mt-1 txt-dim">Dihitung dengan <span class="underline decoration-dotted">kurs tetap</span>.</p>
               </div>
             </div>
 
-            <div class="flex items-center justify-between rounded-xl bg-white/5 ring-1 ring-white/10 px-3 py-2">
-              <span class="text-sm text-white/80">Setara (IDR, kurs tetap):</span>
+            <div class="flex items-center justify-between rounded-xl bg-white/5 ring-1 ring-white/10 px-3 py-2 themed">
+              <span class="text-sm text-white/80 txt-dim">Setara (IDR, kurs tetap):</span>
               <span id="idr" class="font-semibold">Rp 0</span>
             </div>
 
@@ -124,49 +161,35 @@
               class="w-full rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-semibold py-3 transition focus:outline-none focus:ring-2 focus:ring-emerald-300">
               Kirim Order via WhatsApp
             </button>
-            <p class="text-[11px] text-white/60">Dengan mengirim, Anda setuju data disimpan untuk riwayat transaksi.</p>
+            <p class="text-[11px] text-white/60 txt-dim">Dengan mengirim, Anda setuju data disimpan untuk riwayat transaksi.</p>
           </form>
         </div>
 
-        <!-- Kurs & Tools -->
-        <aside class="rounded-2xl bg-white/5 backdrop-blur-md ring-1 ring-white/10 p-5 sm:p-6">
+        <!-- Kurs & Info -->
+        <aside class="themed rounded-2xl bg-white/5 backdrop-blur-md ring-1 ring-white/10 p-5 sm:p-6">
           <h3 class="text-lg font-semibold mb-2">Informasi Kurs</h3>
-          <ul class="space-y-2 text-sm text-white/80">
-            <li>• <b>Kurs tetap</b> digunakan untuk perhitungan IDR.</li>
-            <li>• <b>Kurs real-time</b> hanya sebagai informasi pasar saat ini.</li>
-            <li>• Anda bisa menyesuaikan kurs tetap di kotak di bawah (tersimpan di browser).</li>
+          <ul class="space-y-2 text-sm text-white/80 txt-dim">
+            <li>• <b>Kurs tetap</b> digunakan untuk perhitungan IDR (bisa diubah di kode).</li>
+            <li>• <b>Kurs real-time</b> hanya info pasar saat ini (multi-sumber).</li>
           </ul>
 
           <div class="mt-4 grid gap-3">
-            <div class="rounded-xl bg-white/10 ring-1 ring-white/10 p-3">
-              <div class="flex items-center justify-between">
-                <span class="text-sm text-white/70">Kurs Tetap</span>
-                <button id="editFixedRate" class="text-xs px-2 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-300">
-                  Ubah
-                </button>
-              </div>
+            <div class="themed rounded-xl bg-white/10 ring-1 ring-white/10 p-3">
+              <div class="text-white/60 txt-dim text-sm">Kurs Tetap</div>
               <div id="fixedRateLarge" class="mt-1 text-2xl font-bold">Rp 12.000</div>
-              <div id="fixedRateEdit" class="mt-2 hidden">
-                <div class="flex items-center gap-2">
-                  <input id="fixedInput" type="number" min="1000" step="1" class="w-full rounded-lg px-3 py-2 text-black" placeholder="12000" />
-                  <button id="saveFixed" class="px-3 py-2 rounded-lg bg-emerald-500 text-black font-semibold">Simpan</button>
-                </div>
-                <p class="text-[11px] text-white/60 mt-1">Tersimpan lokal (browser ini), tidak mengubah server.</p>
-              </div>
+              <div class="text-[11px] text-white/60 mt-1 txt-dim">Ubah nilai di kode: <code>DEFAULT_RATE_INITIAL</code>.</div>
             </div>
 
-            <div class="rounded-xl bg-white/10 ring-1 ring-white/10 p-3">
+            <div class="themed rounded-xl bg-white/10 ring-1 ring-white/10 p-3">
               <div class="flex items-center justify-between">
-                <span class="text-sm text-white/70">Kurs Real-Time</span>
-                <div class="flex items-center gap-2">
-                  <button id="refreshRate" class="text-xs px-2 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-300">
-                    Refresh
-                  </button>
-                </div>
+                <span class="text-sm text-white/70 txt-dim">Kurs Real-Time</span>
+                <button id="refreshRate" class="text-xs px-2 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-300 btn-primary">
+                  Refresh
+                </button>
               </div>
               <div class="mt-1">
                 <div id="liveRateBig" class="text-2xl font-bold">Memuat…</div>
-                <div id="liveMeta" class="text-[11px] text-white/60 mt-1">Sumber: exchangerate.host</div>
+                <div id="liveMeta" class="text-[11px] text-white/60 mt-1 txt-dim">Sumber: exchangerate.host</div>
               </div>
             </div>
           </div>
@@ -177,34 +200,37 @@
 
   <!-- Riwayat -->
   <section class="max-w-6xl mx-auto px-4 pt-2 pb-10">
-    <div class="rounded-2xl bg-white/5 backdrop-blur-md ring-1 ring-white/10 p-5 sm:p-6">
-      <div class="flex items-center justify-between gap-3 mb-3">
+    <div class="themed rounded-2xl bg-white/5 backdrop-blur-md ring-1 ring-white/10 p-5 sm:p-6">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
         <h2 class="text-xl font-semibold">Riwayat Transaksi</h2>
         <div class="flex items-center gap-2">
           <button id="exportBtn" class="px-3 py-2 rounded-lg bg-yellow-400 text-black font-semibold">Export CSV</button>
-          <button id="reloadHistory" class="px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-500">Reload</button>
+          <button id="reloadHistory" class="px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 btn-primary">Reload</button>
         </div>
       </div>
 
-      <div class="overflow-auto rounded-xl ring-1 ring-white/10">
-        <table class="min-w-full text-left text-sm">
-          <thead class="bg-white/10 text-white/80">
-            <tr>
-              <th class="px-3 py-2">Tanggal</th>
-              <th class="px-3 py-2">Nama</th>
-              <th class="px-3 py-2">Tipe</th>
-              <th class="px-3 py-2">Kategori</th>
-              <th class="px-3 py-2">Provider</th>
-              <th class="px-3 py-2">USD</th>
-              <th class="px-3 py-2">IDR</th>
-            </tr>
-          </thead>
-          <tbody id="history" class="divide-y divide-white/10">
-            <tr class="animate-pulse"><td class="px-3 py-2" colspan="7">Memuat data…</td></tr>
-          </tbody>
-        </table>
+      <div class="rounded-xl ring-1 ring-white/10 themed-strong overflow-hidden">
+        <!-- Wrapper scroll vertikal -->
+        <div class="max-h-[360px] overflow-y-auto">
+          <table class="min-w-full text-left text-sm">
+            <thead class="bg-white/10 text-white/80 sticky-head themed">
+              <tr>
+                <th class="px-3 py-2">Tanggal</th>
+                <th class="px-3 py-2">Nama</th>
+                <th class="px-3 py-2">Tipe</th>
+                <th class="px-3 py-2">Kategori</th>
+                <th class="px-3 py-2">Provider</th>
+                <th class="px-3 py-2">USD</th>
+                <th class="px-3 py-2">IDR</th>
+              </tr>
+            </thead>
+            <tbody id="history" class="divide-y divide-white/10">
+              <tr class="animate-pulse"><td class="px-3 py-2" colspan="7">Memuat data…</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-      <p id="historyEmpty" class="hidden text-center text-white/60 text-sm mt-3">Belum ada transaksi.</p>
+      <p id="historyEmpty" class="hidden text-center text-white/60 text-sm mt-3 txt-dim">Belum ada transaksi.</p>
     </div>
   </section>
 
@@ -245,13 +271,14 @@
     const SUPABASE_URL  = "https://rhujpinlutjiztyonmas.supabase.co";
     const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJodWpwaW5sdXRqaXp0eW9ubWFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczMDQyOTIsImV4cCI6MjA3Mjg4MDI5Mn0.zcfDUOHTeBYydFFscwmy3U9yryHiItTVJPLRurUlBvY";
     const WA_ADMIN      = "6285846005280";
-    const LS_FIXED_KEY  = "xkay_fixed_rate";
+
+    // Ubah kurs tetap disini (tombol UI dihapus)
     const DEFAULT_RATE_INITIAL = 12000;
 
     // ================== STATE & HELPERS ==================
     const idLocale = "id-ID";
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-    let FIXED_RATE = Number(localStorage.getItem(LS_FIXED_KEY)) || DEFAULT_RATE_INITIAL;
+    let FIXED_RATE = DEFAULT_RATE_INITIAL;
     let LIVE_RATE  = FIXED_RATE;
     let selected   = { category: null, provider: null };
     let modalOpener = null;
@@ -271,6 +298,19 @@
       qs("#fixedRateLarge").textContent = rp(FIXED_RATE);
       const usd = parseFloat(qs("#usd").value) || 0;
       qs("#idr").textContent = rp(usd * FIXED_RATE);
+    }
+
+    // ================== THEME TOGGLE ==================
+    const THEME_KEY = "xkay_theme"; // 'dark' | 'light'
+    function applyTheme(t){
+      const body = document.body;
+      if(t === "light"){ body.classList.add("theme-light"); document.documentElement.dataset.theme = "light"; }
+      else { body.classList.remove("theme-light"); document.documentElement.dataset.theme = "dark"; }
+      localStorage.setItem(THEME_KEY, t);
+    }
+    function toggleTheme(){
+      const curr = localStorage.getItem(THEME_KEY) || "dark";
+      applyTheme(curr === "dark" ? "light" : "dark");
     }
 
     // ================== KURS REAL-TIME (Multi-sumber) ==================
@@ -302,13 +342,11 @@
       liveBig.textContent   = "Memuat…";
 
       try{
-        // Try 1: exchangerate.host
         LIVE_RATE = await getRate_exchangerate_host();
         meta.textContent = "Sumber: exchangerate.host • " + new Date().toLocaleString(idLocale);
       }catch(e1){
         console.warn("exchangerate.host gagal:", e1);
         try{
-          // Try 2: open.er-api.com
           LIVE_RATE = await getRate_open_er_api();
           meta.textContent = "Sumber: open.er-api.com • " + new Date().toLocaleString(idLocale);
         }catch(e2){
@@ -358,6 +396,18 @@
       closeModal();
     });
 
+    // ================== VALIDASI KETAT ==================
+    function isValidEmail(email){
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+    function isValidName(name){
+      return name && name.trim().length >= 3;
+    }
+    function isValidAccount(acc){
+      // Boleh angka/huruf, minimal 5
+      return /^[a-zA-Z0-9.\-_]{5,}$/.test(acc.trim());
+    }
+
     // ================== FORM ==================
     const usdInput = qs("#usd");
     usdInput.addEventListener("input", ()=>{
@@ -378,18 +428,17 @@
       const usd = Math.max(0, parseFloat(qs("#usd").value) || 0);
       const idr = Math.round(usd * FIXED_RATE);
 
+      // Validasi
       if(!selected.provider){
         toast("Pilih Bank / E-Wallet dulu.", false);
-        submitBtn.disabled = false; submitBtn.textContent = "Kirim Order via WhatsApp";
-        qs("#providerBtn").focus(); return;
+        submitBtn.disabled = false; submitBtn.textContent = "Kirim Order via WhatsApp"; return;
       }
-      if(!name || !paypal_email || !usd || usd <= 0){
-        toast("Isi semua data dengan benar.", false);
-        submitBtn.disabled = false; submitBtn.textContent = "Kirim Order via WhatsApp";
-        return;
-      }
+      if(!isValidName(name)){ toast("Nama minimal 3 karakter.", false); submitBtn.disabled=false; submitBtn.textContent="Kirim Order via WhatsApp"; return; }
+      if(!isValidEmail(paypal_email)){ toast("Email tidak valid.", false); submitBtn.disabled=false; submitBtn.textContent="Kirim Order via WhatsApp"; return; }
+      if(!isValidAccount(account)){ toast("Akun/Rekening minimal 5 karakter (huruf/angka . - _).", false); submitBtn.disabled=false; submitBtn.textContent="Kirim Order via WhatsApp"; return; }
+      if(!(usd > 0)){ toast("Nominal USD harus lebih dari 0.", false); submitBtn.disabled=false; submitBtn.textContent="Kirim Order via WhatsApp"; return; }
 
-      // Simpan ke Supabase (best-effort; kalau gagal tetap lanjut WA)
+      let savedOK = false;
       try{
         const { error } = await supabaseClient.from("orders").insert([{
           type, name, paypal_email,
@@ -397,9 +446,11 @@
           target_type: selected.category, provider: selected.provider, account
         }]);
         if(error) throw error;
+        savedOK = true;
+        toast("Order tersimpan. Membuka WhatsApp…", true);
       }catch(err){
         console.error("[DB] insert gagal:", err);
-        toast("Gagal menyimpan ke database (akan tetap membuka WhatsApp).", false);
+        toast("DB error—tetap membuka WhatsApp.", false);
       }
 
       // Kirim ke WhatsApp
@@ -415,15 +466,16 @@
         ``,
         `Kurs real-time saat ini: ${rp(LIVE_RATE)}`
       ].join("\n");
-      window.open(`https://wa.me/6285846005280?text=${encodeURIComponent(waText)}`, "_blank");
+      window.open(`https://wa.me/${WA_ADMIN}?text=${encodeURIComponent(waText)}`, "_blank");
 
-      orderForm.reset();
-      selected = { category:null, provider:null };
-      qs("#selectedProvider").textContent = "Belum dipilih";
-      qs("#idr").textContent = rp(0);
+      if(savedOK){
+        orderForm.reset();
+        selected = { category:null, provider:null };
+        qs("#selectedProvider").textContent = "Belum dipilih";
+        qs("#idr").textContent = rp(0);
+        loadHistory();
+      }
       submitBtn.disabled = false; submitBtn.textContent = "Kirim Order via WhatsApp";
-      loadHistory();
-      toast("Order dibuat. Mengarah ke WhatsApp…");
     });
 
     // ================== RIWAYAT ==================
@@ -463,6 +515,7 @@
         empty.textContent = "Gagal memuat riwayat. Coba Reload.";
       }
     }
+
     async function exportCSV(){
       try{
         const { data, error } = await supabaseClient.from("orders").select("*");
@@ -483,31 +536,22 @@
       }
     }
 
-    // ================== Fixed Rate UI (Local) ==================
-    qs("#editFixedRate").addEventListener("click", ()=>{
-      qs("#fixedRateEdit").classList.toggle("hidden");
-      qs("#fixedInput").value = FIXED_RATE;
-      qs("#fixedInput").focus();
-    });
-    qs("#saveFixed").addEventListener("click", ()=>{
-      const val = Math.floor(Number(qs("#fixedInput").value));
-      if(!val || val < 1000){ toast("Nilai kurs tidak valid.", false); return; }
-      FIXED_RATE = val;
-      localStorage.setItem(LS_FIXED_KEY, String(FIXED_RATE));
-      setFixedUI();
-      toast("Kurs tetap diperbarui.");
-      qs("#fixedRateEdit").classList.add("hidden");
-    });
-
-    // ================== Bind Buttons (satu kali) ==================
+    // ================== Bind Buttons ==================
     qs("#refreshRate").addEventListener("click", loadLiveRate, { passive:true });
     qs("#reloadHistory").addEventListener("click", loadHistory, { passive:true });
     qs("#exportBtn").addEventListener("click", exportCSV, { passive:true });
+    qs("#themeToggle").addEventListener("click", toggleTheme, { passive:true });
+    qs("#themeToggleSm").addEventListener("click", toggleTheme, { passive:true });
 
     // ================== INIT ==================
     (async function init(){
-      // styling tombol provider (pastikan class terpasang)
+      // Apply saved theme
+      const savedTheme = localStorage.getItem(THEME_KEY) || "dark";
+      applyTheme(savedTheme);
+
+      // styling tombol provider
       qsa(".opt-btn").forEach(b=> b.className = "opt-btn px-3 py-2 rounded-xl bg-black/5 hover:bg-black/10 ring-1 ring-black/10 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm");
+
       setFixedUI();
       await loadLiveRate();
       await loadHistory();
