@@ -315,6 +315,10 @@ body.dark .pagination-info {
   color: #ddd;
 }
 
+.pagination-info:empty {
+  display: none;
+}
+
 /* Dropdown entri */
 .rows-dropdown {
   margin-right: 10px;
@@ -725,18 +729,45 @@ headers.forEach(th => {
 document.querySelectorAll(".history tbody tr").forEach(tr => tr.classList.add("show"));
 
 // ==========================
-// PAGINATION
+// SEARCH + PAGINATION
 // ==========================
 let ROWS_PER_PAGE = 50; // default
 let currentPage = 1;
+let filteredRows = []; // hasil filter aktif
 
+function getAllRows() {
+  return Array.from(table.querySelectorAll("tbody tr"));
+}
+
+function applySearchFilter() {
+  const filter = searchInput.value.toLowerCase();
+  const allRows = getAllRows();
+
+  filteredRows = allRows.filter(row =>
+    row.innerText.toLowerCase().includes(filter)
+  );
+
+  currentPage = 1; // reset ke halaman 1
+  renderTablePage(currentPage);
+}
+
+searchInput.addEventListener("input", applySearchFilter);
+
+// Render tabel sesuai pagination + filter
 function renderTablePage(page = 1) {
-  const rows = table.querySelectorAll("tbody tr");
-  const totalRows = rows.length;
+  const rows = getAllRows();
+  const rowsToShow = filteredRows.length > 0 || searchInput.value
+    ? filteredRows
+    : rows;
+
+  const totalRows = rowsToShow.length;
   const totalPages = Math.ceil(totalRows / ROWS_PER_PAGE);
 
+  // Sembunyikan semua dulu
+  rows.forEach(r => (r.style.display = "none"));
+
   // Tampilkan hanya baris sesuai halaman
-  rows.forEach((row, index) => {
+  rowsToShow.forEach((row, index) => {
     row.style.display =
       index >= (page - 1) * ROWS_PER_PAGE && index < page * ROWS_PER_PAGE
         ? ""
@@ -813,7 +844,7 @@ function renderPagination(totalPages, activePage, totalRows) {
   const nextBtn = document.createElement("button");
   nextBtn.textContent = "Next ➡️";
   nextBtn.classList.add("page-btn");
-  nextBtn.disabled = activePage === totalPages;
+  nextBtn.disabled = activePage === totalPages || totalPages === 0;
   nextBtn.addEventListener("click", () => {
     if (currentPage < totalPages) {
       currentPage++;
@@ -831,12 +862,14 @@ function renderPagination(totalPages, activePage, totalRows) {
     table.parentNode.appendChild(info);
   }
 
-  const start = (activePage - 1) * ROWS_PER_PAGE + 1;
-  const end = Math.min(activePage * ROWS_PER_PAGE, totalRows);
-
-  info.textContent = `Menampilkan ${start}–${end} dari ${totalRows} entri`;
+  if (totalRows > 0) {
+    const start = (activePage - 1) * ROWS_PER_PAGE + 1;
+    const end = Math.min(activePage * ROWS_PER_PAGE, totalRows);
+    info.textContent = `Menampilkan ${start}–${end} dari ${totalRows} entri`;
+  } else {
+    info.textContent = "Tidak ada data yang cocok";
+  }
 }
 
 // Jalankan saat halaman pertama kali dibuka
-renderTablePage();
-</script></body></html>
+applySearchFilter();</script></body></html>

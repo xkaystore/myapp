@@ -585,7 +585,58 @@ body.dark .form-group label {
 }
 body.dark .rate-box {
   background: #374151;
-}</style></head> 
+}
+
+/* Animasi fade-in untuk card */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.form-card {
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+/* Toast Notification */
+.toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  min-width: 250px;
+  background: #2563eb;
+  color: white;
+  padding: 12px 18px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  z-index: 2000;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.toast.error {
+  background: #dc2626; /* merah */
+}
+
+.toast.success {
+  background: #16a34a; /* hijau */
+}
+
+.toast.warning {
+  background: #f59e0b; /* kuning */
+}
+</style></head> 
  <body> <!-- Navbar --> 
   <nav class="navbar"> 
    <div class="navbar-left"> <button id="sidebarToggle" class="icon-btn">☰</button> 
@@ -612,34 +663,31 @@ body.dark .rate-box {
   <header class="header"> 
    <h1>Convert Saldo PayPal</h1> 
    <p>Kurs Tetap Convert: <strong>Rp12.000 / USD</strong></p> 
-   <p id="convert-realtime" style="font-size:14px; display:flex; align-items:center; gap:6px; justify-content:center;"> <span id="convert-status">🟡</span> <span id="convert-text">Kurs Real-Time: Memuat...</span> <button id="refreshRate" style="border:none; background:none; cursor:pointer; font-size:14px; transition: transform 0.6s ease;">🔄</button> </p> <small id="convert-lastupdate" style="font-size:12px; color:gray;"> Terakhir update: - </small> 
   </header> <!-- Content --> 
   <main class="content"> 
    <section class="form-card"> 
     <h2 style="text-align:center; margin-bottom:15px;">Form Convert</h2> <!-- Kurs Info --> 
-    <div class="rate-box" style="justify-content:center; margin-bottom:20px;"> <span id="convert-status">🟡</span> <span id="convert-text">Kurs Real-Time: Memuat...</span> <button id="refreshRate" style="border:none; background:none; cursor:pointer; font-size:14px;">🔄</button> 
-    </div> <small id="convert-lastupdate" style="display:block; text-align:center; margin-bottom:20px; color:gray;">Terakhir update: -</small> <!-- Form --> 
     <form id="convertForm"> 
      <div class="form-group"> <label for="convert-name">Nama Lengkap</label> 
-      <input type="text" id="convert-name" required> 
+      <input type="text" id="convert-name"> 
      </div> 
      <div class="form-group"> <label for="convert-email">Email PayPal</label> 
-      <input type="email" id="convert-email" required> 
+      <input type="email" id="convert-email"> 
      </div> 
-     <div class="form-group"> <label for="convert-category">Kategori</label> <select id="convCat" required> <option value="">-- Pilih Kategori --</option> <option value="bank">Bank Lokal</option> <option value="ewallet">E-Wallet</option> </select> 
+     <div class="form-group"> <label for="convert-category">Kategori</label> <select id="convCat"> <option value="">-- Pilih Kategori --</option> <option value="bank">Bank Lokal</option> <option value="ewallet">E-Wallet</option> </select> 
      </div> 
      <div class="form-group" id="bankGroup" style="display:none;"> <label for="convBank">Bank Lokal</label> <select id="convBank"> <option value="">-- Pilih Bank --</option> <option value="BCA">BCA</option> <option value="BNI">BNI</option> <option value="BRI">BRI</option> <option value="Mandiri">Mandiri</option> </select> 
      </div> 
      <div class="form-group" id="ewalletGroup" style="display:none;"> <label for="convEw">E-Wallet</label> <select id="convEw"> <option value="">-- Pilih E-Wallet --</option> <option value="OVO">OVO</option> <option value="Dana">Dana</option> <option value="ShopeePay">ShopeePay</option> <option value="GoPay">GoPay</option> </select> 
      </div> 
      <div class="form-group"> <label for="convert-account">No. Rekening / E-Wallet</label> 
-      <input type="text" id="convert-account" required> 
+      <input type="text" id="convert-account"> 
      </div> 
      <div class="form-group"> <label for="convert-usd">Nominal (USD)</label> 
-      <input type="number" id="convert-usd" required> 
+      <input type="number" id="convert-usd"> 
      </div> 
      <div class="form-group"> <label for="convert-idr">Nominal (IDR)</label> 
-      <input type="text" id="convert-idr" readonly> 
+      <input type="text" id="convert-idr" readonly> <small id="convert-info" style="display:block; margin-top:5px; font-size:13px; color:gray;"> Kurs Real-Time (info): Memuat... </small> 
      </div> <button type="submit" class="btn-submit">Kirim ke WhatsApp</button> 
     </form> 
    </section> 
@@ -648,67 +696,40 @@ body.dark .rate-box {
     © 2025 Xkay Store. All Rights Reserved. 
   </footer> 
   <script src="script.js"></script> 
-  <script src="convert.js"></script> 
+  <script src="convert.js"></script>
+  <div id="toast" class="toast"></div>
  
 <script type="text/javascript" id="dcoder_script">const CONVERT_RATE = 12000;
 const waNumber = "6285846005280";
 let realtimeRateConvert = null;
 
 async function showConvertRealtimeRate() {
-  const statusIcon = document.getElementById("convert-status");
-  const textEl = document.getElementById("convert-text");
-  const lastUpdate = document.getElementById("convert-lastupdate");
+  const infoEl = document.getElementById("convert-info");
 
   try {
-    const res = await fetch("https://open.er-api.com/v6/latest/USD"); // API kurs USD
+    const res = await fetch("https://open.er-api.com/v6/latest/USD");
     const data = await res.json();
 
     if (!data.rates || !data.rates.IDR) throw new Error("Data tidak valid");
 
     realtimeRateConvert = data.rates.IDR;
-
-    statusIcon.textContent = "🟢";
-    textEl.style.color = "green";
-    textEl.textContent = `Kurs Real-Time: Rp ${realtimeRateConvert.toLocaleString("id-ID")} / USD`;
-
-    const now = new Date();
-    lastUpdate.textContent = "Terakhir update: " + now.toLocaleTimeString("id-ID");
+    infoEl.style.color = "green";
+    infoEl.textContent = `Kurs Real-Time (info): Rp ${realtimeRateConvert.toLocaleString("id-ID")} / USD`;
   } catch (err) {
     console.error("Gagal ambil kurs:", err);
     realtimeRateConvert = null;
-
-    statusIcon.textContent = "🔴";
-    textEl.style.color = "red";
-    textEl.textContent = "Kurs Real-Time: gagal memuat ❌";
-    lastUpdate.textContent = "Terakhir update: gagal memuat";
+    infoEl.style.color = "red";
+    infoEl.textContent = "Kurs Real-Time (info): gagal memuat ❌";
   }
 }
 
-// Load awal + auto refresh tiap 5 menit
+// Saat halaman load
 window.addEventListener("load", () => {
-  const textEl = document.getElementById("convert-text");
-  textEl.style.color = "orange";
+  const infoEl = document.getElementById("convert-info");
+  infoEl.style.color = "orange";
+  infoEl.textContent = "Kurs Real-Time (info): Memuat...";
   showConvertRealtimeRate();
-  setInterval(showConvertRealtimeRate, 300000); // auto refresh
-});
-
-// 🔄 Tombol refresh manual dengan animasi
-document.getElementById("refreshRate").addEventListener("click", e => {
-  const btn = e.currentTarget;
-  const statusIcon = document.getElementById("convert-status");
-  const textEl = document.getElementById("convert-text");
-
-  // animasi muter
-  btn.style.transform = "rotate(360deg)";
-  setTimeout(() => (btn.style.transform = "rotate(0deg)"), 600);
-
-  // status jadi loading
-  statusIcon.textContent = "🟡";
-  textEl.style.color = "orange";
-  textEl.textContent = "Kurs Real-Time: Memuat...";
-
-  // ambil kurs baru
-  showConvertRealtimeRate();
+  setInterval(showConvertRealtimeRate, 300000);
 });
 
 // Hitung otomatis kurs tetap
@@ -718,26 +739,99 @@ document.getElementById("convert-usd").addEventListener("input", () => {
     "Rp " + (usd * CONVERT_RATE).toLocaleString("id-ID");
 });
 
-// Kirim ke WhatsApp
+// ===== TOAST =====
+function showToast(message, type = "success") {
+  const toast = document.getElementById("toast");
+  toast.textContent = message;
+  toast.className = `toast ${type} show`;
+
+  setTimeout(() => {
+    toast.classList.remove("show");
+  }, 3000); // hilang setelah 3 detik
+}
+
+// ===== VALIDASI REAL-TIME =====
+const nameInput = document.getElementById("convert-name");
+const emailInput = document.getElementById("convert-email");
+const accountInput = document.getElementById("convert-account");
+const usdInput = document.getElementById("convert-usd");
+
+// Nama minimal 3 karakter
+nameInput.addEventListener("input", () => {
+  if (nameInput.value.trim().length < 3) {
+    nameInput.style.borderColor = "red";
+  } else {
+    nameInput.style.borderColor = "#2563eb";
+  }
+});
+
+// Email validasi
+emailInput.addEventListener("input", () => {
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!regex.test(emailInput.value)) {
+    emailInput.style.borderColor = "red";
+  } else {
+    emailInput.style.borderColor = "#2563eb";
+  }
+});
+
+// Nomor rekening / e-wallet tidak boleh kosong
+accountInput.addEventListener("input", () => {
+  if (accountInput.value.trim() === "") {
+    accountInput.style.borderColor = "red";
+  } else {
+    accountInput.style.borderColor = "#2563eb";
+  }
+});
+
+// Nominal minimal 1 USD
+usdInput.addEventListener("input", () => {
+  if (parseFloat(usdInput.value) < 1) {
+    usdInput.style.borderColor = "red";
+  } else {
+    usdInput.style.borderColor = "#2563eb";
+  }
+});
+
+// ===== KIRIM FORM =====
 document.getElementById("convertForm").addEventListener("submit", e => {
   e.preventDefault();
-  const name = document.getElementById("convert-name").value.trim();
-  const email = document.getElementById("convert-email").value.trim();
+
+  const name = nameInput.value.trim();
+  const email = emailInput.value.trim();
   const categoryType = convCat.value;
   const categoryValue = categoryType === "bank" ? convBank.value : convEw.value;
-  const account = document.getElementById("convert-account").value.trim();
-  const usd = document.getElementById("convert-usd").value.trim();
+  const account = accountInput.value.trim();
+  const usd = usdInput.value.trim();
   const idr = document.getElementById("convert-idr").value.trim();
 
+  // Validasi tambahan
+  if (!name || name.length < 3) {
+    showToast("Nama minimal 3 karakter!", "error");
+    return;
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showToast("Email tidak valid!", "error");
+    return;
+  }
   if (!categoryType) {
-    alert("Pilih kategori (Bank atau E-Wallet).");
+    showToast("Pilih kategori (Bank / E-Wallet).", "warning");
     return;
   }
   if (!categoryValue) {
-    alert(`Pilih ${categoryType === "bank" ? "Bank Lokal" : "E-Wallet"} yang sesuai.`);
+    showToast(`Pilih ${categoryType === "bank" ? "Bank Lokal" : "E-Wallet"}.`, "warning");
+    return;
+  }
+  if (!account) {
+    showToast("Nomor rekening / e-wallet wajib diisi!", "error");
+    return;
+  }
+  if (parseFloat(usd) < 1) {
+    showToast("Nominal minimal 1 USD!", "error");
     return;
   }
 
+  // Pesan ke WA
   const message = `*Convert Saldo PayPal*
 Nama: ${name}
 Email PayPal: ${email}
@@ -748,5 +842,7 @@ Total Terima: ${idr}
 Kurs Tetap: Rp ${CONVERT_RATE.toLocaleString("id-ID")} / USD
 Kurs Real-Time (info): ${realtimeRateConvert ? "Rp " + realtimeRateConvert.toLocaleString("id-ID") + " / USD" : "Tidak tersedia"}`;
 
+  showToast("Mengalihkan ke WhatsApp...", "success");
   window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`);
-});</script></body></html>
+});
+</script></body></html>
