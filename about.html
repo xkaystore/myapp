@@ -772,11 +772,27 @@ if (sidebarToggle && sidebar && overlay) {
   }
 }
 
-// Dark mode
+// === DARK MODE dengan localStorage ===
 const darkModeToggle = document.getElementById("darkModeToggle");
+
+// Saat halaman pertama kali dibuka, cek preferensi yang disimpan
+if (localStorage.getItem("theme") === "dark") {
+  document.body.classList.add("dark");
+  if (darkModeToggle) darkModeToggle.textContent = "☀️";
+} else {
+  if (darkModeToggle) darkModeToggle.textContent = "🌙";
+}
+
+// Event listener toggle
 if (darkModeToggle) {
   darkModeToggle.addEventListener("click", () => {
     document.body.classList.toggle("dark");
-    darkModeToggle.textContent = document.body.classList.contains("dark") ? "☀️" : "🌙";
+    const isDark = document.body.classList.contains("dark");
+
+    // Simpan preferensi ke localStorage
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+
+    // Ganti icon tombol
+    darkModeToggle.textContent = isDark ? "☀️" : "🌙";
   });
 }</script></body></html>

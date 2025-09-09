@@ -3,7 +3,8 @@
  <head> 
   <meta charset="UTF-8"> 
   <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-  <title>Xkay Store - Halaman Utama</title> <!--<link rel="stylesheet" href="style.css"></link>--> 
+  <title>Xkay Store - Halaman Utama</title> 
+  <link rel="stylesheet" href="style.css"> 
  <style type="text/css" id="dcoder_stylesheet">/* Reset */
 * {
   margin: 0;
@@ -496,6 +497,198 @@ body.dark #searchInput {
   .sidebar.collapsed ul li a .tooltip {
     display: block;
   }
+}
+/* Container form */
+.form-card {
+  max-width: 500px;
+  margin: 20px auto;
+  padding: 25px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: background 0.4s ease, color 0.4s ease;
+}
+
+/* Dark mode */
+body.dark .form-card {
+  background: #1f2937;
+  color: white;
+  box-shadow: 0 4px 12px rgba(255,255,255,0.05);
+}
+
+/* Input group */
+.form-group {
+  margin-bottom: 18px;
+  position: relative;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+  color: #374151;
+  transition: color 0.3s ease;
+}
+body.dark .form-group label {
+  color: #d1d5db;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 15px;
+  transition: border 0.3s, box-shadow 0.3s, background 0.3s, color 0.3s;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.3);
+}
+
+/* Button */
+.btn-submit {
+  width: 100%;
+  padding: 12px;
+  background: #2563eb;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.btn-submit:hover {
+  background: #1e40af;
+  transform: translateY(-2px);
+}
+
+.btn-submit:active {
+  transform: scale(0.97);
+}
+
+/* Kurs Real-time box */
+.rate-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #f3f4f6;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  margin-top: 6px;
+}
+body.dark .rate-box {
+  background: #374151;
+}
+
+/* Animasi fade-in untuk card */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.form-card {
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+/* Toast Notification */
+.toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  min-width: 250px;
+  background: #2563eb;
+  color: white;
+  padding: 12px 18px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  z-index: 2000;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.toast.error {
+  background: #dc2626; /* merah */
+}
+
+.toast.success {
+  background: #16a34a; /* hijau */
+}
+
+.toast.warning {
+  background: #f59e0b; /* kuning */
+}
+
+.popup {
+  display: none; /* hidden by default */
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(3px);
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.popup-content {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+  animation: fadeInUp 0.4s ease;
+}
+body.dark .popup-content {
+  background: #1f2937;
+  color: white;
+}
+
+.grid-options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin: 15px 0;
+}
+
+.grid-options button {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.grid-options button:hover {
+  background: #2563eb;
+  color: white;
+}
+
+.btn-close {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  background: #dc2626;
+  color: white;
+  cursor: pointer;
 }</style></head> 
  <body> <!-- Navbar --> 
   <nav class="navbar"> 
@@ -531,34 +724,37 @@ body.dark #searchInput {
     <h2>Kenapa memilih kami?</h2> 
     <p> Xkay Store menyediakan layanan <strong>Convert</strong> saldo PayPal dengan kurs tetap Rp12.000/USD dan <strong>Topup</strong> saldo PayPal dengan kurs tetap Rp17.000/USD, serta opsi kurs real-time sesuai pasar. </p> 
     <p>Kami berkomitmen memberikan layanan cepat, aman, dan terpercaya 🚀</p> 
-   </section>
-    <!-- Tabel riwayat transaksi -->
-    <section class="history">
-      <h2>Riwayat Transaksi</h2>
-      <input type="text" id="searchInput" placeholder="Cari transaksi... (nama, USD, IDR)">
-      <table id="transactionTable">
-        <thead>
-        <tr>
-          <th data-col="0">Waktu</th>
-          <th data-col="1">Nama Lengkap</th>
-          <th data-col="2">Jumlah (USD)</th>
-          <th data-col="3">Jumlah (IDR)</th>
-        </tr>
-        </thead>
-        <tbody>
-          <tr><td colspan="4">Memuat data...</td></tr>
-        </tbody>
-      </table>
-    </section>
+   </section> <!-- Tabel riwayat transaksi --> 
+   <section class="history form-card"> 
+    <h2>Riwayat Transaksi</h2> 
+    <input type="text" id="searchInput" placeholder="Cari transaksi... (nama, USD, IDR)"> 
+    <table id="transactionTable"> 
+     <thead> 
+      <tr> 
+       <th data-col="0">Waktu</th> 
+       <th data-col="1">Nama Lengkap</th> 
+       <th data-col="2">Jumlah (USD)</th> 
+       <th data-col="3">Jumlah (IDR)</th> 
+      </tr> 
+     </thead> 
+     <tbody> 
+      <tr> 
+       <td colspan="4">Memuat data...</td> 
+      </tr> 
+     </tbody> 
+    </table> 
+   </section> 
   </main> <!-- Footer --> 
   <footer class="footer">
     © 2025 Xkay Store. All Rights Reserved. 
-  </footer> <!--<script src="script.js"></script>-->
-   <script type="module" src="supabase.js"></script>
+  </footer> 
+  <script src="script.js"></script> <!-- Supabase + Script --> 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
+  <script>
+    const SUPABASE_URL = "https://rhujpinlutjiztyonmas.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJodWpwaW5sdXRqaXp0eW9ubWFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczMDQyOTIsImV4cCI6MjA3Mjg4MDI5Mn0.zcfDUOHTeBYydFFscwmy3U9yryHiItTVJPLRurUlBvY";
 
-  <!-- Load transactions -->
-  <script type="module">
-    import { supabase } from "./supabase.js";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     async function loadTransactions() {
       const tbody = document.querySelector("#transactionTable tbody");
@@ -571,11 +767,12 @@ body.dark #searchInput {
         .limit(50);
 
       if (error) {
-        console.error(error);
+        console.error("Supabase error:", error);
         tbody.innerHTML = `<tr><td colspan="4">Gagal memuat data ❌</td></tr>`;
         return;
       }
-       tbody.innerHTML = "";
+
+      tbody.innerHTML = "";
       data.forEach(tx => {
         const tr = document.createElement("tr");
         tr.classList.add("show");
@@ -590,7 +787,7 @@ body.dark #searchInput {
     }
 
     document.addEventListener("DOMContentLoaded", loadTransactions);
-  </script>
+  </script> 
  
 <script type="text/javascript" id="dcoder_script">// Toggle sidebar
 const sidebar = document.getElementById("sidebar");
@@ -599,8 +796,30 @@ const sidebarToggle = document.getElementById("sidebarToggle");
 const closeSidebar = document.getElementById("closeSidebar");
 const collapseSidebar = document.getElementById("collapseSidebar");
 
-// Dark mode
+// === DARK MODE dengan localStorage ===
 const darkModeToggle = document.getElementById("darkModeToggle");
+
+// Saat halaman pertama kali dibuka, cek preferensi yang disimpan
+if (localStorage.getItem("theme") === "dark") {
+  document.body.classList.add("dark");
+  if (darkModeToggle) darkModeToggle.textContent = "☀️";
+} else {
+  if (darkModeToggle) darkModeToggle.textContent = "🌙";
+}
+
+// Event listener toggle
+if (darkModeToggle) {
+  darkModeToggle.addEventListener("click", () => {
+    document.body.classList.toggle("dark");
+    const isDark = document.body.classList.contains("dark");
+
+    // Simpan preferensi ke localStorage
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+
+    // Ganti icon tombol
+    darkModeToggle.textContent = isDark ? "☀️" : "🌙";
+  });
+}
 
 // Search + table
 const searchInput = document.getElementById("searchInput");
@@ -637,20 +856,6 @@ if (localStorage.getItem("sidebarCollapsed") === "true") {
   document.body.classList.add("sidebar-collapsed");
   document.querySelector(".navbar").classList.add("sidebar-collapsed");
 }
-
-// Apply saved theme
-if (localStorage.getItem("theme") === "dark") {
-  document.body.classList.add("dark");
-  darkModeToggle.textContent = "☀️";
-}
-
-// Toggle
-darkModeToggle.addEventListener("click", () => {
-  document.body.classList.toggle("dark");
-  const isDark = document.body.classList.contains("dark");
-  darkModeToggle.textContent = isDark ? "☀️" : "🌙";
-  localStorage.setItem("theme", isDark ? "dark" : "light");
-});
 
 // Search filter
 searchInput.addEventListener("input", () => {

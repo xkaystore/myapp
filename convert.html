@@ -4,6 +4,7 @@
   <meta charset="UTF-8"> 
   <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
   <title>Xkay Store - Convert Saldo</title> <!--<link rel="stylesheet" href="style.css"> </link>--> 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
  <style type="text/css" id="dcoder_stylesheet">/* Reset */
 * {
   margin: 0;
@@ -746,8 +747,9 @@ body.dark .popup-content {
   </main> <!-- Footer --> 
   <footer class="footer">
     © 2025 Xkay Store. All Rights Reserved. 
-  </footer> <!--<script src="script.js"></script>
-  <script src="convert.js"></script>--> 
+  </footer> 
+  <script src="script.js"></script> 
+  <script src="convert.js"></script> 
   <div id="toast" class="toast"></div> <!-- Popup Modal --> 
   <div id="categoryPopup" class="popup"> 
    <div class="popup-content"> 
@@ -759,84 +761,13 @@ body.dark .popup-content {
     <div id="ewalletList" class="grid-options" style="display:none;"> <button>OVO</button> <button>DANA</button> <button>GoPay</button> <button>ShopeePay</button> 
     </div> <button class="btn-close" id="closePopup">Tutup</button> 
    </div> 
-  </div>
-  <script type="module" src="supabase.js"></script>
-
-  <!-- Page logic -->
-  <script type="module">
-    import { supabase } from "./supabase.js";
-
-    const CONVERT_RATE = 12000;
-    const infoEl = document.getElementById("convert-info");
-    let realtimeRateConvert = null;
-
-    async function showConvertRealtimeRate() {
-      try {
-        const res = await fetch("https://open.er-api.com/v6/latest/USD");
-        const data = await res.json();
-        if (!data.rates || !data.rates.IDR) throw new Error("Data tidak valid");
-        realtimeRateConvert = data.rates.IDR;
-        infoEl.style.color = "green";
-        infoEl.textContent = `Kurs Real-Time (info): Rp ${realtimeRateConvert.toLocaleString("id-ID")} / USD`;
-      } catch (e) {
-        infoEl.style.color = "red";
-        infoEl.textContent = "Kurs Real-Time (info): gagal memuat ❌";
-      }
-    }
-    showConvertRealtimeRate();
-    setInterval(showConvertRealtimeRate, 300000);
-
-    const usd = document.getElementById("convUsd");
-    const idr = document.getElementById("convIdr");
-    usd.addEventListener("input", () => {
-      const v = parseFloat(usd.value) || 0;
-      idr.value = v ? "Rp " + (v * CONVERT_RATE).toLocaleString("id-ID") : "";
-    });
-
-    function showToast(msg, type = "success") {
-      const t = document.getElementById("toast");
-      t.textContent = msg;
-      t.className = `toast ${type} show`;
-      setTimeout(() => t.classList.remove("show"), 3000);
-    }
-
-    document.getElementById("convertForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const name = document.getElementById("convName").value.trim();
-      const email = document.getElementById("convEmail").value.trim();
-      const selected = document.getElementById("selectedOption").value.trim();
-      const acc = document.getElementById("convAccount").value.trim();
-      const usdVal = parseFloat(document.getElementById("convUsd").value) || 0;
-      const idrVal = parseInt((document.getElementById("convIdr").value || "0").replace(/\D/g, "")) || 0;
-
-      if (!name) return showToast("Nama lengkap wajib diisi.", "warning");
-      if (!/^\S+@\S+\.\S+$/.test(email)) return showToast("Email PayPal tidak valid.", "warning");
-      if (!selected) return showToast("Isi kategori & bank/ewallet.", "warning");
-      if (!acc) return showToast("Nomor rekening / e-wallet wajib diisi.", "warning");
-      if (usdVal <= 0) return showToast("Nominal USD harus > 0.", "warning");
-      if (idrVal <= 0) return showToast("Nominal IDR tidak valid.", "warning");
-
-      const { error } = await supabase.from("transactions").insert([{
-        type: "convert",
-        name,
-        email,
-        bank_ewallet: selected,
-        account: acc,
-        usd: usdVal,
-        idr: idrVal
-      }]);
-
-      if (error) {
-        console.error(error);
-        showToast("Gagal menyimpan ke database ❌", "error");
-      } else {
-        showToast("Transaksi Convert tersimpan ✅", "success");
-        e.target.reset();
-        idr.value = "";
-      }
-    });
-  </script>
+  </div> 
+  <script>
+    // 🔹 Supabase Init
+    const SUPABASE_URL = "https://rhujpinlutjiztyonmas.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJodWpwaW5sdXRqaXp0eW9ubWFzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczMDQyOTIsImV4cCI6MjA3Mjg4MDI5Mn0.zcfDUOHTeBYydFFscwmy3U9yryHiItTVJPLRurUlBvY";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+ </script> 
  
 <script type="text/javascript" id="dcoder_script">// Sidebar toggle
 const sidebar = document.getElementById("sidebar");
@@ -872,12 +803,28 @@ if (sidebarToggle && sidebar && overlay) {
   }
 }
 
-// Dark mode
+// === DARK MODE dengan localStorage ===
 const darkModeToggle = document.getElementById("darkModeToggle");
+
+// Saat halaman pertama kali dibuka, cek preferensi yang disimpan
+if (localStorage.getItem("theme") === "dark") {
+  document.body.classList.add("dark");
+  if (darkModeToggle) darkModeToggle.textContent = "☀️";
+} else {
+  if (darkModeToggle) darkModeToggle.textContent = "🌙";
+}
+
+// Event listener toggle
 if (darkModeToggle) {
   darkModeToggle.addEventListener("click", () => {
     document.body.classList.toggle("dark");
-    darkModeToggle.textContent = document.body.classList.contains("dark") ? "☀️" : "🌙";
+    const isDark = document.body.classList.contains("dark");
+
+    // Simpan preferensi ke localStorage
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+
+    // Ganti icon tombol
+    darkModeToggle.textContent = isDark ? "☀️" : "🌙";
   });
 }
 
@@ -1016,69 +963,48 @@ document.querySelectorAll("#bankList button, #ewalletList button").forEach(btn =
 });
 
 // ===== KIRIM FORM =====
-document.addEventListener("DOMContentLoaded", () => {
-  const convertForm = document.getElementById("convertForm");
+    document.getElementById("convertForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const name = convName.value.trim();
+      const email = convEmail.value.trim();
+      const bank = selectedOption.value.trim();
+      const account = convAccount.value.trim();
+      const usdVal = parseFloat(convUsd.value);
+      const idrVal = parseInt((convIdr.value || "0").replace(/\D/g,""));
 
-  convertForm.addEventListener("submit", function (e) {
-    e.preventDefault(); // cegah auto-submit
-    console.log("👉 Submit ditekan");
+      if (!name) return showToast("Nama wajib diisi", "warning");
+      if (!/^\S+@\S+\.\S+$/.test(email)) return showToast("Email tidak valid", "warning");
+      if (!bank) return showToast("Pilih kategori / bank / ewallet", "warning");
+      if (!account) return showToast("Nomor rekening / akun wajib diisi", "warning");
+      if (usdVal <= 0) return showToast("Nominal USD tidak valid", "warning");
 
-    const convName = document.getElementById("convName");
-    const convEmail = document.getElementById("convEmail");
-    const selectedOption = document.getElementById("selectedOption");
-    const convAccount = document.getElementById("convAccount");
-    const convUsd = document.getElementById("convUsd");
-    const convIdr = document.getElementById("convIdr");
+      // ✅ Simpan ke Supabase
+      const { error } = await supabase.from("transactions").insert([{
+        type: "convert",
+        name, email,
+        bank_ewallet: bank,
+        account,
+        usd: usdVal,
+        idr: idrVal
+      }]);
 
-    // Validasi
-    if (!convName.value.trim()) {
-      showToast("Nama lengkap wajib diisi.", "warning");
-      console.log("❌ Nama kosong");
-      return;
-    }
+      if (error) {
+        console.error(error);
+        showToast("Gagal simpan transaksi ❌", "error");
+        return;
+      }
 
-    if (!convEmail.value.trim() || !/\S+@\S+\.\S+/.test(convEmail.value)) {
-      showToast("Masukkan email PayPal yang valid.", "warning");
-      console.log("❌ Email tidak valid");
-      return;
-    }
+      showToast("Transaksi tersimpan ✅", "success");
 
-    if (!selectedOption.value.trim()) {
-      showToast("Pilih kategori & bank/ewallet dulu.", "warning");
-      console.log("❌ Kategori belum dipilih");
-      return;
-    }
-
-    if (!convAccount.value.trim()) {
-      showToast("Nomor rekening / akun e-wallet wajib diisi.", "warning");
-      console.log("❌ Rekening kosong");
-      return;
-    }
-
-    if (!convUsd.value.trim() || isNaN(convUsd.value) || parseFloat(convUsd.value) <= 0) {
-      showToast("Nominal USD harus angka lebih dari 0.", "warning");
-      console.log("❌ Nominal USD tidak valid");
-      return;
-    }
-
-    if (!convIdr.value.trim()) {
-      showToast("Konversi IDR tidak valid.", "warning");
-      console.log("❌ Konversi IDR kosong");
-      return;
-    }
-
-    // ✅ Semua valid → kirim WA
-    const message = `
+      // Kirim ke WhatsApp
+      const msg = `
 Convert Saldo PayPal
-Nama: ${convName.value}
-Email PayPal: ${convEmail.value}
-Kategori: ${selectedOption.value}
-No Rekening/E-Wallet: ${convAccount.value}
-Nominal USD: ${convUsd.value}
-Nominal IDR: ${convIdr.value}
-    `.trim();
-
-    console.log("✅ Semua valid, kirim ke WA");
-    window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`, "_blank");
-  });
-});</script></body></html>
+Nama: ${name}
+Email PayPal: ${email}
+Kategori: ${bank}
+No Rekening/E-Wallet: ${account}
+Nominal USD: ${usdVal}
+Nominal IDR: Rp ${idrVal.toLocaleString("id-ID")}
+      `.trim();
+      window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`, "_blank");
+    });</script></body></html>
