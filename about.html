@@ -4,7 +4,7 @@
   <meta charset="UTF-8"> 
   <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
   <title>Xkay Store - Tentang Kami</title> 
-  <link rel="stylesheet" href="style.css"> 
+  <!--<link rel="stylesheet" href="style.css"></link>-->
  </head> 
  <body> <!-- Navbar --> 
   <nav class="navbar"> 
@@ -53,7 +53,49 @@
   <footer class="footer">
     © 2025 Xkay Store. All Rights Reserved. 
   </footer> 
-  <script src="script.js"></script> 
-  <script src="about.js"></script> 
+  <!--<script src="script.js"></script> 
+  <script src="about.js"></script> -->
  
-</body></html>
+<script type="text/javascript" id="dcoder_script">// Sidebar toggle
+const sidebar = document.getElementById("sidebar");
+const overlay = document.getElementById("overlay");
+const sidebarToggle = document.getElementById("sidebarToggle");
+const closeSidebar = document.getElementById("closeSidebar");
+const collapseSidebar = document.getElementById("collapseSidebar");
+
+if (sidebarToggle && sidebar && overlay) {
+  sidebarToggle.addEventListener("click", () => {
+    sidebar.classList.add("active");
+    overlay.classList.add("active");
+  });
+
+  overlay.addEventListener("click", () => {
+    sidebar.classList.remove("active");
+    overlay.classList.remove("active");
+  });
+
+  if (closeSidebar) {
+    closeSidebar.addEventListener("click", () => {
+      sidebar.classList.remove("active");
+      overlay.classList.remove("active");
+    });
+  }
+
+  if (collapseSidebar) {
+    collapseSidebar.addEventListener("click", () => {
+      sidebar.classList.toggle("collapsed");
+      document.body.classList.toggle("sidebar-collapsed");
+      document.querySelector(".navbar").classList.toggle("sidebar-collapsed");
+    });
+  }
+}
+
+// Dark mode
+const darkModeToggle = document.getElementById("darkModeToggle");
+if (darkModeToggle) {
+  darkModeToggle.addEventListener("click", () => {
+    document.body.classList.toggle("dark");
+    darkModeToggle.textContent = document.body.classList.contains("dark") ? "☀️" : "🌙";
+  });
+}
+</script></body></html>
