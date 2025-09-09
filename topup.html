@@ -3,7 +3,7 @@
  <head> 
   <meta charset="UTF-8"> 
   <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-  <title>Xkay Store - Convert Saldo</title> 
+  <title>Xkay Store - Topup Saldo</title> 
   <link rel="stylesheet" href="style.css"> 
  <style type="text/css" id="dcoder_stylesheet">/* Reset */
 * {
@@ -694,7 +694,7 @@ body.dark .popup-content {
   <nav class="navbar"> 
    <div class="navbar-left"> <button id="sidebarToggle" class="icon-btn">☰</button> 
     <div class="logo">
-      🌐 
+     🌐
     </div> <span class="title">Xkay Store</span> 
    </div> 
    <div class="navbar-right"> <button id="darkModeToggle" class="icon-btn">🌙</button> 
@@ -709,104 +709,95 @@ body.dark .popup-content {
    <ul> 
     <li><a href="index.html"><span class="icon">🏠</span><span class="text">Home</span><span class="tooltip">Home</span></a></li> 
     <li><a href="convert.html"><span class="icon">💱</span><span class="text">Convert</span><span class="tooltip">Convert</span></a></li> 
-    <li><a href="topup.html"><span class="icon">💳</span><span class="text">Topup</span><span class="tooltip">Topup</span></a></li> 
+    <li><a href="topup.html" class="active"><span class="icon">💳</span><span class="text">Topup</span><span class="tooltip">Topup</span></a></li> 
     <li><a href="#"><span class="icon">ℹ️</span><span class="text">Tentang Kami</span><span class="tooltip">Tentang Kami</span></a></li> 
     <li><a href="#"><span class="icon">📞</span><span class="text">Kontak</span><span class="tooltip">Kontak</span></a></li> 
    </ul> 
   </aside> <!-- Overlay --> 
   <div id="overlay" class="overlay"></div> <!-- Header --> 
   <header class="header"> 
-   <h1>Convert Saldo PayPal</h1> 
-   <p>Kurs Tetap Convert: <strong>Rp12.000 / USD</strong></p> 
+   <h1>Topup Saldo PayPal</h1> 
+   <p>Kurs Tetap Topup: <strong>Rp17.000 / USD</strong></p> 
   </header> <!-- Content --> 
   <main class="content"> 
    <section class="form-card"> 
-    <h2 style="text-align:center; margin-bottom:15px;">Form Convert</h2> <!-- Kurs Info --> 
-    <form id="convertForm"> 
-     <div class="form-group"> <label for="convName">Nama Lengkap</label> 
-      <input type="text" id="convName" placeholder="Masukkan nama lengkap"> 
+    <h2 style="text-align:center; margin-bottom:15px;">Form Topup</h2> 
+    <form id="topupForm"> 
+     <div class="form-group"> <label for="topName">Nama Lengkap</label> 
+      <input type="text" id="topName" placeholder="Masukkan nama lengkap"> 
      </div> 
-     <div class="form-group"> <label for="convEmail">Email PayPal</label> 
-      <input type="email" id="convEmail" placeholder="Masukkan email PayPal"> 
+     <div class="form-group"> <label for="topEmail">Email PayPal</label> 
+      <input type="email" id="topEmail" placeholder="Masukkan email PayPal"> 
      </div> 
-     <div class="form-group"> <label for="selectedOption">Kategori &amp; Bank/E-Wallet</label> 
-      <input type="text" id="selectedOption" placeholder="Klik untuk memilih" readonly> 
+     <div class="form-group"> <label for="topSelectedOption">Kategori &amp; Bank/E-Wallet</label> 
+      <input type="text" id="topSelectedOption" placeholder="Klik untuk memilih" readonly> 
      </div> 
-     <div class="form-group"> <label for="convAccount">No Rekening / E-Wallet</label> 
-      <input type="text" id="convAccount" placeholder="Masukkan no rekening/ewallet"> 
+     <div class="form-group"> <label for="topAccount">No Rekening / E-Wallet</label> 
+      <input type="text" id="topAccount" placeholder="Masukkan no rekening/ewallet"> 
      </div> 
-     <div class="form-group"> <label for="convUsd">Nominal (USD)</label> 
-      <input type="number" id="convUsd" placeholder="Masukkan nominal USD"> 
+     <div class="form-group"> <label for="topUsd">Nominal (USD)</label> 
+      <input type="number" id="topUsd" placeholder="Masukkan nominal USD"> 
      </div> 
-     <div class="form-group"> <label for="convIdr">Nominal (IDR)</label> 
-      <input type="text" id="convIdr" readonly> <!-- Kurs info --> 
-      <p id="convert-info" class="rate-box"></p> 
-     </div> <!-- tombol harus submit --> <button type="submit" id="submitBtn" class="btn-submit">Kirim ke Admin</button> 
+     <div class="form-group"> <label for="topIdr">Nominal (IDR)</label> 
+      <input type="text" id="topIdr" readonly> 
+      <p id="topup-info" class="rate-box"></p> 
+     </div> <button type="submit" id="topupSubmitBtn" class="btn-submit">Kirim ke Admin</button> 
     </form> 
    </section> 
   </main> <!-- Footer --> 
   <footer class="footer">
-    © 2025 Xkay Store. All Rights Reserved. 
+   © 2025 Xkay Store. All Rights Reserved.
   </footer> 
   <script src="script.js"></script> 
-  <script src="convert.js"></script> 
+  <script src="topup.js"></script> 
   <div id="toast" class="toast"></div> <!-- Popup Modal --> 
-  <div id="categoryPopup" class="popup"> 
+  <div id="topupCategoryPopup" class="popup"> 
    <div class="popup-content"> 
     <h3>Pilih Kategori</h3> 
     <div class="grid-options"> <button data-category="Bank Lokal">🏦 Bank Lokal</button> <button data-category="E-Wallet">💳 E-Wallet</button> 
     </div> 
-    <div id="bankList" class="grid-options" style="display:none;"> <button>BRI</button> <button>BCA</button> <button>BNI</button> <button>Mandiri</button> 
+    <div id="topupBankList" class="grid-options" style="display:none;"> <button>BRI</button> <button>BCA</button> <button>BNI</button> <button>Mandiri</button> 
     </div> 
-    <div id="ewalletList" class="grid-options" style="display:none;"> <button>OVO</button> <button>DANA</button> <button>GoPay</button> <button>ShopeePay</button> 
-    </div> <button class="btn-close" id="closePopup">Tutup</button> 
+    <div id="topupEwalletList" class="grid-options" style="display:none;"> <button>OVO</button> <button>DANA</button> <button>GoPay</button> <button>ShopeePay</button> 
+    </div> <button class="btn-close" id="topupClosePopup">Tutup</button> 
    </div> 
   </div> 
  
-<script type="text/javascript" id="dcoder_script">const CONVERT_RATE = 12000;
+<script type="text/javascript" id="dcoder_script">const TOPUP_RATE = 17000;
 const waNumber = "6285846005280";
-let realtimeRateConvert = null;
+let realtimeRateTopup = null;
 
-// ===== KURS REAL-TIME =====
-async function showConvertRealtimeRate() {
-  const infoEl = document.getElementById("convert-info");
-
+// ===== REAL-TIME RATE =====
+async function showTopupRealtimeRate() {
+  const infoEl = document.getElementById("topup-info");
   try {
     const res = await fetch("https://open.er-api.com/v6/latest/USD");
     const data = await res.json();
-
     if (!data.rates || !data.rates.IDR) throw new Error("Data tidak valid");
 
-    realtimeRateConvert = data.rates.IDR;
-    if (infoEl) {
-      infoEl.style.color = "green";
-      infoEl.textContent = `Kurs Real-Time (info): Rp ${realtimeRateConvert.toLocaleString("id-ID")} / USD`;
-    }
+    realtimeRateTopup = data.rates.IDR;
+    infoEl.style.color = "green";
+    infoEl.textContent = `Kurs Real-Time (info): Rp ${realtimeRateTopup.toLocaleString("id-ID")} / USD`;
   } catch (err) {
     console.error("Gagal ambil kurs:", err);
-    realtimeRateConvert = null;
-    if (infoEl) {
-      infoEl.style.color = "red";
-      infoEl.textContent = "Kurs Real-Time (info): gagal memuat ❌";
-    }
+    realtimeRateTopup = null;
+    infoEl.style.color = "red";
+    infoEl.textContent = "Kurs Real-Time (info): gagal memuat ❌";
   }
 }
-
 window.addEventListener("load", () => {
-  const infoEl = document.getElementById("convert-info");
-  if (infoEl) {
-    infoEl.style.color = "orange";
-    infoEl.textContent = "Kurs Real-Time (info): Memuat...";
-  }
-  showConvertRealtimeRate();
-  setInterval(showConvertRealtimeRate, 300000); // update tiap 5 menit
+  const infoEl = document.getElementById("topup-info");
+  infoEl.style.color = "orange";
+  infoEl.textContent = "Kurs Real-Time (info): Memuat...";
+  showTopupRealtimeRate();
+  setInterval(showTopupRealtimeRate, 300000);
 });
 
-// ===== HITUNG OTOMATIS KURS TETAP =====
-document.getElementById("convUsd").addEventListener("input", () => {
-  const usd = parseFloat(document.getElementById("convUsd").value) || 0;
-  document.getElementById("convIdr").value =
-    "Rp " + (usd * CONVERT_RATE).toLocaleString("id-ID");
+// ===== OTOMATIS KONVERSI =====
+document.getElementById("topUsd").addEventListener("input", () => {
+  const usd = parseFloat(document.getElementById("topUsd").value) || 0;
+  document.getElementById("topIdr").value =
+    "Rp " + (usd * TOPUP_RATE).toLocaleString("id-ID");
 });
 
 // ===== TOAST =====
@@ -814,69 +805,79 @@ function showToast(message, type = "success") {
   const toast = document.getElementById("toast");
   toast.textContent = message;
   toast.className = `toast ${type} show`;
-
-  setTimeout(() => {
-    toast.classList.remove("show");
-  }, 3000);
+  setTimeout(() => toast.classList.remove("show"), 3000);
 }
 
 // ===== VALIDASI REAL-TIME =====
-const nameInput = document.getElementById("convName");
-const emailInput = document.getElementById("convEmail");
-const accountInput = document.getElementById("convAccount");
-const usdInput = document.getElementById("convUsd");
+const nameInput = document.getElementById("topName");
+const emailInput = document.getElementById("topEmail");
+const accountInput = document.getElementById("topAccount");
+const usdInput = document.getElementById("topUsd");
 
 nameInput.addEventListener("input", () => {
-  if (nameInput.value.trim().length < 3) {
-    nameInput.style.borderColor = "red";
-  } else {
-    nameInput.style.borderColor = "#2563eb";
-  }
+  nameInput.style.borderColor = nameInput.value.trim().length < 3 ? "red" : "#2563eb";
 });
-
 emailInput.addEventListener("input", () => {
   const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!regex.test(emailInput.value)) {
-    emailInput.style.borderColor = "red";
-  } else {
-    emailInput.style.borderColor = "#2563eb";
-  }
+  emailInput.style.borderColor = !regex.test(emailInput.value) ? "red" : "#2563eb";
 });
-
 accountInput.addEventListener("input", () => {
-  if (accountInput.value.trim() === "") {
-    accountInput.style.borderColor = "red";
-  } else {
-    accountInput.style.borderColor = "#2563eb";
-  }
+  accountInput.style.borderColor = accountInput.value.trim() === "" ? "red" : "#2563eb";
+});
+usdInput.addEventListener("input", () => {
+  usdInput.style.borderColor = parseFloat(usdInput.value) < 1 ? "red" : "#2563eb";
 });
 
-usdInput.addEventListener("input", () => {
-  if (parseFloat(usdInput.value) < 1) {
-    usdInput.style.borderColor = "red";
-  } else {
-    usdInput.style.borderColor = "#2563eb";
-  }
+// ===== SUBMIT FORM =====
+document.addEventListener("DOMContentLoaded", () => {
+  const topupForm = document.getElementById("topupForm");
+
+  topupForm.addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const topName = document.getElementById("topName");
+    const topEmail = document.getElementById("topEmail");
+    const topSelectedOption = document.getElementById("topSelectedOption");
+    const topAccount = document.getElementById("topAccount");
+    const topUsd = document.getElementById("topUsd");
+    const topIdr = document.getElementById("topIdr");
+
+    if (!topName.value.trim()) return showToast("Nama lengkap wajib diisi.", "warning");
+    if (!topEmail.value.trim() || !/\S+@\S+\.\S+/.test(topEmail.value)) return showToast("Masukkan email PayPal yang valid.", "warning");
+    if (!topSelectedOption.value.trim()) return showToast("Pilih kategori & bank/ewallet dulu.", "warning");
+    if (!topAccount.value.trim()) return showToast("Nomor rekening / akun e-wallet wajib diisi.", "warning");
+    if (!topUsd.value.trim() || isNaN(topUsd.value) || parseFloat(topUsd.value) <= 0) return showToast("Nominal USD harus lebih dari 0.", "warning");
+    if (!topIdr.value.trim()) return showToast("Konversi IDR tidak valid.", "warning");
+
+    const message = `
+Topup Saldo PayPal
+Nama: ${topName.value}
+Email PayPal: ${topEmail.value}
+Kategori: ${topSelectedOption.value}
+No Rekening/E-Wallet: ${topAccount.value}
+Nominal USD: ${topUsd.value}
+Nominal IDR: ${topIdr.value}
+    `.trim();
+
+    window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`, "_blank");
+  });
 });
 
 // ===== POPUP KATEGORI =====
-const selectedOption = document.getElementById("selectedOption");
-const popup = document.getElementById("categoryPopup");
-const closePopup = document.getElementById("closePopup");
-const bankList = document.getElementById("bankList");
-const ewalletList = document.getElementById("ewalletList");
+const selectedOption = document.getElementById("topSelectedOption");
+const popup = document.getElementById("topupCategoryPopup");
+const closePopup = document.getElementById("topupClosePopup");
+const bankList = document.getElementById("topupBankList");
+const ewalletList = document.getElementById("topupEwalletList");
 
 selectedOption.addEventListener("click", () => {
-  popup.style.display = "flex"; // tampilkan popup
+  popup.style.display = "flex";
   bankList.style.display = "none";
   ewalletList.style.display = "none";
 });
-
 closePopup.addEventListener("click", () => {
   popup.style.display = "none";
 });
-
-// Pilih kategori
 document.querySelectorAll(".grid-options button[data-category]").forEach(btn => {
   btn.addEventListener("click", () => {
     if (btn.dataset.category === "Bank Lokal") {
@@ -888,79 +889,9 @@ document.querySelectorAll(".grid-options button[data-category]").forEach(btn => 
     }
   });
 });
-
-// Pilih bank atau ewallet
-document.querySelectorAll("#bankList button, #ewalletList button").forEach(btn => {
+document.querySelectorAll("#topupBankList button, #topupEwalletList button").forEach(btn => {
   btn.addEventListener("click", () => {
     selectedOption.value = btn.textContent;
     popup.style.display = "none";
-  });
-});
-
-// ===== KIRIM FORM =====
-document.addEventListener("DOMContentLoaded", () => {
-  const convertForm = document.getElementById("convertForm");
-
-  convertForm.addEventListener("submit", function (e) {
-    e.preventDefault(); // cegah auto-submit
-    console.log("👉 Submit ditekan");
-
-    const convName = document.getElementById("convName");
-    const convEmail = document.getElementById("convEmail");
-    const selectedOption = document.getElementById("selectedOption");
-    const convAccount = document.getElementById("convAccount");
-    const convUsd = document.getElementById("convUsd");
-    const convIdr = document.getElementById("convIdr");
-
-    // Validasi
-    if (!convName.value.trim()) {
-      showToast("Nama lengkap wajib diisi.", "warning");
-      console.log("❌ Nama kosong");
-      return;
-    }
-
-    if (!convEmail.value.trim() || !/\S+@\S+\.\S+/.test(convEmail.value)) {
-      showToast("Masukkan email PayPal yang valid.", "warning");
-      console.log("❌ Email tidak valid");
-      return;
-    }
-
-    if (!selectedOption.value.trim()) {
-      showToast("Pilih kategori & bank/ewallet dulu.", "warning");
-      console.log("❌ Kategori belum dipilih");
-      return;
-    }
-
-    if (!convAccount.value.trim()) {
-      showToast("Nomor rekening / akun e-wallet wajib diisi.", "warning");
-      console.log("❌ Rekening kosong");
-      return;
-    }
-
-    if (!convUsd.value.trim() || isNaN(convUsd.value) || parseFloat(convUsd.value) <= 0) {
-      showToast("Nominal USD harus angka lebih dari 0.", "warning");
-      console.log("❌ Nominal USD tidak valid");
-      return;
-    }
-
-    if (!convIdr.value.trim()) {
-      showToast("Konversi IDR tidak valid.", "warning");
-      console.log("❌ Konversi IDR kosong");
-      return;
-    }
-
-    // ✅ Semua valid → kirim WA
-    const message = `
-Convert Saldo PayPal
-Nama: ${convName.value}
-Email PayPal: ${convEmail.value}
-Kategori: ${selectedOption.value}
-No Rekening/E-Wallet: ${convAccount.value}
-Nominal USD: ${convUsd.value}
-Nominal IDR: ${convIdr.value}
-    `.trim();
-
-    console.log("✅ Semua valid, kirim ke WA");
-    window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`, "_blank");
   });
 });</script></body></html>
