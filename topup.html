@@ -1,11 +1,10 @@
 <!doctype html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Xkay Store - Topup</title>
-  <!--<link rel="stylesheet" href="style.css"/>-->
-<style type="text/css" id="dcoder_stylesheet">/* Reset */
+<html lang="id"> 
+ <head> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <title>Xkay Store - Topup Saldo</title> <!--<link rel="stylesheet" href="style.css"></link>--> 
+ <style type="text/css" id="dcoder_stylesheet">/* Reset */
 * {
   margin: 0;
   padding: 0;
@@ -689,95 +688,79 @@ body.dark .popup-content {
   background: #dc2626;
   color: white;
   cursor: pointer;
-}</style></head>
-<body>
-  <!-- Navbar -->
-  <nav class="navbar">
-    <div class="navbar-left">
-      <button id="sidebarToggle" class="icon-btn">☰</button>
-      <div class="logo">🌐</div>
-      <span class="title">Xkay Store</span>
-    </div>
-    <div class="navbar-right">
-      <a href="index.html" class="icon-btn" title="Home">🏠</a>
-      <a href="convert.html" class="icon-btn" title="Convert">💱</a>
-      <button id="darkModeToggle" class="icon-btn">🌙</button>
-    </div>
-  </nav>
-
-  <!-- Sidebar -->
-  <aside id="sidebar" class="sidebar">
-    <div class="sidebar-header">
-      <h2>Menu</h2>
-      <div class="sidebar-actions">
-        <button id="collapseSidebar" class="icon-btn">⬅️</button>
-        <button id="closeSidebar" class="icon-btn">❌</button>
-      </div>
-    </div>
-    <ul>
-      <li><a href="index.html"><span class="icon">🏠</span><span class="text">Home</span><span class="tooltip">Home</span></a></li>
-      <li><a href="convert.html"><span class="icon">💱</span><span class="text">Convert</span><span class="tooltip">Convert</span></a></li>
-      <li><a class="active" href="topup.html"><span class="icon">💳</span><span class="text">Topup</span><span class="tooltip">Topup</span></a></li>
-      <li><a href="#"><span class="icon">ℹ️</span><span class="text">Tentang Kami</span><span class="tooltip">Tentang Kami</span></a></li>
-      <li><a href="#"><span class="icon">📞</span><span class="text">Kontak</span><span class="tooltip">Kontak</span></a></li>
-    </ul>
-  </aside>
-  <div id="overlay" class="overlay"></div>
-
-  <!-- Header -->
-  <header class="header">
-    <h1>Topup Saldo PayPal</h1>
-    <p>Kurs Tetap Topup: <strong>Rp17.000 / USD</strong></p>
-  </header>
-
-  <!-- Form -->
-  <main class="content">
-    <section class="form-card">
-      <h2 style="text-align:center; margin-bottom:15px;">Form Topup</h2>
-
-      <form id="topupForm">
-        <div class="form-group">
-          <label for="topName">Nama Lengkap</label>
-          <input type="text" id="topName" placeholder="Masukkan nama lengkap">
-        </div>
-
-        <div class="form-group">
-          <label for="topEmail">Email PayPal</label>
-          <input type="email" id="topEmail" placeholder="Masukkan email PayPal">
-        </div>
-
-        <div class="form-group">
-          <label for="topSelected">Kategori &amp; Bank/E-Wallet</label>
-          <input type="text" id="topSelected" placeholder="Contoh: Bank BCA / OVO">
-        </div>
-
-        <div class="form-group">
-          <label for="topAccount">No Rekening / E-Wallet</label>
-          <input type="text" id="topAccount" placeholder="Masukkan no rekening / e-wallet">
-        </div>
-
-        <div class="form-group">
-          <label for="topUsd">Nominal (USD)</label>
-          <input type="number" id="topUsd" placeholder="Masukkan nominal USD" min="1" step="0.01">
-        </div>
-
-        <div class="form-group">
-          <label for="topIdr">Nominal (IDR)</label>
-          <input type="text" id="topIdr" readonly>
-          <div class="rate-box" id="topup-info">Kurs Real-Time (info): memuat…</div>
-        </div>
-
-        <button type="submit" class="btn-submit">Simpan Transaksi</button>
-      </form>
-    </section>
-  </main>
-
-  <footer class="footer">© 2025 Xkay Store. All Rights Reserved.</footer>
-  <div id="toast" class="toast"></div>
-
-  <!-- Shared scripts -->
-  <!--<script src="script.js"></script>-->
-  <script type="module" src="supabase.js"></script>
+}</style></head> 
+ <body> <!-- Navbar --> 
+  <nav class="navbar"> 
+   <div class="navbar-left"> <button id="sidebarToggle" class="icon-btn">☰</button> 
+    <div class="logo">
+      🌐 
+    </div> <span class="title">Xkay Store</span> 
+   </div> 
+   <div class="navbar-right"> <button id="darkModeToggle" class="icon-btn">🌙</button> 
+   </div> 
+  </nav> <!-- Sidebar --> 
+  <aside id="sidebar" class="sidebar"> 
+   <div class="sidebar-header"> 
+    <h2>Menu</h2> 
+    <div class="sidebar-actions"> <button id="collapseSidebar" class="icon-btn">⬅️</button> <button id="closeSidebar" class="icon-btn">❌</button> 
+    </div> 
+   </div> 
+   <ul> 
+    <li><a href="index.html"><span class="icon">🏠</span><span class="text">Home</span><span class="tooltip">Home</span></a></li> 
+    <li><a href="convert.html"><span class="icon">💱</span><span class="text">Convert</span><span class="tooltip">Convert</span></a></li> 
+    <li><a href="topup.html" class="active"><span class="icon">💳</span><span class="text">Topup</span><span class="tooltip">Topup</span></a></li> 
+    <li><a href="about.html"><span class="icon">ℹ️</span><span class="text">Tentang Kami</span><span class="tooltip">Tentang Kami</span></a></li> 
+    <li><a href="contact.html"><span class="icon">📞</span><span class="text">Kontak</span><span class="tooltip">Kontak</span></a></li> 
+   </ul> 
+  </aside> <!-- Overlay --> 
+  <div id="overlay" class="overlay"></div> <!-- Header --> 
+  <header class="header"> 
+   <h1>Topup Saldo PayPal</h1> 
+   <p>Kurs Tetap Topup: <strong>Rp17.000 / USD</strong></p> 
+  </header> <!-- Content --> 
+  <main class="content"> 
+   <section class="form-card"> 
+    <h2 style="text-align:center; margin-bottom:15px;">Form Topup</h2> 
+    <form id="topupForm"> 
+     <div class="form-group"> <label for="topName">Nama Lengkap</label> 
+      <input type="text" id="topName" placeholder="Masukkan nama lengkap"> 
+     </div> 
+     <div class="form-group"> <label for="topEmail">Email PayPal</label> 
+      <input type="email" id="topEmail" placeholder="Masukkan email PayPal"> 
+     </div> 
+     <div class="form-group"> <label for="topSelectedOption">Kategori &amp; Bank/E-Wallet</label> 
+      <input type="text" id="topSelectedOption" placeholder="Klik untuk memilih" readonly> 
+     </div> 
+     <div class="form-group"> <label for="topAccount">No Rekening / E-Wallet</label> 
+      <input type="text" id="topAccount" placeholder="Masukkan no rekening/ewallet"> 
+     </div> 
+     <div class="form-group"> <label for="topUsd">Nominal (USD)</label> 
+      <input type="number" id="topUsd" placeholder="Masukkan nominal USD"> 
+     </div> 
+     <div class="form-group"> <label for="topIdr">Nominal (IDR)</label> 
+      <input type="text" id="topIdr" readonly> 
+      <p id="topup-info" class="rate-box"></p> 
+     </div> <button type="submit" id="topupSubmitBtn" class="btn-submit">Kirim ke Admin</button> 
+    </form> 
+   </section> 
+  </main> <!-- Footer --> 
+  <footer class="footer">
+    © 2025 Xkay Store. All Rights Reserved. 
+  </footer> <!--<script src="script.js"></script> 
+  <script src="topup.js"></script> --> 
+  <div id="toast" class="toast"></div> <!-- Popup Modal --> 
+  <div id="topupCategoryPopup" class="popup"> 
+   <div class="popup-content"> 
+    <h3>Pilih Kategori</h3> 
+    <div class="grid-options"> <button data-category="Bank Lokal">🏦 Bank Lokal</button> <button data-category="E-Wallet">💳 E-Wallet</button> 
+    </div> 
+    <div id="topupBankList" class="grid-options" style="display:none;"> <button>BRI</button> <button>BCA</button> <button>BNI</button> <button>Mandiri</button> 
+    </div> 
+    <div id="topupEwalletList" class="grid-options" style="display:none;"> <button>OVO</button> <button>DANA</button> <button>GoPay</button> <button>ShopeePay</button> 
+    </div> <button class="btn-close" id="topupClosePopup">Tutup</button> 
+   </div> 
+  </div>
+   <script type="module" src="supabase.js"></script>
 
   <!-- Page logic -->
   <script type="module">
@@ -854,7 +837,7 @@ body.dark .popup-content {
       }
     });
   </script>
-
+ 
 <script type="text/javascript" id="dcoder_script">// Sidebar toggle
 const sidebar = document.getElementById("sidebar");
 const overlay = document.getElementById("overlay");

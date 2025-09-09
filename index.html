@@ -1,11 +1,10 @@
 <!doctype html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Xkay Store - Halaman Utama</title>
-  <!--<link rel="stylesheet" href="style.css"/>-->
-<style type="text/css" id="dcoder_stylesheet">/* Reset */
+<html lang="id"> 
+ <head> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <title>Xkay Store - Halaman Utama</title> <!--<link rel="stylesheet" href="style.css"></link>--> 
+ <style type="text/css" id="dcoder_stylesheet">/* Reset */
 * {
   margin: 0;
   padding: 0;
@@ -497,59 +496,42 @@ body.dark #searchInput {
   .sidebar.collapsed ul li a .tooltip {
     display: block;
   }
-}</style></head>
-<body>
-  <!-- Navbar -->
-  <nav class="navbar">
-    <div class="navbar-left">
-      <button id="sidebarToggle" class="icon-btn">☰</button>
-      <div class="logo">🌐</div>
-      <span class="title">Xkay Store</span>
-    </div>
-    <div class="navbar-right">
-      <a href="convert.html" class="icon-btn" title="Convert">💱</a>
-      <a href="topup.html" class="icon-btn" title="Topup">💳</a>
-      <button id="darkModeToggle" class="icon-btn">🌙</button>
-    </div>
-  </nav>
-
-  <!-- Sidebar -->
-  <aside id="sidebar" class="sidebar">
-    <div class="sidebar-header">
-      <h2>Menu</h2>
-      <div class="sidebar-actions">
-        <button id="collapseSidebar" class="icon-btn">⬅️</button>
-        <button id="closeSidebar" class="icon-btn">❌</button>
-      </div>
-    </div>
-    <ul>
-      <li><a class="active" href="index.html"><span class="icon">🏠</span><span class="text">Home</span><span class="tooltip">Home</span></a></li>
-      <li><a href="convert.html"><span class="icon">💱</span><span class="text">Convert</span><span class="tooltip">Convert</span></a></li>
-      <li><a href="topup.html"><span class="icon">💳</span><span class="text">Topup</span><span class="tooltip">Topup</span></a></li>
-      <li><a href="#"><span class="icon">ℹ️</span><span class="text">Tentang Kami</span><span class="tooltip">Tentang Kami</span></a></li>
-      <li><a href="#"><span class="icon">📞</span><span class="text">Kontak</span><span class="tooltip">Kontak</span></a></li>
-    </ul>
-  </aside>
-
-  <!-- Overlay -->
-  <div id="overlay" class="overlay"></div>
-
-  <!-- Header -->
-  <header class="header">
-    <h1>Selamat Datang di Xkay Store</h1>
-    <p>Layanan convert &amp; topup saldo PayPal terpercaya</p>
-  </header>
-
-  <!-- Body -->
-  <main class="content">
-    <section class="intro">
-      <h2>Kenapa memilih kami?</h2>
-      <p>
-        Kami menyediakan layanan <strong>Convert</strong> saldo PayPal dengan kurs tetap Rp12.000/USD
-        dan <strong>Topup</strong> dengan kurs tetap Rp17.000/USD. Data transaksi terbaru tampil otomatis dari database.
-      </p>
-    </section>
-
+}</style></head> 
+ <body> <!-- Navbar --> 
+  <nav class="navbar"> 
+   <div class="navbar-left"> <button id="sidebarToggle" class="icon-btn">☰</button> 
+    <div class="logo">
+      🌐 
+    </div> <span class="title">Xkay Store</span> 
+   </div> 
+   <div class="navbar-right"> <button id="darkModeToggle" class="icon-btn">🌙</button> 
+   </div> 
+  </nav> <!-- Sidebar --> 
+  <aside id="sidebar" class="sidebar"> 
+   <div class="sidebar-header"> 
+    <h2>Menu</h2> 
+    <div class="sidebar-actions"> <button id="collapseSidebar" class="icon-btn">⬅️</button> <button id="closeSidebar" class="icon-btn">❌</button> 
+    </div> 
+   </div> 
+   <ul> 
+    <li><a href="index.html" class="active"><span class="icon">🏠</span><span class="text">Home</span><span class="tooltip">Home</span></a></li> 
+    <li><a href="convert.html"><span class="icon">💱</span><span class="text">Convert</span><span class="tooltip">Convert</span></a></li> 
+    <li><a href="topup.html"><span class="icon">💳</span><span class="text">Topup</span><span class="tooltip">Topup</span></a></li> 
+    <li><a href="about.html"><span class="icon">ℹ️</span><span class="text">Tentang Kami</span><span class="tooltip">Tentang Kami</span></a></li> 
+    <li><a href="contact.html"><span class="icon">📞</span><span class="text">Kontak</span><span class="tooltip">Kontak</span></a></li> 
+   </ul> 
+  </aside> <!-- Overlay --> 
+  <div id="overlay" class="overlay"></div> <!-- Header --> 
+  <header class="header"> 
+   <h1>Selamat Datang di Xkay Store</h1> 
+   <p>Layanan convert &amp; topup saldo PayPal terpercaya</p> 
+  </header> <!-- Body --> 
+  <main class="content"> 
+   <section class="intro form-card"> 
+    <h2>Kenapa memilih kami?</h2> 
+    <p> Xkay Store menyediakan layanan <strong>Convert</strong> saldo PayPal dengan kurs tetap Rp12.000/USD dan <strong>Topup</strong> saldo PayPal dengan kurs tetap Rp17.000/USD, serta opsi kurs real-time sesuai pasar. </p> 
+    <p>Kami berkomitmen memberikan layanan cepat, aman, dan terpercaya 🚀</p> 
+   </section>
     <!-- Tabel riwayat transaksi -->
     <section class="history">
       <h2>Riwayat Transaksi</h2>
@@ -557,10 +539,10 @@ body.dark #searchInput {
       <table id="transactionTable">
         <thead>
         <tr>
-          <th data-col="0">Waktu ⬍</th>
-          <th data-col="1">Nama Lengkap ⬍</th>
-          <th data-col="2">Jumlah (USD) ⬍</th>
-          <th data-col="3">Jumlah (IDR) ⬍</th>
+          <th data-col="0">Waktu</th>
+          <th data-col="1">Nama Lengkap</th>
+          <th data-col="2">Jumlah (USD)</th>
+          <th data-col="3">Jumlah (IDR)</th>
         </tr>
         </thead>
         <tbody>
@@ -568,14 +550,11 @@ body.dark #searchInput {
         </tbody>
       </table>
     </section>
-  </main>
-
-  <!-- Footer -->
-  <footer class="footer">© 2025 Xkay Store. All Rights Reserved.</footer>
-
-  <!-- Shared scripts -->
-  <!--<script src="script.js"></script>-->
-  <script type="module" src="supabase.js"></script>
+  </main> <!-- Footer --> 
+  <footer class="footer">
+    © 2025 Xkay Store. All Rights Reserved. 
+  </footer> <!--<script src="script.js"></script>-->
+   <script type="module" src="supabase.js"></script>
 
   <!-- Load transactions -->
   <script type="module">
@@ -596,8 +575,7 @@ body.dark #searchInput {
         tbody.innerHTML = `<tr><td colspan="4">Gagal memuat data ❌</td></tr>`;
         return;
       }
-
-      tbody.innerHTML = "";
+       tbody.innerHTML = "";
       data.forEach(tx => {
         const tr = document.createElement("tr");
         tr.classList.add("show");
@@ -613,7 +591,7 @@ body.dark #searchInput {
 
     document.addEventListener("DOMContentLoaded", loadTransactions);
   </script>
-
+ 
 <script type="text/javascript" id="dcoder_script">// Toggle sidebar
 const sidebar = document.getElementById("sidebar");
 const overlay = document.getElementById("overlay");
