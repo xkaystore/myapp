@@ -722,41 +722,31 @@ body.dark .popup-content {
   <main class="content"> 
    <section class="form-card"> 
     <h2 style="text-align:center; margin-bottom:15px;">Form Convert</h2> <!-- Kurs Info --> 
-<form id="convertForm">
-  <div class="form-group">
-    <label for="convName">Nama Lengkap</label>
-    <input type="text" id="convName" placeholder="Masukkan nama lengkap">
-  </div>
-
-  <div class="form-group">
-    <label for="convEmail">Email PayPal</label>
-    <input type="email" id="convEmail" placeholder="Masukkan email PayPal">
-  </div>
-
-  <div class="form-group">
-    <label for="selectedOption">Kategori &amp; Bank/E-Wallet</label>
-    <input type="text" id="selectedOption" placeholder="Klik untuk memilih" readonly>
-  </div>
-
-  <div class="form-group">
-    <label for="convAccount">No Rekening / E-Wallet</label>
-    <input type="text" id="convAccount" placeholder="Masukkan no rekening/ewallet">
-  </div>
-
-  <div class="form-group">
-    <label for="convUsd">Nominal (USD)</label>
-    <input type="number" id="convUsd" placeholder="Masukkan nominal USD">
-  </div>
-
-  <div class="form-group">
-    <label for="convIdr">Nominal (IDR)</label>
-    <input type="text" id="convIdr" readonly>
-  </div>
-
-  <!-- 🔹 tombol harus submit -->
-  <button type="submit" id="submitBtn">Kirim ke Admin</button>
-</form>
-
+    <form id="convertForm"> 
+     <div class="form-group"> <label for="convName">Nama Lengkap</label> 
+      <input type="text" id="convName" placeholder="Masukkan nama lengkap"> 
+     </div> 
+     <div class="form-group"> <label for="convEmail">Email PayPal</label> 
+      <input type="email" id="convEmail" placeholder="Masukkan email PayPal"> 
+     </div> 
+     <div class="form-group"> <label for="selectedOption">Kategori &amp; Bank/E-Wallet</label> 
+      <input type="text" id="selectedOption" placeholder="Klik untuk memilih" readonly> 
+     </div> 
+     <div class="form-group"> <label for="convAccount">No Rekening / E-Wallet</label> 
+      <input type="text" id="convAccount" placeholder="Masukkan no rekening/ewallet"> 
+     </div> 
+     <div class="form-group"> <label for="convUsd">Nominal (USD)</label> 
+      <input type="number" id="convUsd" placeholder="Masukkan nominal USD"> 
+     </div> 
+<div class="form-group">
+  <label for="convIdr">Nominal (IDR)</label>
+  <input type="text" id="convIdr" readonly>
+  <!-- Kurs info -->
+  <p id="convert-info" class="rate-box"></p>
+</div>
+ <!-- tombol harus submit -->
+<button type="submit" id="submitBtn" class="btn-submit">Kirim ke Admin</button>
+    </form> 
    </section> 
   </main> <!-- Footer --> 
   <footer class="footer">
@@ -764,7 +754,33 @@ body.dark .popup-content {
   </footer> 
   <script src="script.js"></script> 
   <script src="convert.js"></script> 
-  <div id="toast" class="toast"></div> 
+  <div id="toast" class="toast"></div>
+
+<!-- Popup Modal -->
+<div id="categoryPopup" class="popup">
+  <div class="popup-content">
+    <h3>Pilih Kategori</h3>
+    <div class="grid-options">
+      <button data-category="Bank Lokal">🏦 Bank Lokal</button>
+      <button data-category="E-Wallet">💳 E-Wallet</button>
+    </div>
+    <div id="bankList" class="grid-options" style="display:none;">
+      <button>BRI</button>
+      <button>BCA</button>
+      <button>BNI</button>
+      <button>Mandiri</button>
+    </div>
+    <div id="ewalletList" class="grid-options" style="display:none;">
+      <button>OVO</button>
+      <button>DANA</button>
+      <button>GoPay</button>
+      <button>ShopeePay</button>
+    </div>
+    <button class="btn-close" id="closePopup">Tutup</button>
+  </div>
+</div>
+
+
  
 <script type="text/javascript" id="dcoder_script">const CONVERT_RATE = 12000;
 const waNumber = "6285846005280";
@@ -862,6 +878,44 @@ usdInput.addEventListener("input", () => {
   }
 });
 
+// ===== POPUP KATEGORI =====
+const selectedOption = document.getElementById("selectedOption");
+const popup = document.getElementById("categoryPopup");
+const closePopup = document.getElementById("closePopup");
+const bankList = document.getElementById("bankList");
+const ewalletList = document.getElementById("ewalletList");
+
+selectedOption.addEventListener("click", () => {
+  popup.style.display = "flex"; // tampilkan popup
+  bankList.style.display = "none";
+  ewalletList.style.display = "none";
+});
+
+closePopup.addEventListener("click", () => {
+  popup.style.display = "none";
+});
+
+// Pilih kategori
+document.querySelectorAll(".grid-options button[data-category]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    if (btn.dataset.category === "Bank Lokal") {
+      bankList.style.display = "grid";
+      ewalletList.style.display = "none";
+    } else {
+      ewalletList.style.display = "grid";
+      bankList.style.display = "none";
+    }
+  });
+});
+
+// Pilih bank atau ewallet
+document.querySelectorAll("#bankList button, #ewalletList button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    selectedOption.value = btn.textContent;
+    popup.style.display = "none";
+  });
+});
+
 // ===== KIRIM FORM =====
 document.addEventListener("DOMContentLoaded", () => {
   const convertForm = document.getElementById("convertForm");
@@ -928,5 +982,4 @@ Nominal IDR: ${convIdr.value}
     console.log("✅ Semua valid, kirim ke WA");
     window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`, "_blank");
   });
-});
-</script></body></html>
+});</script></body></html>
